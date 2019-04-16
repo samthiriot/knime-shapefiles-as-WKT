@@ -12,4 +12,7 @@ These nodes where developed for the [European Institute for Energy Research (EIF
 They are notably used for Generation of Synthetic Populations (GoSP), in order to read spatial populations. 
 These nodes are released as GPL v3; see the [Free Software Foundation presentation](https://www.gnu.org/licenses/quick-guide-gplv3.en.html) if you're not familiar with open-source licenses.
 
+## Development environment
+
+In order to create a development environment, follow the [instructions to create a KNIME development environment](https://github.com/knime/knime-sdk-setup).
 
