@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shp-wkt-writer-icon.png" 
+		type="Sink" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+		
+    <name>Write WKT as a Shapefile</name>
+    
+    <shortDescription>
+        Stores the WKT data as a shapefile.
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        Creates a <a href="https://en.wikipedia.org/wiki/Shapefile">shapefile in ESRI format</a>, 
+        and stores the geometries found in the column "the_geom" expected to be in <a href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">WKT format</a>.
+        
+        Only one type of geometry (point, line, polyline...) can be stored per shapefile (this is a limitation of the shapefile format).
+        This type will be detected automatically from the content of the input table. 
+        If several types are present, the writing will fail.
+        
+        Note that other attributes are not (yet) written in the file.
+        </intro>
+   
+        <option name="filename">File to create or erase</option>
+        
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="WKT data">Table with a the_geom column</inPort>
+       
+    </ports>    
+   
+</knimeNode>

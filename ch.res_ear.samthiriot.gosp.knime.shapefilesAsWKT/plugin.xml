@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?eclipse version="3.0"?><plugin>
+   <extension point="org.knime.workbench.repository.categories">
+      <category description="Manipulation of shapefiles as WKT text" icon="icons/shapefilesAsWKT.png" level-id="spatialAsWKT" locked="false" name="Shapefiles as WKT" path="/community/">
+      </category>
+   </extension>
+
+   <extension point="org.knime.workbench.repository.nodes">
+      <node category-path="/community/spatialAsWKT" deprecated="false" factory-class="ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT.readFromShapefile.ReadShapefileAsWKTNodeFactory" id="ch.res_ear.samthiriot.gosp.knime.shapefilesKML.readFromShapefile"/>
+   <node
+         category-path="/community/spatialAsWKT"
+         deprecated="false"
+         factory-class="ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT.writeToShapefile.WriteWKTAsShapefileNodeFactory"
+         id="ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT.writeToShapefile.WriteWKTAsShapefileNodeFactory"/>
+</extension>
+   
+</plugin>
