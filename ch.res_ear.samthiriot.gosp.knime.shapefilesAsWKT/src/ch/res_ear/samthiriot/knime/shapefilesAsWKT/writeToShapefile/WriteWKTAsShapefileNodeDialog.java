@@ -1,4 +1,4 @@
-package ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT.writeToShapefile;
+package ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToShapefile;
 
 import javax.swing.JFileChooser;
 

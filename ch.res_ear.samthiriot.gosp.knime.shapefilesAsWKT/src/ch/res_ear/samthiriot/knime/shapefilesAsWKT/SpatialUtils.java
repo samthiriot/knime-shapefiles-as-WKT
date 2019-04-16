@@ -1,4 +1,4 @@
-package ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT;
+package ch.res_ear.samthiriot.knime.shapefilesAsWKT;
 
 import java.io.File;
 import java.io.IOException;

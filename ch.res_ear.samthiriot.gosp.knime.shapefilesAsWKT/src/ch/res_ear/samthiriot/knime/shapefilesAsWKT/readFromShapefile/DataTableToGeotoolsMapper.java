@@ -1,4 +1,4 @@
-package ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT.readFromShapefile;
+package ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromShapefile;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +22,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT.SpatialUtils;
+import ch.res_ear.samthiriot.knime.shapefilesAsWKT.SpatialUtils;
 
 
 public class DataTableToGeotoolsMapper {

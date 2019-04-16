@@ -1,4 +1,4 @@
-package ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT.readFromShapefile;
+package ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromShapefile;
 
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;

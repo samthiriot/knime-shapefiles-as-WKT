@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: KNIME Shapefile KML manipulation
-Bundle-SymbolicName: ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT;singleton:=true
+Bundle-Name: KNIME Shapefile WKT manipulation
+Bundle-SymbolicName: ch.res_ear.samthiriot.knime.shapefilesAsWKT;singleton:=true
 Bundle-Version: 1.0.0
 Bundle-ClassPath: readshapefileaskml.jar,
  lib/animal-sniffer-annotations-1.17.jar,
@@ -111,12 +111,12 @@ Bundle-ClassPath: readshapefileaskml.jar,
  lib/uom-lib-common-1.0.2.jar,
  lib/uom-se-1.0.8.jar,
  lib/xml-commons-resolver-1.2.jar
-Bundle-Activator: ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT.ShapefileAsWKTNodePlugin
+Bundle-Activator: ch.res_ear.samthiriot.knime.shapefilesAsWKT.ShapefileAsWKTNodePlugin
 Bundle-Vendor: EIFER
 Require-Bundle: org.eclipse.core.runtime,
  org.knime.workbench.core,
  org.knime.workbench.repository,
  org.knime.base
 Bundle-ActivationPolicy: lazy
-Export-Package: ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT.readFromShapefile
+Export-Package: ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromShapefile
 

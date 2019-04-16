@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT.features"
+      id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.features"
       label="KNIME-Shapefiles as WKT: manipulate spatial features in Well-known Text format"
       version="1.0.0.qualifier"
       provider-name="Samuel Thiriot">
