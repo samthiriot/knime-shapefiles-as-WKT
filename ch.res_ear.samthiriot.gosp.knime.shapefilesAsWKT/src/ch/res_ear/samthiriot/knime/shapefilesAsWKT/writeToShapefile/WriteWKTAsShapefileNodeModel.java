@@ -1,4 +1,4 @@
-package ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT.writeToShapefile;
+package ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToShapefile;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +20,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT.SpatialUtils;
+import ch.res_ear.samthiriot.knime.shapefilesAsWKT.SpatialUtils;
 
 
 /**

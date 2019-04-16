@@ -6,12 +6,12 @@
    </extension>
 
    <extension point="org.knime.workbench.repository.nodes">
-      <node category-path="/community/spatialAsWKT" deprecated="false" factory-class="ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT.readFromShapefile.ReadShapefileAsWKTNodeFactory" id="ch.res_ear.samthiriot.gosp.knime.shapefilesKML.readFromShapefile"/>
+      <node category-path="/community/spatialAsWKT" deprecated="false" factory-class="ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromShapefile.ReadShapefileAsWKTNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesKML.readFromShapefile"/>
    <node
          category-path="/community/spatialAsWKT"
          deprecated="false"
-         factory-class="ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT.writeToShapefile.WriteWKTAsShapefileNodeFactory"
-         id="ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT.writeToShapefile.WriteWKTAsShapefileNodeFactory"/>
+         factory-class="ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToShapefile.WriteWKTAsShapefileNodeFactory"
+         id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToShapefile.WriteWKTAsShapefileNodeFactory"/>
 </extension>
    
 </plugin>

@@ -2,7 +2,7 @@
  * $Revision$ $Date$ $Author$
  *
  */
-package ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT;
+package ch.res_ear.samthiriot.knime.shapefilesAsWKT;
 
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;

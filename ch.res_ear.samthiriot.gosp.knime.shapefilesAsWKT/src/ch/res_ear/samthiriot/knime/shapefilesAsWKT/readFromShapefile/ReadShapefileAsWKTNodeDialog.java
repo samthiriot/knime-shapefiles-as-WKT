@@ -1,4 +1,4 @@
-package ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT.readFromShapefile;
+package ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromShapefile;
 
 import java.nio.charset.Charset;
 

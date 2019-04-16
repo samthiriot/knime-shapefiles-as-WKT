@@ -1,4 +1,4 @@
-package ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT.readFromShapefile;
+package ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromShapefile;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +35,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT.SpatialUtils;
+import ch.res_ear.samthiriot.knime.shapefilesAsWKT.SpatialUtils;
 
 
 /**
