@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KNIME Shapefile WKT manipulation
 Bundle-SymbolicName: ch.res_ear.samthiriot.knime.shapefilesAsWKT;singleton:=true
-Bundle-Version: 1.1.0
+Bundle-Version: 1.1.1
 Bundle-ClassPath: readshapefileaskml.jar,
  lib/animal-sniffer-annotations-1.17.jar,
  lib/checker-qual-2.5.2.jar,
@@ -118,5 +118,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.knime.workbench.repository,
  org.knime.base
 Bundle-ActivationPolicy: lazy
-Export-Package: ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromShapefile
+Export-Package: ch.res_ear.samthiriot.knime.dialogs,
+ ch.res_ear.samthiriot.knime.shapefilesAsWKT,
+ ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromShapefile
 
