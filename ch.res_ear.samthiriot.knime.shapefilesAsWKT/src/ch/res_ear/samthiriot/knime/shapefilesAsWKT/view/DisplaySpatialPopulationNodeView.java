@@ -13,7 +13,6 @@ import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.styling.SLD;
 import org.geotools.styling.Style;
 import org.geotools.swing.JMapPane;
-import org.geotools.swing.tool.PanTool;
 import org.geotools.swing.tool.ScrollWheelTool;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeView;
@@ -74,7 +73,6 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
     @Override
     protected void modelChanged() {
 
-        // TODO retrieve the new model from your nodemodel and 
         // update the view.
         DisplaySpatialPopulationNodeModel nodeModel = 
             (DisplaySpatialPopulationNodeModel)getNodeModel();
@@ -94,10 +92,8 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
     @Override
     protected void onClose() {
     
-        // TODO things to do when closing the view
+    	content.dispose();
     	
-
-
 
     }
 
@@ -116,12 +112,8 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
         }
         
         try {
-	        // TODO things to do when opening the view
-	        
-        	// TODO remove ? content.removeLayer(layer)
         	
-        	
-        	System.out.println("layers:" + nodeModel.datastore1.getNames());
+        	//System.out.println("layers:" + nodeModel.datastore1.getNames());
         	
         	// add layer 1
     		SimpleFeatureSource shapefileSource = nodeModel.datastore1.getFeatureSource(
@@ -131,7 +123,7 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
             content.addLayer(shpLayer);
             mapPane.setDisplayArea(content.getMaxBounds());
 
-        	System.out.println("added layer 1");
+        	//System.out.println("added layer 1");
         	
             // add layer 2
             if (nodeModel.datastore2 != null) {
@@ -146,8 +138,8 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
           
 
         } catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw new RuntimeException("error when displaying the map: "+e.getMessage(), e);
 		}    
     }
 
