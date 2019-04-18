@@ -18,6 +18,12 @@
          factory-class="ch.res_ear.samthiriot.knime.shapefilesAsWKT.view.DisplaySpatialPopulationNodeFactory"
          id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.view.DisplaySpatialPopulationNodeFactory">
    </node>
+   <node
+         category-path="/community/spatialAsWKT"
+         deprecated="false"
+         factory-class="ch.res_ear.samthiriot.knime.shapefilesAsWKT.reproject.ReprojectNodeFactory"
+         id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.reproject.ReprojectNodeFactory">
+   </node>
 </extension>
    
 </plugin>
