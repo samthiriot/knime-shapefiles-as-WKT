@@ -524,7 +524,8 @@ public class SpatialUtils {
 	 * @param geom
 	 * @return
 	 */
-	public static FeatureIterator<SimpleFeature> findEntitiesWithin(SimpleFeatureSource source, Geometry geom) {
+	public static FeatureIterator<SimpleFeature> findEntitiesWithin(
+			SimpleFeatureSource source, Geometry geom) {
 		
 		FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2( GeoTools.getDefaultHints() );
 		Filter filter = ff.within(ff.property( BasicFeatureTypes.GEOMETRY_ATTRIBUTE_NAME), ff.literal( geom ));

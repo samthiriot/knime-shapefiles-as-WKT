@@ -193,6 +193,7 @@ public class ReadShapefileAsWKTNodeModel extends NodeModel {
 		}
 		
 		itFeature.close();
+		datastore.dispose();
 		
         // once we are done, we close the container and return its table
         container.close();
