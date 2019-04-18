@@ -2,7 +2,7 @@
 <feature
       id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.features"
       label="KNIME-Shapefiles as WKT: manipulate spatial features in Well-known Text format"
-      version="1.0.0.qualifier"
+      version="1.1.0.qualifier"
       provider-name="Samuel Thiriot">
 
    <description>
@@ -696,11 +696,10 @@ Public License instead of this License.  But first, please read
       <import plugin="org.knime.workbench.core"/>
       <import plugin="org.knime.workbench.repository"/>
       <import plugin="org.knime.base"/>
-      <import plugin="ch.res_ear.samthiriot.gosp" version="1.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
-         id="ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT"
+         id="ch.res_ear.samthiriot.knime.shapefilesAsWKT"
          download-size="0"
          install-size="0"
          version="0.0.0"/>
