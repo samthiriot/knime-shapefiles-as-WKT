@@ -50,6 +50,8 @@ public class DataTableToGeotoolsMapper {
 	protected final NodeLogger logger;
 	protected final CoordinateReferenceSystem coordinateReferenceSystem;
 
+	protected MissingCell missingCell = new MissingCell("no data");
+	
 	public DataTableToGeotoolsMapper(
 			AttributeDescriptor gtDesc, 
 			CoordinateReferenceSystem coordinateReferenceSystem, 
@@ -142,6 +144,9 @@ public class DataTableToGeotoolsMapper {
      * @return
      */
 	public DataCell convert(Object gtObject) {
+		
+		if (gtObject == null)
+			return missingCell;
 		
 		switch (gtDetectedType) {
 		case ATTRIBUTE_BOOLEAN:
