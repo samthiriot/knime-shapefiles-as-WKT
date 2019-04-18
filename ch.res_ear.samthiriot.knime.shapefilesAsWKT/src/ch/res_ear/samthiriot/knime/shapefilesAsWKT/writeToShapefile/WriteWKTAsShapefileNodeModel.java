@@ -2,6 +2,9 @@ package ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToShapefile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.InvalidPathException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -18,6 +21,7 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.util.FileUtil;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import ch.res_ear.samthiriot.knime.shapefilesAsWKT.SpatialUtils;
@@ -65,10 +69,18 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
     	    	
     	CoordinateReferenceSystem crsOrig = SpatialUtils.decodeCRS(inputPopulation.getSpec());
     	
-    	String filename = m_file.getStringValue();
-    	
-    	File file = new File(filename);
-
+    	//String filename = m_file.getStringValue();
+    	URL url;
+		try {
+			
+			url = FileUtil.toURL(m_file.getStringValue());
+		} catch (InvalidPathException | MalformedURLException e2) {
+			e2.printStackTrace();
+			throw new InvalidSettingsException("unable to open URL "+m_file.getStringValue()+": "+e2.getMessage());
+		}
+        
+    	File file = FileUtil.getFileFromURL(url);
+        
     	// copy the input population into a datastore
     	exec.setMessage("storing entities");
         DataStore datastore = SpatialUtils.createDataStore(file, true);
@@ -113,13 +125,21 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
     	
     	DataTableSpec specs = inSpecs[0];
 
-    	// check the parameters include a filename
-    	String filename = m_file.getStringValue();
-    	if (filename == null)
+    	if (m_file.getStringValue() == null)
     		throw new IllegalArgumentException("No filename was provided");
-    	File file = new File(filename);
-    	if (!file.canWrite())
-    		throw new IllegalArgumentException("The destination file is not writable");
+    	
+    	// check the parameters include a filename
+    	URL url;
+		try {
+			url = FileUtil.toURL(m_file.getStringValue());
+		} catch (InvalidPathException | MalformedURLException e2) {
+			e2.printStackTrace();
+			throw new InvalidSettingsException("unable to open URL "+m_file.getStringValue()+": "+e2.getMessage());
+		}
+        
+    	//File file = FileUtil.getFileFromURL(url);
+    	//if (!file.canWrite())
+    	//	throw new IllegalArgumentException("The destination file is not writable");
     	
     	// check the input table contains a geometry
     	
