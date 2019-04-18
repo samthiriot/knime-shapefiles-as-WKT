@@ -3,7 +3,9 @@ package ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromShapefile;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,10 +32,11 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.util.CheckUtils;
+import org.knime.core.util.FileUtil;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import ch.res_ear.samthiriot.knime.shapefilesAsWKT.SpatialUtils;
 
@@ -66,27 +69,25 @@ public class ReadShapefileAsWKTNodeModel extends NodeModel {
 
     	
     	// retrieve parameters
-        String filename = m_file.getStringValue();
+        CheckUtils.checkSourceFile(m_file.getStringValue());
+        
+        URL filename;
+		try {
+			filename = FileUtil.toURL(m_file.getStringValue());
+		} catch (InvalidPathException | MalformedURLException e2) {
+			e2.printStackTrace();
+			throw new InvalidSettingsException("unable to open URL "+m_file.getStringValue()+": "+e2.getMessage());
+		}
+        
         if (filename == null)
         	throw new InvalidSettingsException("no file defined");
-        File fileInput = new File(filename);
-        
-        if (!fileInput.exists() || !fileInput.isFile())
-        	throw new InvalidSettingsException("This URL is not a file: "+fileInput);
-        if (!fileInput.canRead())
-        	throw new InvalidSettingsException("This file cannot be read: "+fileInput);
-        
+       
         String charset = m_charset.getStringValue();
 
 
         // open the 
 		Map<String,Object> parameters = new HashMap<>();
-		try {
-			parameters.put("url", fileInput.toURI().toURL());
-		} catch (MalformedURLException e1) {
-			e1.printStackTrace();
-			throw new InvalidSettingsException("Invalid url to open: "+e1.getMessage());
-		}
+		parameters.put("url", filename);
 		DataStore datastore;
 		try {
 	        logger.info("opening as a shapefile: "+filename);
