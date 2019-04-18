@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode icon="./shapefilesAsWKT.png" 
+			type="Other" 
+			xmlns="http://knime.org/node/v2.8" 
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+			
+    <name>Reprojects WKT geometries</name>
+    
+    <shortDescription>
+        Projects WKT geometries into another Coordinate Reference System (CRS).
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        Projects <a href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">WKT (Well-known Text)  geometries</a> 
+        into another Coordinate Reference System (CRS).
+        
+        The actual processing is done by the wonderful <a href="https://geotools.org/">geotools library</a>.
+        </intro>
+  
+        <option name="Coordinate Reference System">The target Coordinate Reference System</option>
+
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="Spatialized entities">Entities with spatial features</inPort>
+        <outPort index="0" name="Reprojected entities">The entities reprojected</outPort>
+    </ports>
+</knimeNode>

@@ -22,6 +22,8 @@
         If several types are present, the writing will fail.
         
         Note that other attributes are not (yet) written in the file.
+        
+        The actual processing is done by the wonderful <a href="https://geotools.org/">geotools library</a>.
         </intro>
    
         <option name="filename">File to create or erase</option>
