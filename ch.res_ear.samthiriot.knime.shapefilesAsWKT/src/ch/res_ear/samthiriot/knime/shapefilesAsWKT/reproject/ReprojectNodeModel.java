@@ -173,6 +173,8 @@ public class ReprojectNodeModel extends NodeModel {
         }
         itEntities.close();
     	
+        datastore.dispose();
+        
         // once we are done, we close the container and return its table
         container.close();
         BufferedDataTable out = container.getTable();
