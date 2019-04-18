@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode icon="./shapefilesAsWKT.png" 
+			type="Visualizer" 
+			xmlns="http://knime.org/node/v2.8" 
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+    
+    <name>View WKT Spatial Data</name>
+    
+    <shortDescription>
+        View spatial data encoded as WKT on a map.
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        Displays one (or two) table(s) made of spatial features on a map.
+        
+        Input data should contain a "the_geom" column encoded in <a href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">WKT (Well-known Text)</a> representation,
+        and a variable storing the Coordinate Reference System. 
+        The best is to display data which was loaded using the "Read Shapefile as WKT" node. 
+        
+        The actual visualization is done using the wonderful <a href="https://geotools.org/">geotools library</a>.
+        
+        </intro>
+        
+        
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="WKT table">A table with WKT data</inPort>
+        <inPort index="1" name="WKT table">(optional)A table with WKT data</inPort>
+        
+    </ports>    
+    <views>
+        <view index="0" name="view map">View the table(s) on the same map</view>
+        
+    </views>
+</knimeNode>
