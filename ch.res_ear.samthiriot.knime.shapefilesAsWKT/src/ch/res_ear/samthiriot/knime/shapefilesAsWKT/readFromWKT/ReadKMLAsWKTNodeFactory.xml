@@ -30,13 +30,8 @@
         
         </intro>
         
-        <option name="Selected file">The shapefile to open (often finishing with .shp)</option>
-        <option name="encoding">
-        	The encoding used to encode accents and other special characters in the file. 
-        	Is UTF8 by default. 
-        	Change it if you have problems with accents and special characters. 
-       	</option>
-        
+        <option name="Selected file">The KML to open (often finishing with .kml)</option>
+       
     </fullDescription>
     
     <ports>        
