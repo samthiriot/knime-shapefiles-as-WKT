@@ -18,7 +18,7 @@
         Input data should contain a "the_geom" column encoded in <a href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">WKT (Well-known Text)</a> representation,
         and a variable storing the Coordinate Reference System. 
         The best is to display data which was loaded using the "Read Shapefile as WKT" node.
-        <p/>
+        </p>
         <p>
         In the view, wheel scrolling zooms in and out.  
         </p>
