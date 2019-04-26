@@ -2,7 +2,7 @@
 <feature
       id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.features"
       label="KNIME-Shapefiles as WKT: manipulate spatial features in Well-known Text format"
-      version="1.2.0.qualifier"
+      version="1.2.1.qualifier"
       provider-name="EIFER">
 
    <description>
