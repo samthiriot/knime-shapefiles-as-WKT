@@ -21,7 +21,7 @@
         
         <p>
         Accepts any geometry type: points, lines, polygons, multilines, multipolygons, etc. 
-        Decodes the geometry as a String column in WKT (Well-known Text Representation). 
+        Decodes the geometry as a String column in <a href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">WKT (Well-known Text Representation)</a>. 
         Decodes every attribute of the spatial features as a column of a corresponding KNIME type.
         </p>
         <p>

@@ -110,13 +110,15 @@ Bundle-ClassPath: readshapefileaskml.jar,
  lib/unit-api-1.0.jar,
  lib/uom-lib-common-1.0.2.jar,
  lib/uom-se-1.0.8.jar,
- lib/xml-commons-resolver-1.2.jar
+ lib/xml-commons-resolver-1.2.jar,
+ lib/gt-xsd-kml-20.1.jar
 Bundle-Activator: ch.res_ear.samthiriot.knime.shapefilesAsWKT.ShapefileAsWKTNodePlugin
 Bundle-Vendor: EIFER
 Require-Bundle: org.eclipse.core.runtime,
  org.knime.workbench.core,
  org.knime.workbench.repository,
- org.knime.base
+ org.knime.base,
+ org.eclipse.xsd;bundle-version="2.13.0"
 Bundle-ActivationPolicy: lazy
 Export-Package: au.com.objectix.jgridshift,
  ch.res_ear.samthiriot.knime.dialogs,
@@ -553,6 +555,10 @@ Export-Package: au.com.objectix.jgridshift,
  org.geotools.image.palette,
  org.geotools.image.test,
  org.geotools.io,
+ org.geotools.kml,
+ org.geotools.kml.bindings,
+ org.geotools.kml.v22,
+ org.geotools.kml.v22.bindings,
  org.geotools.legend,
  org.geotools.map,
  org.geotools.map.direct,

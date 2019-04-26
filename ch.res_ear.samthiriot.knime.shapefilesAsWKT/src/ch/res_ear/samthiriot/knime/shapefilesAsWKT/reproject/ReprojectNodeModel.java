@@ -117,7 +117,7 @@ public class ReprojectNodeModel extends NodeModel {
         
     	
     	DataColumnSpec[] novelsSpecs = new DataColumnSpec[inputPopulation.getDataTableSpec().getNumColumns()];
-    	for (int i=0; i<idxColumnGeom-1; i++) {
+    	for (int i=0; i<idxColumnGeom; i++) {
     		novelsSpecs[i] = inputPopulation.getDataTableSpec().getColumnSpec(i);
     	}
     	// TODO inputPopulation.getDataTableSpec().getColumnSpec(idxColumnGeom).getProperties().
@@ -155,7 +155,7 @@ public class ReprojectNodeModel extends NodeModel {
         	
         	
         	DataCell[] novelCells = new DataCell[row.getNumCells()];
-        	for (int i=0; i<idxColumnGeom-1; i++) {
+        	for (int i=0; i<idxColumnGeom; i++) {
         		novelCells[i] = row.getCell(i);
         	}
         	novelCells[idxColumnGeom] = StringCellFactory.create(geom.toString());
@@ -205,10 +205,10 @@ public class ReprojectNodeModel extends NodeModel {
     	
     	
     	DataColumnSpec[] novelsSpecs = new DataColumnSpec[inSpecs[0].getNumColumns()];
-    	for (int i=0; i<idxColumnGeom-1; i++) {
+    	for (int i=0; i<idxColumnGeom; i++) {
     		novelsSpecs[i] = inSpecs[0].getColumnSpec(i);
     	}
-		Map<String,String> properties = new HashMap<String, String>(inSpecs[idxColumnGeom].getProperties());
+		Map<String,String> properties = new HashMap<String, String>(inSpecs[0].getProperties());
 		properties.put(SpatialUtils.PROPERTY_CRS_CODE, SpatialUtils.getStringForCRS(crsTarget));
 		properties.put(SpatialUtils.PROPERTY_CRS_WKT, crsTarget.toWKT());
     	DataColumnSpecCreator creator = new DataColumnSpecCreator(
@@ -221,7 +221,7 @@ public class ReprojectNodeModel extends NodeModel {
     		novelsSpecs[i] = inSpecs[0].getColumnSpec(i);
     	}
     	
-        return new DataTableSpec[]{ inSpecs[0] };
+        return new DataTableSpec[]{ new DataTableSpec("recoded", novelsSpecs) };
     }
 
     /**
