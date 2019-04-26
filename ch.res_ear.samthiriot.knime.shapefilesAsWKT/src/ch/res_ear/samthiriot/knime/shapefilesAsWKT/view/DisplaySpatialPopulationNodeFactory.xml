@@ -14,14 +14,17 @@
     <fullDescription>
         <intro>
         Displays one (or two) table(s) made of spatial features on a map.
-        <br/>
+        <p>
         Input data should contain a "the_geom" column encoded in <a href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">WKT (Well-known Text)</a> representation,
         and a variable storing the Coordinate Reference System. 
         The best is to display data which was loaded using the "Read Shapefile as WKT" node.
-        <br/>
+        <p/>
+        <p>
         In the view, wheel scrolling zooms in and out.  
-        <br/>
+        </p>
+        <p>
         The actual visualization is done using the wonderful <a href="https://geotools.org/">geotools library</a>.
+        </p>
         </intro>
         
     </fullDescription>
