@@ -55,7 +55,6 @@ public class ReadShapefileAsWKTNodeModel extends NodeModel {
         
     private final SettingsModelString m_file = new SettingsModelString("filename", null);
     private final SettingsModelString m_charset = new SettingsModelString("charset", Charset.defaultCharset().name());
-    private final SettingsModelString m_crs = new SettingsModelString("crs", SpatialUtils.getDefaultCRSString());
 
     /**
      * Constructor for the node model.

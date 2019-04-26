@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shp-wkt-reader-icon.png" 
+		type="Source" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+		
+    <name>Read KML spatial data as WKT</name>
+    
+    <shortDescription>
+        Reads WKT spatial data from KML format
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        <p>
+        Reads spatial data stored in <a href="https://fr.wikipedia.org/wiki/Keyhole_Markup_Language">KML format</a>
+        and decodes the geometries into <a href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">WKT (Well-known Text Representation)</a>. 
+        Decodes every attribute of the spatial features as a column of a corresponding KNIME type.
+        </p>
+        <p>
+        Note that KML data is always assumed to be encoded in the Coordinate Reference System EPSG:4326. 
+        If you have problems with further processing of spatial data, you might try to reproject to another 
+        CRS using the "Reproject WKT geometries" node.
+        </p>
+        <p>
+        The actual decoding of the shapefile format is done using the <a href="https://geotools.org/">geotools library</a>.
+        </p>
+        
+        </intro>
+        
+        <option name="Selected file">The shapefile to open (often finishing with .shp)</option>
+        <option name="encoding">
+        	The encoding used to encode accents and other special characters in the file. 
+        	Is UTF8 by default. 
+        	Change it if you have problems with accents and special characters. 
+       	</option>
+        
+    </fullDescription>
+    
+    <ports>        
+        <outPort index="0" name="WKT entities">The population with their attributes and WKT representation.</outPort>
+    </ports>    
+  
+</knimeNode>

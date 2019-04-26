@@ -5,7 +5,7 @@
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 			xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
 			
-    <name>Reprojects WKT geometries</name>
+    <name>Reproject WKT geometries</name>
     
     <shortDescription>
         Projects WKT geometries into another Coordinate Reference System (CRS).
