@@ -24,8 +24,14 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import ch.res_ear.samthiriot.knime.shapefilesAsWKT.SpatialUtils;
 
-
-public class DataTableToGeotoolsMapper {
+/**
+ * Maps a geotools attribute into a KNIME column. 
+ * One is created per attribute. It is then called 
+ * to translate every single cell of the column. 
+ * 
+ * @author Samuel Thiriot
+ */
+public class GeotoolsToDataTableMapper {
 
 	private static final MissingCell missing = new MissingCell("no data provided");
 	
@@ -52,7 +58,7 @@ public class DataTableToGeotoolsMapper {
 
 	protected MissingCell missingCell = new MissingCell("no data");
 	
-	public DataTableToGeotoolsMapper(
+	public GeotoolsToDataTableMapper(
 			AttributeDescriptor gtDesc, 
 			CoordinateReferenceSystem coordinateReferenceSystem, 
 			NodeLogger logger) {

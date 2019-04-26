@@ -31,6 +31,7 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.def.IntCell;
+import org.knime.core.data.def.LongCell;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
@@ -102,7 +103,8 @@ public class SpatialUtils {
 	 */
 	public static Class<?> detectGeometryClassFromData(
 							BufferedDataTable sample,
-							String colNameGeom) {
+							String colNameGeom) 
+							throws IllegalArgumentException {
 			
 		final int SAMPLE = 50;
 		
@@ -158,13 +160,15 @@ public class SpatialUtils {
 	public static DataStore createDataStore() {
         return SpatialUtils.createTmpDataStore(true);
 	}
+
 	
 	public static SimpleFeatureType createGeotoolsType(
-			BufferedDataTable sample,
-			String colNameGeom,
-			String featureName,
-			CoordinateReferenceSystem crs
-			) {
+				BufferedDataTable sample,
+				String colNameGeom,
+				String featureName,
+				CoordinateReferenceSystem crs
+				)
+				throws IllegalArgumentException {
 		
 		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
         builder.setName(featureName);

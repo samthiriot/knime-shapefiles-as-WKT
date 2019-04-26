@@ -16,14 +16,18 @@
         <intro>
         Creates a <a href="https://en.wikipedia.org/wiki/Shapefile">shapefile in ESRI format</a>, 
         and stores the geometries found in the column "the_geom" expected to be in <a href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">WKT format</a>.
-        <br/>
+        <p>
         Only one type of geometry (point, line, polyline...) can be stored per shapefile (this is a limitation of the shapefile format).
         This type will be detected automatically from the content of the input table. 
         If several types are present, the writing will fail.
-        <br/>
-        Note that other attributes are not (yet) written in the file.
-        <br/>
+        </p>
+        <p>
+		Other columns are written as attributes of the features, with an automatic conversion of classical KNIME types:
+		String, Double, Long, Integer, Boolean. Other attribute types are mapped to String attributes.
+		</p>
+		 <p>
         The actual processing is done by the wonderful <a href="https://geotools.org/">geotools library</a>.
+		</p>
         </intro>
    
         <option name="filename">File to create or erase</option>
