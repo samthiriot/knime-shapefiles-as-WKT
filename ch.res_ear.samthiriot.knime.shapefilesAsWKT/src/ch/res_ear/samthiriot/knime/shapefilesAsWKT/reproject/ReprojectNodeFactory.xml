@@ -15,8 +15,12 @@
         <intro>
         Projects <a href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">WKT (Well-known Text)  geometries</a> 
         into another Coordinate Reference System (CRS).
-        
+        <p>
+        Note that the target Coordinate Reference System should be compliant with the locations of geometries.  
+        </p>
+        <p>
         The actual processing is done by the wonderful <a href="https://geotools.org/">geotools library</a>.
+        </p>
         </intro>
   
         <option name="Coordinate Reference System">The target Coordinate Reference System</option>
