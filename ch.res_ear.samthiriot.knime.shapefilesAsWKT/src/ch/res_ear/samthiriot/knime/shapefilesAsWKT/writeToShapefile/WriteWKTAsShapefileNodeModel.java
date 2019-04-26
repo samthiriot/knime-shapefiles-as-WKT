@@ -5,12 +5,21 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.InvalidPathException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.geotools.data.DataStore;
+import org.geotools.data.collection.ListFeatureCollection;
+import org.geotools.data.simple.SimpleFeatureSource;
+import org.geotools.data.simple.SimpleFeatureStore;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.geometry.jts.JTSFactoryFinder;
+import org.knime.core.data.DataCell;
+import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.container.CloseableRowIterator;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -22,6 +31,12 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.util.FileUtil;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import ch.res_ear.samthiriot.knime.shapefilesAsWKT.SpatialUtils;
@@ -39,7 +54,13 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
     // the logger instance
     private static final NodeLogger logger = NodeLogger
             .getLogger(WriteWKTAsShapefileNodeModel.class);
-        
+    
+    /**
+     * Count of entities to write at once
+     */
+    final static int BUFFER = 5000;
+	
+	
     private final SettingsModelString m_file = new SettingsModelString("filename", null);
 
 
@@ -55,8 +76,9 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-            final ExecutionContext exec) throws Exception {
+    protected BufferedDataTable[] execute(
+			    		final BufferedDataTable[] inData,
+			            final ExecutionContext exec) throws Exception {
 
     	final BufferedDataTable inputPopulation = inData[0];
     	
@@ -69,7 +91,6 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
     	    	
     	CoordinateReferenceSystem crsOrig = SpatialUtils.decodeCRS(inputPopulation.getSpec());
     	
-    	//String filename = m_file.getStringValue();
     	URL url;
 		try {
 			
@@ -84,26 +105,129 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
     	// copy the input population into a datastore
     	exec.setMessage("storing entities");
         DataStore datastore = SpatialUtils.createDataStore(file, true);
-        Runnable runnableSpatialize = SpatialUtils.decodeAsFeaturesRunnable(
-        		inputPopulation, 
+        
+        
+		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+        builder.setName("entities");
+        builder.setCRS(crsOrig); 
+        
+        // TODO improve: create different files for different geom types (?)
+        Class<?> geomClassToBeStored = SpatialUtils.detectGeometryClassFromData(	
+        										inputPopulation, 
+        										SpatialUtils.GEOMETRY_COLUMN_NAME);
+        
+        // add attributes in order
+        builder.add(
         		SpatialUtils.GEOMETRY_COLUMN_NAME, 
-        		exec, 
-        		datastore, 
-        		"entities", 
-        		crsOrig,
-        		false
+        		geomClassToBeStored
         		);
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(runnableSpatialize);
-        executor.shutdown();
-        try {
-        	// wait forever
-        	executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        } catch (InterruptedException e) {
-        	throw new RuntimeException(e);
+        
+        // create mappers
+        List<DataTableToGeotoolsMapper> mappers = inputPopulation
+        												.getDataTableSpec()
+        												.stream()
+        												.filter(colspec -> !SpatialUtils.GEOMETRY_COLUMN_NAME.equals((colspec.getName())))
+        												.map(colspec -> new DataTableToGeotoolsMapper(logger, colspec))
+        												.collect(Collectors.toList());
+        // add those to the builder type
+        mappers.forEach(mapper -> mapper.addAttributeForSpec(builder));
+        
+        
+        // build the type
+        final SimpleFeatureType type = builder.buildFeatureType();
+        // get or create the type in the file store 
+		try {
+			datastore.getSchema(type.getName());
+		} catch (IOException e) {
+			datastore.createSchema(type);	
+		}
+		// retrieve it 
+		SimpleFeatureSource featureSource = datastore.getFeatureSource(datastore.getNames().get(0));
+        if (!(featureSource instanceof SimpleFeatureStore)) {
+            throw new IllegalStateException("Modification not supported");
         }
-        datastore.dispose();
-    	
+        SimpleFeatureStore featureStore = (SimpleFeatureStore) featureSource;
+
+        // identify the id of the geom column, that we will not use as a standard one
+        final int idxColGeom = inputPopulation.getDataTableSpec().findColumnIndex(SpatialUtils.GEOMETRY_COLUMN_NAME);
+		
+        // prepare classes to create Geometries from WKT
+        GeometryFactory geomFactory = JTSFactoryFinder.getGeometryFactory( null );
+        WKTReader reader = new WKTReader(geomFactory);
+        
+        SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(type);
+
+        // the buffer of spatial features to be added soon (it's quicker to add several lines than only one)
+		List<SimpleFeature> toStore = new ArrayList<>(BUFFER);
+		
+        CloseableRowIterator itRow = inputPopulation.iterator();
+        try {
+	        int currentRow = 0;
+	        while (itRow.hasNext()) {
+	        	final DataRow row = itRow.next();
+	        	
+	        	// process the geom column
+	        	final DataCell cellGeom = row.getCell(idxColGeom);
+	        	if (cellGeom.isMissing()) {
+	        		// no geometry
+	        		continue; // skip lines without geom
+	        	}
+	        	try {
+		
+		        	Geometry geom = reader.read(cellGeom.toString());
+		        	featureBuilder.add(geom);
+	
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					throw new RuntimeException(e);
+				}
+	        	
+	        	int colId = 0;
+	        	for (int i=0; i<row.getNumCells(); i++) {
+	        		
+	        		if (i == idxColGeom) {
+	        			// skip the column with geom
+	        		} else {
+	        			// process as a standard column
+	        			featureBuilder.add(mappers.get(colId++).getValue(row.getCell(i)));
+	        		}
+	        	}
+	        	
+	        	// build this feature
+	            SimpleFeature feature = featureBuilder.buildFeature(null);
+	            // add this feature to the buffer
+	            toStore.add(feature);
+	            if (toStore.size() >= BUFFER) {
+	        		exec.checkCanceled();
+	            	featureStore.addFeatures( new ListFeatureCollection( type, toStore));
+	            	toStore.clear();
+	            }
+	            
+	            if (currentRow % 10 == 0) {
+	        		exec.setProgress((double)currentRow / inputPopulation.size(), "processing entity "+currentRow);
+	        		exec.checkCanceled();
+	            }
+	            currentRow++;
+	            
+	        }
+	
+	
+	        // store last lines
+	        if (!toStore.isEmpty()) {
+	        	featureStore.addFeatures( new ListFeatureCollection( type, toStore));
+	        }
+	        exec.setProgress(1.0);
+
+        } finally {
+        	if (itRow != null)
+        		itRow.close();
+        	
+            // close datastore
+            datastore.dispose();
+        	
+        }
+
         return new BufferedDataTable[]{};
     }
 
@@ -127,6 +251,13 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
 
     	if (m_file.getStringValue() == null)
     		throw new IllegalArgumentException("No filename was provided");
+
+    	// check the input table contains a geometry
+    	if (!SpatialUtils.hasGeometry(specs))
+    		throw new IllegalArgumentException("the input table contains no spatial data (no column named "+SpatialUtils.GEOMETRY_COLUMN_NAME+")");
+    	
+    	if (!SpatialUtils.hasCRS(specs))
+    		throw new IllegalArgumentException("the input table contains spatial data but no Coordinate Reference System");
     	
     	// check the parameters include a filename
     	URL url;
@@ -137,19 +268,6 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
 			throw new InvalidSettingsException("unable to open URL "+m_file.getStringValue()+": "+e2.getMessage());
 		}
         
-    	//File file = FileUtil.getFileFromURL(url);
-    	//if (!file.canWrite())
-    	//	throw new IllegalArgumentException("The destination file is not writable");
-    	
-    	// check the input table contains a geometry
-    	
-    	if (!SpatialUtils.hasGeometry(specs))
-    		throw new IllegalArgumentException("the input table contains no spatial data (no column named "+SpatialUtils.GEOMETRY_COLUMN_NAME+")");
-    	
-    	if (!SpatialUtils.hasCRS(specs))
-    		throw new IllegalArgumentException("the input table contains spatial data but no Coordinate Reference System");
-    	
-    	
     	
         return new DataTableSpec[]{};
     }

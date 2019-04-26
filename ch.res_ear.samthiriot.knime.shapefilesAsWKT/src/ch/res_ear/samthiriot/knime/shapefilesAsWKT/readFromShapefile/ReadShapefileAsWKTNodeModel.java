@@ -137,11 +137,11 @@ public class ReadShapefileAsWKTNodeModel extends NodeModel {
 		List<AttributeDescriptor> descriptors = new ArrayList<>(type.getAttributeDescriptors());
 		
 		// create mappers
-		Map<AttributeDescriptor,DataTableToGeotoolsMapper> gtAttribute2mapper = 
+		Map<AttributeDescriptor,GeotoolsToDataTableMapper> gtAttribute2mapper = 
 				descriptors.stream()
 							.collect(Collectors.toMap( 
 									ad -> ad, 
-									ad -> new DataTableToGeotoolsMapper(ad, type.getCoordinateReferenceSystem(), logger))
+									ad -> new GeotoolsToDataTableMapper(ad, type.getCoordinateReferenceSystem(), logger))
 							);
 	
 		// prepare the output
@@ -170,7 +170,7 @@ public class ReadShapefileAsWKTNodeModel extends NodeModel {
 			for (AttributeDescriptor gtAtt: descriptors) {
 				
 				Object gtVal = feature.getAttribute(gtAtt.getName());
-				DataTableToGeotoolsMapper mapper = gtAttribute2mapper.get(gtAtt);
+				GeotoolsToDataTableMapper mapper = gtAttribute2mapper.get(gtAtt);
 				
 	    		
 				cells[i++] = mapper.convert(gtVal);
@@ -237,11 +237,11 @@ public class ReadShapefileAsWKTNodeModel extends NodeModel {
 		List<AttributeDescriptor> descriptors = new ArrayList<>(type.getAttributeDescriptors());
 		
 		// create mappers
-		Map<AttributeDescriptor,DataTableToGeotoolsMapper> gtAttribute2mapper = 
+		Map<AttributeDescriptor,GeotoolsToDataTableMapper> gtAttribute2mapper = 
 				descriptors.stream()
 							.collect(Collectors.toMap( 
 									ad -> ad, 
-									ad -> new DataTableToGeotoolsMapper(ad, type.getCoordinateReferenceSystem(), logger))
+									ad -> new GeotoolsToDataTableMapper(ad, type.getCoordinateReferenceSystem(), logger))
 							);
 	
 		// prepare the output
