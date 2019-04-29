@@ -1,7 +1,6 @@
 package ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToShapefile;
 
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.knime.base.data.filter.row.dialog.model.ColumnSpec;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.def.BooleanCell;
