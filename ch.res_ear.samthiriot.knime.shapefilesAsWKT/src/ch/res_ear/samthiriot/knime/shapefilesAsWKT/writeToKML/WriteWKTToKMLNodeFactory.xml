@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shp-wkt-writer-icon.png" 
+		type="Sink" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+		
+    <name>Write WKT to KML</name>
+    
+    <shortDescription>
+        Writes WKT spatial data as KML
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        Writes WKT geometries into <a href="https://fr.wikipedia.org/wiki/Keyhole_Markup_Language">KML format</a>. 
+        <p>
+        The actual processing is done by the wonderful <a href="https://geotools.org/">geotools library</a>.
+		</p>
+        </intro>        
+        
+        <option name="filename">File to create or erase</option>
+    	<option name="remove KML namespace">Remove the KML namespace from the XML tags. 
+    				Check for the file to be readable by most programs like qGis or Google Maps. 
+    				Enabled by default.</option>
+    				
+    	<!-- to be used later; see https://github.com/samthiriot/knime-shapefiles-as-WKT/issues/19
+    	<option name="use KML specification v2.2">Write a file compliant with specifications v2.2
+    				instead of v2.1. Exportation in version 2.2 attempts 
+    				to also export the values of attributes. This support is experimental. 
+    				Disabled by default.</option>
+     	-->
+    
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="In-Port name">Data with WKT geometries</inPort>
+    </ports>    
+    
+</knimeNode>

@@ -1,4 +1,4 @@
-package ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromWKT;
+package ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromKML;
 
 import java.io.File;
 import java.io.IOException;

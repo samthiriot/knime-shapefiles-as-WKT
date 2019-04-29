@@ -3,24 +3,29 @@
    <extension point="org.knime.workbench.repository.categories">
       <category description="Manipulation of shapefiles as WKT text" icon="icons/shapefilesAsWKT.png" level-id="spatialAsWKT" locked="false" name="Shapefiles as WKT" path="/community/">
       </category>
-      <category description="Read spatial data to WKT format" icon="icons/shapefilesAsWKT.png" level-id="readSpatialAsWKT" locked="false" name="Read spatial as WKT" path="/community/spatialAsWKT">
+      <category description="Read spatial data to WKT format" icon="icons/shp-wkt-reader-icon.png" level-id="readSpatialAsWKT" locked="false" name="Read spatial as WKT" path="/community/spatialAsWKT">
       </category>
       <category description="Transform spatial data in WKT format" icon="icons/shapefilesAsWKT.png" level-id="transformSpatialAsWKT" locked="false" name="Transform WKT spatial data" path="/community/spatialAsWKT">
       </category>
       <category description="View spatial data in WKT format" icon="icons/shapefilesAsWKT.png" level-id="viewSpatialAsWKT" locked="false" name="View spatial as WKT" path="/community/spatialAsWKT">
       </category>
-      <category description="Writes WKT spatial data" icon="icons/shapefilesAsWKT.png" level-id="writeSpatialAsWKT" locked="false" name="Write spatial as WKT" path="/community/spatialAsWKT">
+      <category description="Writes WKT spatial data" icon="icons/shp-wkt-writer-icon.png" level-id="writeSpatialAsWKT" locked="false" name="Write spatial as WKT" path="/community/spatialAsWKT">
       </category>
    </extension>
 
    <extension point="org.knime.workbench.repository.nodes">
       <node category-path="/community/spatialAsWKT/readSpatialAsWKT" deprecated="false" factory-class="ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromShapefile.ReadShapefileAsWKTNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesKML.readFromShapefile"/>
+<node category-path="/community/spatialAsWKT/readSpatialAsWKT" factory-class="ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromKML.ReadKMLAsWKTNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromWKT.ReadKMLAsWKTNodeFactory"/>
    <node category-path="/community/spatialAsWKT/viewSpatialAsWKT" deprecated="false" factory-class="ch.res_ear.samthiriot.knime.shapefilesAsWKT.view.DisplaySpatialPopulationNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.view.DisplaySpatialPopulationNodeFactory">
    </node>
-   <node category-path="/community/spatialAsWKT/writeSpatialAsWKT" deprecated="false" factory-class="ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToShapefile.WriteWKTAsShapefileNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToShapefile.WriteWKTAsShapefileNodeFactory"/>
    <node category-path="/community/spatialAsWKT/transformSpatialAsWKT" deprecated="false" factory-class="ch.res_ear.samthiriot.knime.shapefilesAsWKT.reproject.ReprojectNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.reproject.ReprojectNodeFactory">
    </node>
-<node category-path="/community/spatialAsWKT/readSpatialAsWKT" factory-class="ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromWKT.ReadKMLAsWKTNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromWKT.ReadKMLAsWKTNodeFactory"/>
+   <node category-path="/community/spatialAsWKT/writeSpatialAsWKT" deprecated="false" factory-class="ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToShapefile.WriteWKTAsShapefileNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToShapefile.WriteWKTAsShapefileNodeFactory"/>
+<node
+      category-path="/community/spatialAsWKT/writeSpatialAsWKT"
+      deprecated="false"
+      factory-class="ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToKML.WriteWKTToKMLNodeFactory"
+      id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToKML.WriteWKTToKMLNodeFactory"/>
 </extension>
    
 </plugin>

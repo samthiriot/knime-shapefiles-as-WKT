@@ -105,6 +105,7 @@ public class DataTableToGeotoolsMapper {
 			default:
 				throw new RuntimeException("Program(er) error: we should have dealt with type "+targetType);
 		}
+		builder.nillable(true);
 	}
 	
 	public Object getValue(DataCell cell) {
@@ -130,5 +131,28 @@ public class DataTableToGeotoolsMapper {
 		}
 	}
 	
+	
+	public Object getValueNoNull(DataCell cell) {
+		
+		if (cell.isMissing())
+			return "";
+		
+		switch (targetType) {
+			case Integer:
+				return ((IntCell)cell).getIntValue();
+			case String:
+				return ((StringCell)cell).getStringValue();
+			case Double:
+				return ((DoubleCell)cell).getDoubleValue();
+			case Long:
+				return ((LongCell)cell).getLongValue();
+			case Boolean:
+				return ((BooleanCell)cell).getBooleanValue();
+			case Ignore:
+				return cell.toString();
+			default:
+				throw new RuntimeException("Program(er) error: we should have dealt with type "+targetType);
+		}
+	}
 	
 }

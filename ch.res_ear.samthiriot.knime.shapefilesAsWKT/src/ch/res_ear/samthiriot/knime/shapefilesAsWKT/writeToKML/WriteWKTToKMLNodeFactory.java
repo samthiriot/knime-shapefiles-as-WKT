@@ -1,4 +1,4 @@
-package ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromWKT;
+package ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToKML;
 
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
@@ -6,19 +6,20 @@ import org.knime.core.node.NodeView;
 
 /**
  * This is an example implementation of the node factory of the
- * "ReadKMLAsWKT" node.
+ * "WriteWKTToKML" node.
  *
  * @author Samuel Thiriot
  */
-public class ReadKMLAsWKTNodeFactory 
-        extends NodeFactory<ReadKMLAsWKTNodeModel> {
+public class WriteWKTToKMLNodeFactory 
+        extends NodeFactory<WriteWKTToKMLNodeModel> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ReadKMLAsWKTNodeModel createNodeModel() {
-        return new ReadKMLAsWKTNodeModel();
+    public WriteWKTToKMLNodeModel createNodeModel() {
+		// Create and return a new node model.
+        return new WriteWKTToKMLNodeModel();
     }
 
     /**
@@ -33,8 +34,8 @@ public class ReadKMLAsWKTNodeFactory
      * {@inheritDoc}
      */
     @Override
-    public NodeView<ReadKMLAsWKTNodeModel> createNodeView(final int viewIndex,
-            final ReadKMLAsWKTNodeModel nodeModel) {
+    public NodeView<WriteWKTToKMLNodeModel> createNodeView(final int viewIndex,
+            final WriteWKTToKMLNodeModel nodeModel) {
 		return null;
     }
 
@@ -51,7 +52,8 @@ public class ReadKMLAsWKTNodeFactory
      */
     @Override
     public NodeDialogPane createNodeDialogPane() {
-        return new ReadKMLAsWKTNodeDialog();
+		// This example node has a dialog, hence we create and return it here. Also see "hasDialog()".
+        return new WriteWKTToKMLNodeDialog();
     }
 
 }
