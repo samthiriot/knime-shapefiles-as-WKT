@@ -38,8 +38,6 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 
-import ch.res_ear.samthiriot.knime.shapefilesAsWKT.SpatialUtils;
-
 
 /**
  * This is the model implementation of ReadShapefileAsKML.

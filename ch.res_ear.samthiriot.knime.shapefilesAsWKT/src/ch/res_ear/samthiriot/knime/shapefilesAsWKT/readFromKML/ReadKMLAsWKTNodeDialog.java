@@ -1,12 +1,8 @@
 package ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromKML;
 
-import java.nio.charset.Charset;
-
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-
-import ch.res_ear.samthiriot.knime.dialogs.DialogComponentEncodingSelection;
 
 /**
  * Dialog to configure this node.
