@@ -14,13 +14,16 @@
     
     <fullDescription>
         <intro>
-        Writes WKT geometries into <a href="https://fr.wikipedia.org/wiki/Keyhole_Markup_Language">KML format</a>. 
+        Writes WKT geometries into 
+        <a href="https://fr.wikipedia.org/wiki/Keyhole_Markup_Language">KML format</a>. 
         <p>
-        The actual processing is done by the wonderful <a href="https://geotools.org/">geotools library</a>.
+        The actual processing is done by the 
+        wonderful <a href="https://geotools.org/">geotools library</a>.
 		</p>
         </intro>        
         
-        <option name="filename">File to create or erase</option>
+        <option name="filename">File to create or erase. If the filename ends with kmz, 
+        			the resulting file will be compressed.</option>
     	<option name="remove KML namespace">Remove the KML namespace from the XML tags. 
     				Check for the file to be readable by most programs like qGis or Google Maps. 
     				Enabled by default.</option>

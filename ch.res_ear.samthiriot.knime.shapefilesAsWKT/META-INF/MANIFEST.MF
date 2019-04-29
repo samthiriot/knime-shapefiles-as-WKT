@@ -111,7 +111,8 @@ Bundle-ClassPath: readshapefileaskml.jar,
  lib/uom-lib-common-1.0.2.jar,
  lib/uom-se-1.0.8.jar,
  lib/xml-commons-resolver-1.2.jar,
- lib/gt-xsd-kml-20.1.jar
+ lib/gt-xsd-kml-20.1.jar,
+ lib/
 Bundle-Activator: ch.res_ear.samthiriot.knime.shapefilesAsWKT.ShapefileAsWKTNodePlugin
 Bundle-Vendor: EIFER
 Require-Bundle: org.eclipse.core.runtime,
@@ -123,9 +124,11 @@ Bundle-ActivationPolicy: lazy
 Export-Package: au.com.objectix.jgridshift,
  ch.res_ear.samthiriot.knime.dialogs,
  ch.res_ear.samthiriot.knime.shapefilesAsWKT,
+ ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromKML,
  ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromShapefile,
  ch.res_ear.samthiriot.knime.shapefilesAsWKT.reproject,
  ch.res_ear.samthiriot.knime.shapefilesAsWKT.view,
+ ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToKML,
  ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToShapefile,
  com.conversantmedia.util.collection,
  com.conversantmedia.util.concurrent,

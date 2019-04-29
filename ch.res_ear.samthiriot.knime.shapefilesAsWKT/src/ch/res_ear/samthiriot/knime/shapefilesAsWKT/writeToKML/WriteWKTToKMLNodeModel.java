@@ -4,12 +4,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.xml.namespace.QName;
 
@@ -101,6 +104,8 @@ public class WriteWKTToKMLNodeModel extends NodeModel {
     		throw new IllegalArgumentException("the input table contains spatial data but no Coordinate Reference System");
     	    	
     	final boolean paramRemoveKMLnamespace = m_removeKMLnamespace.getBooleanValue();
+    	
+    	final boolean zipResult = m_file.getStringValue().toLowerCase().endsWith(".kmz");
     	
     	//CoordinateReferenceSystem crsOrig = SpatialUtils.decodeCRS(inputPopulation.getSpec());
     	
@@ -247,25 +252,35 @@ public class WriteWKTToKMLNodeModel extends NodeModel {
         
         exec.setProgress(0.5, "writing entities");
         
-        FileOutputStream fos = null;
+        OutputStream os = null;
         try {
-	        fos = new FileOutputStream(file);
-	
+        	if (zipResult) {
+        		ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(file));
+        		ZipEntry e = new ZipEntry("doc.kml");
+        		zos.putNextEntry(e);
+        		os = zos;
+        	} else 
+        		os = new FileOutputStream(file);
+        	
 	        if (paramRemoveKMLnamespace) {
-	        	ByteArrayOutputStream os = new ByteArrayOutputStream();
+	        	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	            try {
-	              encoder.encode(featureCollection, KMLspace, os);
-	              String out = os.toString().replaceAll("kml:", "");
-	              fos.write(out.getBytes());
+	              encoder.encode(featureCollection, KMLspace, baos);
+	              String out = baos.toString().replaceAll("kml:", "");
+	              os.write(out.getBytes());
 	            } catch (Exception e) {
 	              throw new RuntimeException(e);
 	            } 
 	        } else {
-	        	encoder.encode(featureCollection, KMLspace, fos);
+	        	encoder.encode(featureCollection, KMLspace, os);
 	        }
         } finally {
-        	if (fos != null)
-        		fos.close();
+        	if (os != null) {
+        		if (zipResult) {
+            		((ZipOutputStream)os).closeEntry();
+            	}
+        		os.close();
+        	}
             
         }
         exec.setProgress(1);
