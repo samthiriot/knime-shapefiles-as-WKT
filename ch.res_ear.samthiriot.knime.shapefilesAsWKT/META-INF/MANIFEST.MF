@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KNIME Shapefile WKT manipulation
 Bundle-SymbolicName: ch.res_ear.samthiriot.knime.shapefilesAsWKT;singleton:=true
-Bundle-Version: 1.2.1
+Bundle-Version: 1.2.2.qualifier
 Bundle-ClassPath: readshapefileaskml.jar,
  lib/animal-sniffer-annotations-1.17.jar,
  lib/checker-qual-2.5.2.jar,
