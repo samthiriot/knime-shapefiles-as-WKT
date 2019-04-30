@@ -118,6 +118,7 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
 	        
 	        
 		    menuBar.add(menu);
+		    
 	    } catch (NoClassDefFoundError e) {
 	    	e.printStackTrace();
 	    	logger.warn("unable to display toolbars");

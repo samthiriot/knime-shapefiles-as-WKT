@@ -3,7 +3,8 @@
       id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.features"
       label="KNIME-Shapefiles as WKT: manipulate spatial features in Well-known Text format"
       version="1.2.2.qualifier"
-      provider-name="EIFER">
+      provider-name="EIFER"
+      plugin="ch.res_ear.samthiriot.knime.shapefilesAsWKT.features">
 
    <description>
       KNIME nodes to read, write, visualize, filter, project or filter

@@ -3,8 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: KNIME Shapefile WKT manipulation
 Bundle-SymbolicName: ch.res_ear.samthiriot.knime.shapefilesAsWKT;singleton:=true
 Bundle-Version: 1.2.2.qualifier
-Bundle-ClassPath: readshapefileaskml.jar,
- lib/animal-sniffer-annotations-1.17.jar,
+Bundle-ClassPath: lib/animal-sniffer-annotations-1.17.jar,
  lib/checker-qual-2.5.2.jar,
  lib/commons-codec-1.2.jar,
  lib/commons-collections-3.2.2.jar,
@@ -108,7 +107,8 @@ Bundle-ClassPath: readshapefileaskml.jar,
  lib/unit-api-1.0.jar,
  lib/uom-lib-common-1.0.2.jar,
  lib/uom-se-1.0.8.jar,
- lib/xml-commons-resolver-1.2.jar
+ lib/xml-commons-resolver-1.2.jar,
+ readshapefileaskml.jar
 Bundle-Activator: ch.res_ear.samthiriot.knime.shapefilesAsWKT.ShapefileAsWKTNodePlugin
 Bundle-Vendor: EIFER
 Require-Bundle: org.eclipse.core.runtime,
@@ -117,8 +117,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.knime.base,
  org.eclipse.xsd;bundle-version="2.13.0"
 Bundle-ActivationPolicy: lazy
-Export-Package: .,
- au.com.objectix.jgridshift,
+Export-Package: au.com.objectix.jgridshift,
  ch.res_ear.samthiriot.knime.dialogs,
  ch.res_ear.samthiriot.knime.shapefilesAsWKT,
  ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromKML,
