@@ -16,7 +16,7 @@
   
   
   <properties>
-     <geotools.version>20.1</geotools.version>
+     <geotools.version>21.0</geotools.version>
 	 <maven.test.skip>true</maven.test.skip>
   </properties>
 
@@ -86,6 +86,32 @@
   </dependencies>
   
   <repositories>
+    <!-- repo for development version -->
+    <repository>
+	    <id>opengeo boundlessgeo</id>
+	    <name>OpenGeo boundlessgeo Repository</name>
+	    <url>https://repo.boundlessgeo.com/snapshot/</url>
+	    <snapshots>
+	        <enabled>true</enabled>
+	    </snapshots>
+	</repository>
+    <repository>
+	    <id>opengeo central</id>
+	    <name>OpenGeo Maven Repository</name>
+	    <url>http://central.maven.org/maven2</url>
+	    <snapshots>
+	        <enabled>true</enabled>
+	    </snapshots>
+	</repository>
+	<!-- <repository>
+	    <id>opengeo</id>
+	    <name>OpenGeo Maven Repository</name>
+	    <url>http://repo.opengeo.org/</url>
+	    <snapshots>
+	        <enabled>true</enabled>
+	    </snapshots>
+	</repository> -->
+	<!-- repos for stable versions -->
 	<repository>
         <id>osgeo</id>
         <name>Open Source Geospatial Foundation Repository</name>

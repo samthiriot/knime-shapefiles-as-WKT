@@ -2,7 +2,15 @@ package ch.res_ear.samthiriot.knime.shapefilesAsWKT.view;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
+
+import javax.swing.JButton;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JToolBar;
 
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.map.FeatureLayer;
@@ -12,7 +20,12 @@ import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.styling.SLD;
 import org.geotools.styling.Style;
+import org.geotools.swing.JMapFrame;
 import org.geotools.swing.JMapPane;
+import org.geotools.swing.action.PanAction;
+import org.geotools.swing.action.ZoomInAction;
+import org.geotools.swing.action.ZoomOutAction;
+import org.geotools.swing.tool.PanTool;
 import org.geotools.swing.tool.ScrollWheelTool;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeView;
@@ -46,6 +59,19 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
 	    mapPane = new JMapPane(content);
 	    mapPane.setRenderer(renderer);
 	    mapPane.addMouseListener(new ScrollWheelTool(mapPane));
+	   
+	    //mapFrame = new JMapFrame(content);
+        //mapFrame.enableToolBar(true);
+        //mapFrame.enableStatusBar(true);
+
+        //JToolBar toolbar = mapFrame.getToolBar();
+        //toolbar.add(new PanAction(mapFrame.getMapPane(), true));
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        mapPane.setPreferredSize(new Dimension(screenSize.width*2/3, screenSize.height*2/3));
+        
+	    setComponent(mapPane);
+	    
 	    //mapPane.addMouseListener(new PanTool());
 	    
 	    /*
@@ -58,13 +84,44 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
 	    }
 	    */
 	    
-	    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-	    
-        mapPane.setPreferredSize(new Dimension(screenSize.width*2/3, screenSize.height*2/3));
+	   //mapPane.setPreferredSize(new Dimension(screenSize.width*2/3, screenSize.height*2/3));
        
-        setComponent(mapPane);
+        //setComponent(mapPane);
         
- 	   	
+	    try {
+		    JMenuBar menuBar = getJMenuBar();
+		    
+	        JMenu menu = new JMenu("Geotools");
+	        menu.setMnemonic('G');
+	        
+	        {
+	        	JMenuItem panMenu = new JMenuItem(PanTool.TOOL_NAME);
+	        	panMenu.setMnemonic('P');
+	        	//panMenu.setToolTipText(PanTool.TOOL_TIP);
+	        	//panMenu.addActionListener(new PanAction(mapPane));
+	        	menu.add(panMenu);
+	        }
+	        {
+	        	JMenuItem panMenu = new JMenuItem("Zoom in");
+	        	panMenu.setMnemonic('+');
+	        	//panMenu.setToolTipText(ZoomInAction.SHORT_DESCRIPTION);
+	        	// TODO panMenu.setIcon(ZoomInAction.SMALL_ICON);
+	        	panMenu.addActionListener(new ZoomInAction(mapPane));
+	        	menu.add(panMenu);
+	        }
+	        {
+	        	JMenuItem panMenu = new JMenuItem("Zoom out");
+	        	panMenu.setMnemonic('-');
+	        	panMenu.addActionListener(new ZoomOutAction(mapPane));
+	        	menu.add(panMenu);
+	        }
+	        
+	        
+		    menuBar.add(menu);
+	    } catch (NoClassDefFoundError e) {
+	    	e.printStackTrace();
+	    	logger.warn("unable to display toolbars");
+	    }
     }
 
     /**
