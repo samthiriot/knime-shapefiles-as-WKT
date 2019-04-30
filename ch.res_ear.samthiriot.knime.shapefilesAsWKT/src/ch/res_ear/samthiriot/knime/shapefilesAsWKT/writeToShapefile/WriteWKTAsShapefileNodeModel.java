@@ -178,7 +178,6 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
 		        	featureBuilder.add(geom);
 	
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					throw new RuntimeException(e);
 				}

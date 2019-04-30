@@ -18,7 +18,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.geotools.feature.simple.SimpleFeatureImpl;
 import org.geotools.referencing.CRS;
-import org.geotools.xml.Parser;
+import org.geotools.xsd.Parser;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnProperties;
 import org.knime.core.data.DataColumnSpec;

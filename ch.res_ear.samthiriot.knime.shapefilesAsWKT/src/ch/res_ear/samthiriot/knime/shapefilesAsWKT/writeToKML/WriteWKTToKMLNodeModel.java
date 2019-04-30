@@ -22,8 +22,8 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.geotools.kml.KMLConfiguration;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.xml.Configuration;
-import org.geotools.xml.Encoder;
+import org.geotools.xsd.Configuration;
+import org.geotools.xsd.Encoder;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
@@ -255,7 +255,8 @@ public class WriteWKTToKMLNodeModel extends NodeModel {
         OutputStream os = null;
         try {
         	if (zipResult) {
-        		ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(file));
+        		@SuppressWarnings("resource")
+				ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(file));
         		ZipEntry e = new ZipEntry("doc.kml");
         		zos.putNextEntry(e);
         		os = zos;
@@ -309,7 +310,7 @@ public class WriteWKTToKMLNodeModel extends NodeModel {
     	
     	// check the parameters include a filename
 		try {
-			URL url = FileUtil.toURL(m_file.getStringValue());
+			FileUtil.toURL(m_file.getStringValue());
 		} catch (InvalidPathException | MalformedURLException e2) {
 			e2.printStackTrace();
 			throw new InvalidSettingsException("unable to open URL "+m_file.getStringValue()+": "+e2.getMessage());
