@@ -180,8 +180,7 @@ public class SpatialUtils {
         		SpatialUtils.GEOMETRY_COLUMN_NAME, 
         		geomClassToBeStored
         		);
-        // TODO later
-        builder.add("id", Integer.class);
+        builder.add("rowid", String.class);
 
         // build the type
         final SimpleFeatureType type = builder.buildFeatureType();
@@ -259,60 +258,49 @@ public class SpatialUtils {
 			double total = (double)this.sample.size();
 			long current = 0;
 			
-			System.out.println(Thread.currentThread().getName()+"  total "+this.sample.size());
+			//System.out.println(Thread.currentThread().getName()+"  will store total "+this.sample.size());
 			Iterator<DataRow> itRow = sample.iterator();
 			
         	while (itRow.hasNext()) {
         		DataRow currentRow = itRow.next();
         		
         		DataCell cellGeom = currentRow.getCell(idxColGeom);
-        		IntCell cellIdx = null;
-        		if (assumeId) {
-        			cellIdx = (IntCell)currentRow.getCell(0);
-        			if (cellIdx == null) {
-                		System.out.println("ignoring the null cell id");
-                		continue;
-            		}
-        		} 
         		
             	if (cellGeom.isMissing()) {
-            		System.out.println("ignoring one line");
+            		System.out.println("ignoring line "+currentRow.getKey()+" which has no geometry");
             		continue; // ignore data with missing elements
             	}
             	
             	try {
     				Geometry geom = reader.read(cellGeom.toString());
     				featureBuilder.add(geom);
-                    if (cellIdx != null) featureBuilder.add(cellIdx.getIntValue());
-
     			} catch (ParseException e) {
-    				// TODO Auto-generated catch block
     				e.printStackTrace();
-    				throw new RuntimeException(e);
-    			}
+    				throw new IllegalArgumentException(
+    						"Invalid WKT geometry on row "+
+    						currentRow.getKey()+":"+
+    						e.getMessage(), 
+    						e);    			}
             	
-                SimpleFeature feature = featureBuilder.buildFeature(null);
-                
+            	final String rowid = currentRow.getKey().getString();
+                SimpleFeature feature = featureBuilder.buildFeature(
+                		rowid, new Object[] { rowid }
+                		);
+             
                 toStore.add(feature);
                 
 				if (toStore.size() >= BUFFER) {
-	    			System.out.println(Thread.currentThread().getName()+" Store buffer "+toStore.size());
-
+	    			//System.out.println(Thread.currentThread().getName()+" Storing buffer "+toStore.size());
 					storeBufferedSpatialData();
 				}
  
-        		if (current % 500 == 0) {
-	        		// TODO not always
+        		if (current % 100 == 0) {
 	        		this.execProgress.setProgress((double)current/total);
 	        		try {
 						this.execProgress.checkCanceled();
 					} catch (CanceledExecutionException e) {
-						// TODO???
 						return;
 					} 
-	        		
-	    			//System.out.println(Thread.currentThread().getName()+" "+current+"/"+this.split.estimateSize());
-
         		}
         		
         		current++;
@@ -360,10 +348,8 @@ public class SpatialUtils {
 
 		final int idxColGeom = sample.getDataTableSpec().findColumnIndex(colNameGeom);
 
-              
         return new AddRowsRunnable(sample, idxColGeom, store, type, execProgress, assumeId);
-        
-		
+        		
 	}
 		
 	
@@ -402,9 +388,7 @@ public class SpatialUtils {
         		SpatialUtils.GEOMETRY_COLUMN_NAME, 
         		detectGeometryClassFromData(sample, colNameGeom)
         		);
-
-
-        builder.add("id", Integer.class);
+        builder.add("id", String.class);
 
         // build the type
         final SimpleFeatureType type = builder.buildFeatureType();
@@ -443,9 +427,12 @@ public class SpatialUtils {
                 featureBuilder.add(id++);
 
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
-				throw new RuntimeException(e);
+				throw new IllegalArgumentException(
+						"Invalid WKT geometry on row "+
+						currentRow.getKey()+":"+
+						e.getMessage(), 
+						e);
 			}
         	
             SimpleFeature feature = featureBuilder.buildFeature(null);
