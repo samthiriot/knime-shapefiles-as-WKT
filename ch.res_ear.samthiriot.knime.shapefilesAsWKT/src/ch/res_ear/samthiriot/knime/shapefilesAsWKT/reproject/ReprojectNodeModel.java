@@ -100,8 +100,7 @@ public class ReprojectNodeModel extends NodeModel {
         		execProgressSpatialiseInputs, 
         		datastore, 
         		"entities", 
-        		crsOrig,
-        		false
+        		crsOrig
         		);
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(runnableSpatialize);

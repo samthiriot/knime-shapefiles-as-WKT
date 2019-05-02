@@ -2,6 +2,7 @@ package ch.res_ear.samthiriot.knime.shapefilesAsWKT;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +31,6 @@ import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.def.IntCell;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
@@ -115,7 +115,6 @@ public class SpatialUtils {
 		List<Geometry> foundGeometries = new ArrayList<Geometry>(SAMPLE);
 		
     	Iterator<DataRow> itRows = sample.iterator();
-    	long id = 0;
     	while (itRows.hasNext()) {
         	DataRow currentRow = itRows.next();
         	
@@ -130,7 +129,6 @@ public class SpatialUtils {
 				g = reader.read(cellGeom.toString());
 				foundGeometries.add(g);
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				// ignore it
 			}
@@ -228,21 +226,19 @@ public class SpatialUtils {
 		private final SimpleFeatureStore featureStore;
 		private final SimpleFeatureType type;
 		private final ExecutionMonitor execProgress;
-		private final boolean assumeId;
 		
 		public AddRowsRunnable(
 				BufferedDataTable sample, 
 				int idxColGeom,
 				SimpleFeatureStore featureStore,
 				SimpleFeatureType type,
-				ExecutionMonitor execProgress,
-				boolean assumeId) {
+				ExecutionMonitor execProgress
+				) {
 			this.sample = sample;
 			this.idxColGeom = idxColGeom;
 			this.featureStore = featureStore;
 			this.type = type;
 			this.execProgress = execProgress;
-			this.assumeId = assumeId;
 	        this.featureBuilder = new SimpleFeatureBuilder(type);
 
 			GeometryFactory geomFactory = JTSFactoryFinder.getGeometryFactory( null );
@@ -321,7 +317,6 @@ public class SpatialUtils {
         	try {
 				featureStore.addFeatures( new ListFeatureCollection( type, toStore) );
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				throw new RuntimeException("error when storing features in the store", e);
 			}
@@ -339,8 +334,7 @@ public class SpatialUtils {
 			ExecutionMonitor execProgress,
 			DataStore datastore,
 			String featureName,
-			CoordinateReferenceSystem crs,
-			boolean assumeId
+			CoordinateReferenceSystem crs
 			) throws IOException {
 		
 		SimpleFeatureType type = createGeotoolsType(sample, colNameGeom, featureName, crs);
@@ -348,7 +342,7 @@ public class SpatialUtils {
 
 		final int idxColGeom = sample.getDataTableSpec().findColumnIndex(colNameGeom);
 
-        return new AddRowsRunnable(sample, idxColGeom, store, type, execProgress, assumeId);
+        return new AddRowsRunnable(sample, idxColGeom, store, type, execProgress);
         		
 	}
 		
@@ -357,8 +351,6 @@ public class SpatialUtils {
 	/**
 	 * Converts a datatable to a collection of spatial features
 	 * by decoding a string column as KWT
-	 * 
-	 * TODO parallel processing
 	 *  
 	 * @param sample
 	 * @param colNameGeom
@@ -470,7 +462,6 @@ public class SpatialUtils {
 		try {
 			file = FileUtil.createTempFile("datastore", ".shp", true);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			throw new RuntimeException("unable to create a geotools datastore", e1);
 
@@ -482,13 +473,12 @@ public class SpatialUtils {
 	
 	public static DataStore createDataStore(File file, boolean createSpatialIndex) {
         
-		Map map = new HashMap();
+		Map<String,Serializable> map = new HashMap<>();
 		try {
 			map.put( "url", file.toURI().toURL() );
 			map.put("create spatial index", Boolean.valueOf(createSpatialIndex));
 
 		} catch (MalformedURLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			throw new RuntimeException("unable to create a geotools datastore", e1);
 
@@ -496,9 +486,7 @@ public class SpatialUtils {
 		DataStore dataStore = null;
 		try {
 			dataStore = new ShapefileDataStoreFactory().createNewDataStore(map);
-			//dataStore = DataStoreFinder.getDataStore(map );
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new RuntimeException("unable to create a geotools datastore", e);
 		}
@@ -524,7 +512,6 @@ public class SpatialUtils {
 		try {
 			fItt = source.getFeatures(filter).features();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new RuntimeException("error while loading entities",e);
 		}

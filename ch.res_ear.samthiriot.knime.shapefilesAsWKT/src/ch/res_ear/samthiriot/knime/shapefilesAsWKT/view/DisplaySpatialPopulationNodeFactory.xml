@@ -20,12 +20,22 @@
         The best is to display data which was loaded using the "Read Shapefile as WKT" node.
         </p>
         <p>
-        In the view, wheel scrolling zooms in and out.  
+        Once you are in the the view:
+        <ul>
+        <li>wheel scrolling zooms in and out</li>
+        <li>the "Spatial tools" menu provides "zoom to fit", zoom in and out, info or pan (move) features</li>
+        </ul> 
         </p>
         <p>
         The actual visualization is done using the wonderful <a href="https://geotools.org/">geotools library</a>.
         </p>
         </intro>
+               
+        <option name="color for entities 1 (top table))">
+        Color that will be used to draw the entities from the first connection</option>
+
+        <option name="color for entities 2 (bottom table))">
+        Color that will be used to draw the entities from the second connection</option>
         
     </fullDescription>
     
