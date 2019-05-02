@@ -25,7 +25,6 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.type.BasicFeatureTypes;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.util.factory.GeoTools;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
@@ -62,7 +61,8 @@ public class SpatialUtils {
 	public static final String PROPERTY_CRS_CODE = "crs code";
 	public static final String PROPERTY_CRS_WKT = "crs WKT";
 	
-	
+	public static final String ATTRIBUTE_NAME_INCREMENTAL_ID = "inc_id";
+
 	public static String getDefaultCRSString() {
 		return "EPSG:4326";
 	}
@@ -182,7 +182,7 @@ public class SpatialUtils {
         builder.add("rowid", String.class);
         
         if (addIncrementalId)
-        	builder.add("inc_id", Integer.class);
+        	builder.add(ATTRIBUTE_NAME_INCREMENTAL_ID, Integer.class);
         
         // build the type
         final SimpleFeatureType type = builder.buildFeatureType();
@@ -367,112 +367,6 @@ public class SpatialUtils {
         		
 	}
 		
-	
-		
-	/**
-	 * Converts a datatable to a collection of spatial features
-	 * by decoding a string column as KWT
-	 *  
-	 * @param sample
-	 * @param colNameGeom
-	 * @return
-	 * @throws IOException 
-	 * @throws CanceledExecutionException 
-	 */
-	public static DataStore decodeAsFeatures(
-			BufferedDataTable sample,
-			String colNameGeom,
-			ExecutionMonitor execProgress) throws IOException, CanceledExecutionException {
-		
-		execProgress.setMessage("creating a file datastore");
-		
-        DataStore datastore = SpatialUtils.createTmpDataStore(true);
-        
-		final int idxColGeom = sample.getDataTableSpec().findColumnIndex(colNameGeom);
-        
-		// 
-        //SimpleFeatureCollection collec = FeatureCollections.newCollection();
-        SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
-        builder.setName("Geom");
-        builder.setCRS(DefaultGeographicCRS.WGS84); // <- Coordinate reference system
-        
-        // add attributes in order
-        builder.add(
-        		SpatialUtils.GEOMETRY_COLUMN_NAME, 
-        		detectGeometryClassFromData(sample, colNameGeom)
-        		);
-        builder.add("id", String.class);
-
-        // build the type
-        final SimpleFeatureType type = builder.buildFeatureType();
-
-        datastore.createSchema(type);
-
-        SimpleFeatureSource featureSource = datastore.getFeatureSource(datastore.getNames().get(0));
-        if (!(featureSource instanceof SimpleFeatureStore)) {
-            throw new IllegalStateException("Modification not supported");
-        }
-        SimpleFeatureStore featureStore = (SimpleFeatureStore) featureSource;
-
-        		
-        SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(type);
-        GeometryFactory geomFactory = JTSFactoryFinder.getGeometryFactory( null );
-        WKTReader reader = new WKTReader(geomFactory);
-        
-        List<SimpleFeature> features = new ArrayList<>();
-
-    	Iterator<DataRow> itRows = sample.iterator();
-    	long id = 0;
-    	final int BUFFER = 100;
-    	List<SimpleFeature> toStore = new ArrayList<>(BUFFER);
-    	while (itRows.hasNext()) {
-        	DataRow currentRow = itRows.next();
-        	
-        	DataCell cellGeom = currentRow.getCell(idxColGeom);
-        	
-        	if (cellGeom.isMissing()) {
-        		continue;
-        	}
-        	
-        	try {
-				Geometry geom = reader.read(cellGeom.toString());
-				featureBuilder.add(geom);
-                featureBuilder.add(id++);
-
-			} catch (ParseException e) {
-				e.printStackTrace();
-				throw new IllegalArgumentException(
-						"Invalid WKT geometry on row "+
-						currentRow.getKey()+":"+
-						e.getMessage(), 
-						e);
-			}
-        	
-            SimpleFeature feature = featureBuilder.buildFeature(null);
-            features.add(feature);
-            
-            toStore.add(feature);
-            
-            if (toStore.size() >= BUFFER) {
-            	featureStore.addFeatures( new ListFeatureCollection( type, toStore));
-            	toStore.clear();
-            }
-            
-            if (id % 10 == 0) {
-        		execProgress.setProgress((double)id / sample.size(), "processing entity "+id);
-        		execProgress.checkCanceled();
-            }
-
-        }
-        if (!toStore.isEmpty()) {
-        	featureStore.addFeatures( new ListFeatureCollection( type, toStore));
-        }
-
-        execProgress.setProgress(1.0);
-        
-        return datastore;
-
-	}
 	
 	/**
 	 * Create a temporary datastore
