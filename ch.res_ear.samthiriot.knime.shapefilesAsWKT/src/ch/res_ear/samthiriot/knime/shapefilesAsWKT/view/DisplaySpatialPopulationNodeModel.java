@@ -110,7 +110,8 @@ public class DisplaySpatialPopulationNodeModel extends NodeModel {
         		progress1, 
         		datastore1, 
         		"entities1", 
-        		crsOrig1
+        		crsOrig1,
+        		false
         		);
     	exec.setMessage("storing entities");
 
@@ -129,7 +130,8 @@ public class DisplaySpatialPopulationNodeModel extends NodeModel {
 	        		progress2, 
 	        		datastore2, 
 	        		"entities2", 
-	        		crsOrig2
+	        		crsOrig2,
+	        		false
 	        		);
 	        executor.execute(runnableSpatialize2);
 
