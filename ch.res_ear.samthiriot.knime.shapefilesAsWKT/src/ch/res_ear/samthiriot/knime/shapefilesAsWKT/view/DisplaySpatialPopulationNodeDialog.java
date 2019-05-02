@@ -33,7 +33,7 @@ public class DisplaySpatialPopulationNodeDialog extends DefaultNodeSettingsPane 
         		true));
         addDialogComponent(new DialogComponentColorChooser(
         		new SettingsModelColor("color2", Color.BLUE),
-        		"color for entities 1 (bottom table)",
+        		"color for entities 2 (bottom table)",
         		true));
 
     }

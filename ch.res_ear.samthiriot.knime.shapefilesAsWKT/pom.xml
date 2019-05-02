@@ -16,7 +16,9 @@
   
   
   <properties>
-     <geotools.version>21.0</geotools.version>
+     <!-- <geotools.version>21.0</geotools.version>  -->
+     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>     
+     <geotools.version>22-SNAPSHOT</geotools.version>
 	 <maven.test.skip>true</maven.test.skip>
   </properties>
 

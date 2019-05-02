@@ -1,16 +1,16 @@
 package ch.res_ear.samthiriot.knime.shapefilesAsWKT.view;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 
-import javax.swing.JButton;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JToolBar;
+import javax.swing.JRadioButtonMenuItem;
 
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.map.FeatureLayer;
@@ -18,17 +18,29 @@ import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.lite.StreamingRenderer;
+import org.geotools.styling.FeatureTypeStyle;
+import org.geotools.styling.Fill;
+import org.geotools.styling.Graphic;
+import org.geotools.styling.Mark;
+import org.geotools.styling.PointSymbolizer;
+import org.geotools.styling.Rule;
 import org.geotools.styling.SLD;
+import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
-import org.geotools.swing.JMapFrame;
+import org.geotools.styling.StyleBuilder;
 import org.geotools.swing.JMapPane;
+import org.geotools.swing.action.InfoAction;
+import org.geotools.swing.action.NoToolAction;
 import org.geotools.swing.action.PanAction;
+import org.geotools.swing.action.ResetAction;
 import org.geotools.swing.action.ZoomInAction;
 import org.geotools.swing.action.ZoomOutAction;
+import org.geotools.swing.tool.InfoTool;
 import org.geotools.swing.tool.PanTool;
 import org.geotools.swing.tool.ScrollWheelTool;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeView;
+import org.opengis.filter.FilterFactory2;
 
 /**
  * <code>NodeView</code> for the "DisplaySpatialPopulation" Node.
@@ -60,69 +72,80 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
 	    mapPane.setRenderer(renderer);
 	    mapPane.addMouseListener(new ScrollWheelTool(mapPane));
 	   
-	    //mapFrame = new JMapFrame(content);
-        //mapFrame.enableToolBar(true);
-        //mapFrame.enableStatusBar(true);
-
-        //JToolBar toolbar = mapFrame.getToolBar();
-        //toolbar.add(new PanAction(mapFrame.getMapPane(), true));
-
+	    // prefered dimension is large but not the entire screen
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         mapPane.setPreferredSize(new Dimension(screenSize.width*2/3, screenSize.height*2/3));
         
 	    setComponent(mapPane);
 	    
-	    //mapPane.addMouseListener(new PanTool());
-	    
-	    /*
-	    try {
-		    PanTool panTool = new PanTool();
-		    panTool.setMapPane(mapPane);
-	    } catch (RuntimeException | NoClassDefFoundError e) {
-	    	e.printStackTrace();
-	    	logger.warn("unable to use panning: "+e.getMessage());
-	    }
-	    */
-	    
-	   //mapPane.setPreferredSize(new Dimension(screenSize.width*2/3, screenSize.height*2/3));
-       
-        //setComponent(mapPane);
-        
+	    // add a menu with tools to zoom, pan, etc.
 	    try {
 		    JMenuBar menuBar = getJMenuBar();
 		    
-	        JMenu menu = new JMenu("Geotools");
-	        menu.setMnemonic('G');
+		    ButtonGroup group = new ButtonGroup();
+
+	        JMenu menu = new JMenu("Spatial tools");
+	        menu.setMnemonic('S');
 	        
 	        {
-	        	JMenuItem panMenu = new JMenuItem(PanTool.TOOL_NAME);
+	        	JMenuItem resetMenu = new JMenuItem("Zoom to fit");
+	        	System.out.println(ResetAction.SMALL_ICON);
+	        	resetMenu.setIcon(new ImageIcon(ResetAction.SMALL_ICON));
+	        	resetMenu.addActionListener(new ResetAction(mapPane));
+	        	menu.add(resetMenu);
+	        }
+	        menu.addSeparator();
+
+	        {
+	        	JRadioButtonMenuItem noToolMenu = new JRadioButtonMenuItem(NoToolAction.TOOL_NAME);
+	        	group.add(noToolMenu);
+	        	noToolMenu.setSelected(true);
+	        	noToolMenu.addActionListener(new NoToolAction(mapPane));
+	        	menu.add(noToolMenu);
+	        }
+	        {
+	        	JRadioButtonMenuItem panMenu = new JRadioButtonMenuItem(PanTool.TOOL_NAME);
+	        	group.add(panMenu);
+	        	panMenu.setIcon(new ImageIcon(PanTool.ICON_IMAGE));
 	        	panMenu.setMnemonic('P');
-	        	//panMenu.setToolTipText(PanTool.TOOL_TIP);
-	        	//panMenu.addActionListener(new PanAction(mapPane));
+	        	panMenu.addActionListener(new PanAction(mapPane));
 	        	menu.add(panMenu);
 	        }
 	        {
-	        	JMenuItem panMenu = new JMenuItem("Zoom in");
-	        	panMenu.setMnemonic('+');
-	        	//panMenu.setToolTipText(ZoomInAction.SHORT_DESCRIPTION);
-	        	// TODO panMenu.setIcon(ZoomInAction.SMALL_ICON);
-	        	panMenu.addActionListener(new ZoomInAction(mapPane));
-	        	menu.add(panMenu);
+	        	JRadioButtonMenuItem infoMenu = new JRadioButtonMenuItem(InfoTool.TOOL_NAME);
+	        	group.add(infoMenu);
+	        	infoMenu.setIcon(new ImageIcon(InfoTool.ICON_IMAGE));
+	        	infoMenu.addActionListener(new InfoAction(mapPane));
+	        	menu.add(infoMenu);
 	        }
 	        {
-	        	JMenuItem panMenu = new JMenuItem("Zoom out");
-	        	panMenu.setMnemonic('-');
-	        	panMenu.addActionListener(new ZoomOutAction(mapPane));
-	        	menu.add(panMenu);
+	        	JRadioButtonMenuItem zoomInMenu = new JRadioButtonMenuItem("Zoom in");
+	        	group.add(zoomInMenu);
+	        	zoomInMenu.setMnemonic('+');
+	        	zoomInMenu.setIcon(new ImageIcon(ZoomInAction.SMALL_ICON));
+	        	zoomInMenu.addActionListener(new ZoomInAction(mapPane));
+	        	menu.add(zoomInMenu);
 	        }
-	        
-	        
+	        {
+	        	JRadioButtonMenuItem zoomOutMenu = new JRadioButtonMenuItem("Zoom out");
+	        	group.add(zoomOutMenu);
+	        	zoomOutMenu.setMnemonic('-');
+	        	zoomOutMenu.setIcon(new ImageIcon(ZoomOutAction.SMALL_ICON));
+	        	zoomOutMenu.addActionListener(new ZoomOutAction(mapPane));
+	        	menu.add(zoomOutMenu);
+	        }
+	       
 		    menuBar.add(menu);
 		    
 	    } catch (NoClassDefFoundError e) {
 	    	e.printStackTrace();
 	    	logger.warn("unable to display toolbars");
 	    }
+	    
+    }
+    
+    protected void uncheckAll() {
+    	
     }
 
     /**
@@ -151,10 +174,59 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
     protected void onClose() {
     
     	content.dispose();
-    	
 
     }
 
+    protected Style getDefaultStyling() {
+    	
+    	// We are using the GeoTools StyleBuilder that is helpful for quickly making things
+        StyleBuilder builder = new StyleBuilder();
+        FilterFactory2 ff = builder.getFilterFactory();
+
+        // RULE 1
+        // first rule to draw cities
+
+        // define a point symbolizer representing a city
+        Graphic city = builder.createGraphic();
+        city.setSize(ff.literal(10));
+        city.graphicalSymbols().add(builder.createExternalGraphic("file:city.svg", "svg")); // svg
+        // preferred
+        city.graphicalSymbols()
+                .add(builder.createExternalGraphic("file:city.png", "png")); // png next
+        city.graphicalSymbols()
+                .add(builder.createMark(StyleBuilder.MARK_CIRCLE, Color.BLUE, Color.BLACK, 1));
+        PointSymbolizer pointSymbolizer = builder.createPointSymbolizer(city, "the_geom");
+
+        Rule rule1 = builder.createRule(pointSymbolizer);
+        rule1.setName("rule1");
+        rule1.getDescription().setTitle("City");
+        rule1.getDescription().setAbstract("Rule for drawing cities");
+        rule1.setFilter(ff.less(ff.property("POPULATION"), ff.literal(50000)));
+
+        //
+        // RULE 2 Default
+        Graphic dotGraphic =
+                builder.createGraphic(null, builder.createMark(StyleBuilder.MARK_CIRCLE), null);
+        PointSymbolizer dotSymbolize = builder.createPointSymbolizer(dotGraphic);
+        Rule rule2 = builder.createRule(dotSymbolize);
+        rule2.setIsElseFilter(true);
+
+        //
+        // define feature type styles used to actually define how features are rendered
+        Rule rules[] = new Rule[] {rule1, rule2};
+        FeatureTypeStyle featureTypeStyle = builder.createFeatureTypeStyle("Feature", rules);
+
+        //
+        // create a "user defined" style
+        Style style = builder.createStyle();
+        style.setName("style");
+        style.getDescription().setTitle("User Style");
+        style.getDescription().setAbstract("Definition of Style");
+        style.featureTypeStyles().add(featureTypeStyle);
+
+        return style;
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -176,7 +248,18 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
         	// add layer 1
     		SimpleFeatureSource shapefileSource = nodeModel.datastore1.getFeatureSource(
     				nodeModel.datastore1.getNames().get(0));
-    	    Style shpStyle = SLD.createPolygonStyle(nodeModel.m_color1.getColorValue(), nodeModel.m_color1.getColorValue(), 0.0f);
+    		
+    		String geometryType = shapefileSource.getSchema().getGeometryDescriptor().getType().getBinding().getSimpleName();
+    		//Style shpStyle = SLD.createSimpleStyle(nodeModel.datastore1, geometryType, nodeModel.m_color1.getColorValue());
+    		Style shpStyle = SLD.createSimpleStyle(shapefileSource.getSchema(), nodeModel.m_color1.getColorValue());
+    		/*
+    		if ("point".equals(geometryType)) {
+    			shpStyle = SLD.createSimpleStyle(store, typeName, nodeModel.m_color1.getColorValue());
+
+    		} else {
+    			shpStyle = SLD.createPolygonStyle(nodeModel.m_color1.getColorValue(), nodeModel.m_color1.getColorValue(), 0.0f);
+    		}
+    		*/
     	    Layer shpLayer = new FeatureLayer(shapefileSource, shpStyle);       
             content.addLayer(shpLayer);
             mapPane.setDisplayArea(content.getMaxBounds());
@@ -188,7 +271,10 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
             	System.out.println("display data source 2 "+nodeModel.datastore2.getNames());
             	SimpleFeatureSource shapefileSource2 = nodeModel.datastore2.getFeatureSource(
         				nodeModel.datastore2.getNames().get(0));
-        	    Style shpStyle2 = SLD.createPolygonStyle(nodeModel.m_color2.getColorValue(), null, 0.0f);
+        	    //Style shpStyle2 = SLD.createPolygonStyle(nodeModel.m_color2.getColorValue(), null, 0.0f);
+        		//Style shpStyle2 = SLD.createSimpleStyle(nodeModel.datastore2, geometryType, nodeModel.m_color2.getColorValue());
+        		Style shpStyle2 = SLD.createSimpleStyle(shapefileSource2.getSchema(), nodeModel.m_color2.getColorValue());
+
         	    Layer shpLayer2 = new FeatureLayer(shapefileSource2, shpStyle2);       
                 content.addLayer(shpLayer2);
 
