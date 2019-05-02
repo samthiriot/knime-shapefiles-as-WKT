@@ -163,7 +163,8 @@ public class SpatialUtils {
 				BufferedDataTable sample,
 				String colNameGeom,
 				String featureName,
-				CoordinateReferenceSystem crs
+				CoordinateReferenceSystem crs,
+				boolean addIncrementalId
 				)
 				throws IllegalArgumentException {
 		
@@ -179,7 +180,10 @@ public class SpatialUtils {
         		geomClassToBeStored
         		);
         builder.add("rowid", String.class);
-
+        
+        if (addIncrementalId)
+        	builder.add("inc_id", Integer.class);
+        
         // build the type
         final SimpleFeatureType type = builder.buildFeatureType();
 
@@ -226,13 +230,15 @@ public class SpatialUtils {
 		private final SimpleFeatureStore featureStore;
 		private final SimpleFeatureType type;
 		private final ExecutionMonitor execProgress;
+		private final boolean addIncrementalId;
 		
 		public AddRowsRunnable(
 				BufferedDataTable sample, 
 				int idxColGeom,
 				SimpleFeatureStore featureStore,
 				SimpleFeatureType type,
-				ExecutionMonitor execProgress
+				ExecutionMonitor execProgress,
+				boolean addIncrementalId
 				) {
 			this.sample = sample;
 			this.idxColGeom = idxColGeom;
@@ -240,7 +246,8 @@ public class SpatialUtils {
 			this.type = type;
 			this.execProgress = execProgress;
 	        this.featureBuilder = new SimpleFeatureBuilder(type);
-
+	        this.addIncrementalId = addIncrementalId;
+	        
 			GeometryFactory geomFactory = JTSFactoryFinder.getGeometryFactory( null );
 	        reader = new WKTReader(geomFactory);
 		}
@@ -252,7 +259,7 @@ public class SpatialUtils {
 			this.execProgress.setProgress(.0);
 			
 			double total = (double)this.sample.size();
-			long current = 0;
+			int current = 0;
 			
 			//System.out.println(Thread.currentThread().getName()+"  will store total "+this.sample.size());
 			Iterator<DataRow> itRow = sample.iterator();
@@ -267,6 +274,7 @@ public class SpatialUtils {
             		continue; // ignore data with missing elements
             	}
             	
+            	// add geometry
             	try {
     				Geometry geom = reader.read(cellGeom.toString());
     				featureBuilder.add(geom);
@@ -276,13 +284,25 @@ public class SpatialUtils {
     						"Invalid WKT geometry on row "+
     						currentRow.getKey()+":"+
     						e.getMessage(), 
-    						e);    			}
+    						e);    			
+    			}
             	
+            	// add row id
             	final String rowid = currentRow.getKey().getString();
-                SimpleFeature feature = featureBuilder.buildFeature(
-                		rowid, new Object[] { rowid }
-                		);
-             
+            	
+                // add incrementalId
+            	SimpleFeature feature = null;
+                if (addIncrementalId) {
+                    feature = featureBuilder.buildFeature(
+                    		rowid, new Object[] { rowid, current }
+                    		);
+                } else {
+                    feature = featureBuilder.buildFeature(
+                    		rowid, new Object[] { rowid }
+                    		);
+                }
+                
+
                 toStore.add(feature);
                 
 				if (toStore.size() >= BUFFER) {
@@ -334,15 +354,16 @@ public class SpatialUtils {
 			ExecutionMonitor execProgress,
 			DataStore datastore,
 			String featureName,
-			CoordinateReferenceSystem crs
+			CoordinateReferenceSystem crs,
+			boolean addIncrementalId
 			) throws IOException {
 		
-		SimpleFeatureType type = createGeotoolsType(sample, colNameGeom, featureName, crs);
+		SimpleFeatureType type = createGeotoolsType(sample, colNameGeom, featureName, crs, addIncrementalId);
 		SimpleFeatureStore store = createFeatureStore(sample, datastore, type, featureName);
 
 		final int idxColGeom = sample.getDataTableSpec().findColumnIndex(colNameGeom);
 
-        return new AddRowsRunnable(sample, idxColGeom, store, type, execProgress);
+        return new AddRowsRunnable(sample, idxColGeom, store, type, execProgress, addIncrementalId);
         		
 	}
 		
