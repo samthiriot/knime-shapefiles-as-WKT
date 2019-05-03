@@ -3,7 +3,6 @@ package ch.res_ear.samthiriot.knime.shapefilesAsWKT.view;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -22,13 +21,10 @@ import org.geotools.map.MapContent;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.styling.FeatureTypeStyle;
-import org.geotools.styling.Fill;
 import org.geotools.styling.Graphic;
-import org.geotools.styling.Mark;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.Rule;
 import org.geotools.styling.SLD;
-import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.swing.JMapPane;
@@ -194,56 +190,6 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
     	content.dispose();
 
     }
-
-    protected Style getDefaultStyling() {
-    	
-    	// We are using the GeoTools StyleBuilder that is helpful for quickly making things
-        StyleBuilder builder = new StyleBuilder();
-        FilterFactory2 ff = builder.getFilterFactory();
-
-        // RULE 1
-        // first rule to draw cities
-
-        // define a point symbolizer representing a city
-        Graphic city = builder.createGraphic();
-        city.setSize(ff.literal(10));
-        city.graphicalSymbols().add(builder.createExternalGraphic("file:city.svg", "svg")); // svg
-        // preferred
-        city.graphicalSymbols()
-                .add(builder.createExternalGraphic("file:city.png", "png")); // png next
-        city.graphicalSymbols()
-                .add(builder.createMark(StyleBuilder.MARK_CIRCLE, Color.BLUE, Color.BLACK, 1));
-        PointSymbolizer pointSymbolizer = builder.createPointSymbolizer(city, "the_geom");
-
-        Rule rule1 = builder.createRule(pointSymbolizer);
-        rule1.setName("rule1");
-        rule1.getDescription().setTitle("City");
-        rule1.getDescription().setAbstract("Rule for drawing cities");
-        rule1.setFilter(ff.less(ff.property("POPULATION"), ff.literal(50000)));
-
-        //
-        // RULE 2 Default
-        Graphic dotGraphic =
-                builder.createGraphic(null, builder.createMark(StyleBuilder.MARK_CIRCLE), null);
-        PointSymbolizer dotSymbolize = builder.createPointSymbolizer(dotGraphic);
-        Rule rule2 = builder.createRule(dotSymbolize);
-        rule2.setIsElseFilter(true);
-
-        //
-        // define feature type styles used to actually define how features are rendered
-        Rule rules[] = new Rule[] {rule1, rule2};
-        FeatureTypeStyle featureTypeStyle = builder.createFeatureTypeStyle("Feature", rules);
-
-        //
-        // create a "user defined" style
-        Style style = builder.createStyle();
-        style.setName("style");
-        style.getDescription().setTitle("User Style");
-        style.getDescription().setAbstract("Definition of Style");
-        style.featureTypeStyles().add(featureTypeStyle);
-
-        return style;
-    }
     
     /**
      * {@inheritDoc}
@@ -267,17 +213,8 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
     		SimpleFeatureSource shapefileSource = nodeModel.datastore1.getFeatureSource(
     				nodeModel.datastore1.getNames().get(0));
     		
-    		String geometryType = shapefileSource.getSchema().getGeometryDescriptor().getType().getBinding().getSimpleName();
-    		//Style shpStyle = SLD.createSimpleStyle(nodeModel.datastore1, geometryType, nodeModel.m_color1.getColorValue());
     		Style shpStyle = SLD.createSimpleStyle(shapefileSource.getSchema(), nodeModel.m_color1.getColorValue());
-    		/*
-    		if ("point".equals(geometryType)) {
-    			shpStyle = SLD.createSimpleStyle(store, typeName, nodeModel.m_color1.getColorValue());
-
-    		} else {
-    			shpStyle = SLD.createPolygonStyle(nodeModel.m_color1.getColorValue(), nodeModel.m_color1.getColorValue(), 0.0f);
-    		}
-    		*/
+    		
     	    Layer shpLayer = new FeatureLayer(shapefileSource, shpStyle);       
             content.addLayer(shpLayer);
             mapPane.setDisplayArea(content.getMaxBounds());
