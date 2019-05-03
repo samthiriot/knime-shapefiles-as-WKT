@@ -11,6 +11,17 @@
 shapefiles in their WKT format.
    </description>
 
+   <copyright>
+      (c) Copyright EIFER&apos;s team 2018, 2019.  All rights reserved.
+
+EIFER:
+Europäisches Institut für Energieforschung EDF-KIT EWIV
+(European Institute for Energy Research)
+Emmy-Noether-Strasse 11, ground floor
+D-76131 Karlsruhe
+Germany
+   </copyright>
+
    <license url="https://www.gnu.org/licenses/gpl.txt">
       GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
