@@ -3,9 +3,12 @@ package ch.res_ear.samthiriot.knime.shapefilesAsWKT.view;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.File;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -30,6 +33,7 @@ import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.swing.JMapPane;
 import org.geotools.swing.action.InfoAction;
+import org.geotools.swing.action.MapAction;
 import org.geotools.swing.action.NoToolAction;
 import org.geotools.swing.action.PanAction;
 import org.geotools.swing.action.ResetAction;
@@ -89,24 +93,31 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
 	        
 	        {
 	        	JMenuItem resetMenu = new JMenuItem("Zoom to fit");
-	        	System.out.println(ResetAction.SMALL_ICON);
-	        	resetMenu.setIcon(new ImageIcon(ResetAction.SMALL_ICON));
-	        	resetMenu.addActionListener(new ResetAction(mapPane));
+	        	MapAction a = new ResetAction(mapPane);
+	        	resetMenu.setIcon((Icon) a.getValue(ResetAction.SMALL_ICON));
+	        	resetMenu.addActionListener(a);
 	        	menu.add(resetMenu);
 	        }
 	        menu.addSeparator();
 
 	        {
 	        	JRadioButtonMenuItem noToolMenu = new JRadioButtonMenuItem(NoToolAction.TOOL_NAME);
+	        	MapAction a = new NoToolAction(mapPane);
 	        	group.add(noToolMenu);
 	        	noToolMenu.setSelected(true);
-	        	noToolMenu.addActionListener(new NoToolAction(mapPane));
+	        	noToolMenu.setIcon((Icon) a.getValue(NoToolAction.SMALL_ICON));
+	        	noToolMenu.addActionListener(a);
 	        	menu.add(noToolMenu);
 	        }
 	        {
 	        	JRadioButtonMenuItem panMenu = new JRadioButtonMenuItem(PanTool.TOOL_NAME);
 	        	group.add(panMenu);
-	        	panMenu.setIcon(new ImageIcon(PanTool.ICON_IMAGE));
+	        	try {
+	        		panMenu.setIcon(new ImageIcon(ImageIO.read(getClass().getResourceAsStream(PanTool.ICON_IMAGE))));
+				} catch (IOException e) {
+					logger.error("unable to load image resource "+PanTool.ICON_IMAGE, e);
+					e.printStackTrace();
+				}
 	        	panMenu.setMnemonic('P');
 	        	panMenu.addActionListener(new PanAction(mapPane));
 	        	menu.add(panMenu);
@@ -114,24 +125,31 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
 	        {
 	        	JRadioButtonMenuItem infoMenu = new JRadioButtonMenuItem(InfoTool.TOOL_NAME);
 	        	group.add(infoMenu);
-	        	infoMenu.setIcon(new ImageIcon(InfoTool.ICON_IMAGE));
+	        	try {
+	        		infoMenu.setIcon(new ImageIcon(ImageIO.read(getClass().getResourceAsStream(InfoTool.ICON_IMAGE))));
+				} catch (IOException e) {
+					logger.error("unable to load image resource "+InfoTool.ICON_IMAGE, e);
+					e.printStackTrace();
+				}
 	        	infoMenu.addActionListener(new InfoAction(mapPane));
 	        	menu.add(infoMenu);
 	        }
 	        {
 	        	JRadioButtonMenuItem zoomInMenu = new JRadioButtonMenuItem("Zoom in");
 	        	group.add(zoomInMenu);
+	        	MapAction a = new ZoomInAction(mapPane);
 	        	zoomInMenu.setMnemonic('+');
-	        	zoomInMenu.setIcon(new ImageIcon(ZoomInAction.SMALL_ICON));
-	        	zoomInMenu.addActionListener(new ZoomInAction(mapPane));
+	        	zoomInMenu.setIcon((Icon) a.getValue(ZoomInAction.SMALL_ICON));
+				zoomInMenu.addActionListener(a);
 	        	menu.add(zoomInMenu);
 	        }
 	        {
 	        	JRadioButtonMenuItem zoomOutMenu = new JRadioButtonMenuItem("Zoom out");
 	        	group.add(zoomOutMenu);
 	        	zoomOutMenu.setMnemonic('-');
-	        	zoomOutMenu.setIcon(new ImageIcon(ZoomOutAction.SMALL_ICON));
-	        	zoomOutMenu.addActionListener(new ZoomOutAction(mapPane));
+	        	MapAction a = new ZoomInAction(mapPane);
+	        	zoomOutMenu.setIcon((Icon) a.getValue(ZoomOutAction.SMALL_ICON));
+	        	zoomOutMenu.addActionListener(a);
 	        	menu.add(zoomOutMenu);
 	        }
 	       
