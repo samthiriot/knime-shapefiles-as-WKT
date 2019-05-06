@@ -450,13 +450,27 @@ public class SpatialUtils {
 			SimpleFeatureSource source,
 			int maxBuffer) {
 		
-		int stepBuffer = maxBuffer/5;
-
+		List<Integer> distances = new LinkedList<Integer>();
+		{
+			distances.add(maxBuffer);
+			int current = maxBuffer;
+			while (current >= 100) {
+				current = current-20;
+				distances.add(0, current);
+			}
+			while (current >= 20) {
+				current = current - 10;
+				distances.add(0, current);
+			}
+				
+		}
+		
 		double shortestDistance = Double.MAX_VALUE;
 		List<SimpleFeature> closestPoints = new LinkedList<SimpleFeature>();
 
-		for (int bufferDistance = stepBuffer; bufferDistance <= stepBuffer*5+1; bufferDistance += stepBuffer) {
+		for (Integer bufferDistance: distances) {
 
+			System.out.println("searching around "+bufferDistance);
 			FeatureIterator<SimpleFeature> itNeighboors = findClosestNeighboorFixBuffer(geom, source, bufferDistance);
 
 			// compute distances
@@ -487,7 +501,7 @@ public class SpatialUtils {
 			return closestPoints.get(0);
 		} else if (closestPoints.size() > 1) {
 			// or one random
-			Random random = new Random();
+			Random random = new Random(); // TODO?!
 			System.err.println("selecting one random neighboor among "+closestPoints.size());
 			return closestPoints.get(random.nextInt(closestPoints.size()));
 		}

@@ -1,6 +1,5 @@
 package ch.res_ear.samthiriot.knime.shapefilesAsWKT.view;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.IOException;
@@ -14,19 +13,15 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 
+import org.eclipse.core.runtime.Platform;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.map.FeatureLayer;
 import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.lite.StreamingRenderer;
-import org.geotools.styling.FeatureTypeStyle;
-import org.geotools.styling.Graphic;
-import org.geotools.styling.PointSymbolizer;
-import org.geotools.styling.Rule;
 import org.geotools.styling.SLD;
 import org.geotools.styling.Style;
-import org.geotools.styling.StyleBuilder;
 import org.geotools.swing.JMapPane;
 import org.geotools.swing.action.InfoAction;
 import org.geotools.swing.action.MapAction;
@@ -40,7 +35,7 @@ import org.geotools.swing.tool.PanTool;
 import org.geotools.swing.tool.ScrollWheelTool;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeView;
-import org.opengis.filter.FilterFactory2;
+import org.osgi.framework.Bundle;
 
 /**
  * <code>NodeView</code> for the "DisplaySpatialPopulation" Node.
