@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?eclipse version="3.0"?><plugin>
+                            <extension
+                                  point="org.knime.product.splashExtension">
+                               <splashExtension
+                                     icon="icons/wkt48.png"
+                                     icon24="icons/wkt24.png"
+                                     icon32="icons/wkt32.png"
+                                     id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.splashExtension"
+                                     tooltip="WKT nodes for KNIME">
+                               </splashExtension>
+                            </extension>
    <extension point="org.knime.workbench.repository.categories">
       <category description="Manipulation of shapefiles as WKT text" icon="icons/shapefilesAsWKT.png" level-id="spatialAsWKT" locked="false" name="Shapefiles as WKT" path="/community/">
       </category>
