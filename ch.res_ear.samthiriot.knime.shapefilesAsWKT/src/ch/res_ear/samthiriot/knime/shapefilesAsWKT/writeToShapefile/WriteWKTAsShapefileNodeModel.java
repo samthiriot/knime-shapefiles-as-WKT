@@ -123,11 +123,12 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
         		);
         
         // create mappers
+        
         List<DataTableToGeotoolsMapper> mappers = inputPopulation
         												.getDataTableSpec()
         												.stream()
         												.filter(colspec -> !SpatialUtils.GEOMETRY_COLUMN_NAME.equals((colspec.getName())))
-        												.map(colspec -> new DataTableToGeotoolsMapper(logger, colspec))
+        												.map(colspec -> new DataTableToGeotoolsMapper(getLogger(), colspec))
         												.collect(Collectors.toList());
         // add those to the builder type
         mappers.forEach(mapper -> mapper.addAttributeForSpec(builder));
