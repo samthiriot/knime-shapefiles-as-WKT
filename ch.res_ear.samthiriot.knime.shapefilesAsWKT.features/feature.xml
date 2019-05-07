@@ -704,14 +704,8 @@ Public License instead of this License.  But first, please read
    </url>
 
    <requires>
-      <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.knime.workbench.core"/>
-      <import plugin="org.knime.workbench.repository"/>
       <import plugin="org.knime.base"/>
-      <import plugin="org.eclipse.xsd" version="2.13.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui.forms" version="3.7.101" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui.views" version="3.9.0" match="greaterOrEqual"/>
-      <import plugin="org.knime.product" version="3.7.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
