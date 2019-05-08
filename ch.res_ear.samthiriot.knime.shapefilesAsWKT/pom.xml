@@ -71,7 +71,37 @@
 		<artifactId>gt-image</artifactId>
 		<version>${geotools.version}</version>
 	</dependency>
+		
+	<dependency>
+		<groupId>org.geotools.jdbc</groupId>
+		<artifactId>gt-jdbc-postgis</artifactId>
+		<version>${geotools.version}</version>
+	</dependency>
 	
+	<dependency>
+   	   <groupId>org.geotools.jdbc</groupId>
+	   <artifactId>gt-jdbc-mysql</artifactId>
+	   <version>${geotools.version}</version>
+	 </dependency>
+	 
+	  <dependency>
+   	   <groupId>org.geotools.jdbc</groupId>
+	   <artifactId>gt-jdbc-h2</artifactId>
+	   <version>${geotools.version}</version>
+	 </dependency>
+	 
+	 <dependency>
+   	   <groupId>org.geotools.jdbc</groupId>
+	   <artifactId>gt-jdbc-h2</artifactId>
+	   <version>${geotools.version}</version>
+	 </dependency>
+	 
+	 <dependency>
+	   <groupId>org.geotools</groupId>
+	   <artifactId>gt-geopkg</artifactId>
+	   <version>${geotools.version}</version>
+	 </dependency>
+	 
 	<dependency>
 		<groupId>org.geotools</groupId>
 		<artifactId>gt-arcgrid</artifactId>
