@@ -35,9 +35,6 @@ import ch.res_ear.samthiriot.knime.shapefilesAsWKT.SpatialUtils;
  */
 public class DisplaySpatialPopulationNodeModel extends NodeModel {
     
-    // the logger instance
-    private static final NodeLogger logger = NodeLogger.getLogger(DisplaySpatialPopulationNodeModel.class);
-        
     protected DataStore datastore1 = null;
     protected File tmpFile1 = null;
     
