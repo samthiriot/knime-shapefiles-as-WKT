@@ -25,6 +25,15 @@
 		Other columns are written as attributes of the features, with an automatic conversion of classical KNIME types:
 		String, Double, Long, Integer, Boolean. Other attribute types are mapped to String attributes.
 		</p>
+		<p>
+		Due to limitations of the shapefile format:
+		<ul>
+			<li>A maximum of 255 fields (columns) can be stored; additional columns will be ignored.</li>
+			<li>Field names (column names) should be of max 10 characters; longer names will be truncated.</li>
+			<li>String values can only store 254 characters; longer ones will be truncated.</li>
+		</ul>
+		In case these limitations apply your data, warnings will be written in the console. 
+		</p>
 		 <p>
         The actual processing is done by the wonderful <a href="https://geotools.org/">geotools library</a>.
 		</p>

@@ -48,6 +48,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import ch.res_ear.samthiriot.knime.shapefilesAsWKT.NodeWarningWriter;
 import ch.res_ear.samthiriot.knime.shapefilesAsWKT.SpatialUtils;
 import ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToShapefile.DataTableToGeotoolsMapper;
 import ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToShapefile.WriteWKTAsShapefileNodeModel;
@@ -71,9 +72,7 @@ public class WriteWKTToKMLNodeModel extends NodeModel {
     
     private final SettingsModelString m_file = new SettingsModelString("filename", null);
     private final SettingsModelBoolean m_removeKMLnamespace = new SettingsModelBoolean("removeNamespace", true);
-    
-    // to be used later; see https://github.com/samthiriot/knime-shapefiles-as-WKT/issues/19
-    //private final SettingsModelBoolean m_useKML22 = new SettingsModelBoolean("useKMLv22", false);
+    private final SettingsModelBoolean m_useKML22 = new SettingsModelBoolean("useKMLv22", true);
     
 	/**
 	 * Constructor for the node model.
@@ -144,11 +143,13 @@ public class WriteWKTToKMLNodeModel extends NodeModel {
         		);
         
         // create mappers
+    	NodeWarningWriter warnings = new NodeWarningWriter(getLogger());
+
         List<DataTableToGeotoolsMapper> mappers = inputPopulation
         												.getDataTableSpec()
         												.stream()
         												.filter(colspec -> !SpatialUtils.GEOMETRY_COLUMN_NAME.equals((colspec.getName())))
-        												.map(colspec -> new DataTableToGeotoolsMapper(logger, colspec))
+        												.map(colspec -> new DataTableToGeotoolsMapper(warnings, colspec))
         												.collect(Collectors.toList());
         // add those to the builder type
         mappers.forEach(mapper -> mapper.addAttributeForSpec(builder));
@@ -186,7 +187,6 @@ public class WriteWKTToKMLNodeModel extends NodeModel {
 		        	featureBuilder.add(geom);
 	
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					throw new RuntimeException(e);
 				}
@@ -234,19 +234,14 @@ public class WriteWKTToKMLNodeModel extends NodeModel {
 
         QName KMLspace = null;
         Configuration configurationEncoder = null;
-        // to be used later 
-        // https://github.com/samthiriot/knime-shapefiles-as-WKT/issues/19
-        /*if (m_useKML22.getBooleanValue()) {
+        if (m_useKML22.getBooleanValue()) {
         	KMLspace = org.geotools.kml.v22.KML.kml;
         	configurationEncoder = new org.geotools.kml.v22.KMLConfiguration();
         } else {
         	KMLspace = org.geotools.kml.KML.kml;
         	configurationEncoder = new KMLConfiguration();
         }
-        */
-        KMLspace = org.geotools.kml.KML.kml;
-    	configurationEncoder = new KMLConfiguration();
-    
+    	
         Encoder encoder = new Encoder(configurationEncoder);
         encoder.setIndenting(true);
         
@@ -285,6 +280,8 @@ public class WriteWKTToKMLNodeModel extends NodeModel {
             
         }
         exec.setProgress(1);
+        
+        setWarningMessage(warnings.buildWarnings());
 
         return new BufferedDataTable[]{};
         
@@ -328,7 +325,7 @@ public class WriteWKTToKMLNodeModel extends NodeModel {
         
     	m_file.saveSettingsTo(settings);
     	m_removeKMLnamespace.saveSettingsTo(settings);
-    	// later: m_useKML22.saveSettingsTo(settings);
+    	m_useKML22.saveSettingsTo(settings);
     }
 
     /**
@@ -341,7 +338,7 @@ public class WriteWKTToKMLNodeModel extends NodeModel {
         
     	m_file.loadSettingsFrom(settings);
     	m_removeKMLnamespace.loadSettingsFrom(settings);
-    	// later: m_useKML22.loadSettingsFrom(settings);
+    	m_useKML22.loadSettingsFrom(settings);
     }
 
     /**
@@ -353,7 +350,7 @@ public class WriteWKTToKMLNodeModel extends NodeModel {
             
     	m_file.validateSettings(settings);
     	m_removeKMLnamespace.validateSettings(settings);
-    	// later: m_useKML22.validateSettings(settings);
+    	m_useKML22.validateSettings(settings);
     }
     
     /**

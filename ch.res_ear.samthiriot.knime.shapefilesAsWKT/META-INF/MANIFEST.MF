@@ -114,7 +114,8 @@ Bundle-ClassPath: readshapefileaskml.jar,
 Bundle-Activator: ch.res_ear.samthiriot.knime.shapefilesAsWKT.ShapefileAsWKTNodePlugin
 Bundle-Vendor: EIFER
 Require-Bundle: org.knime.workbench.core,
- org.knime.base
+ org.knime.base,
+ org.eclipse.xsd;bundle-version="2.13.0"
 Bundle-ActivationPolicy: lazy
 Export-Package: .,
  au.com.objectix.jgridshift,

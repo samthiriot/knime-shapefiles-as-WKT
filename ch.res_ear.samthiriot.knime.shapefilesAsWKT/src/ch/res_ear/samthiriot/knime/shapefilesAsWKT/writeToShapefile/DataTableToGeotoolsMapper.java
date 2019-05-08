@@ -8,7 +8,8 @@ import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.IntCell;
 import org.knime.core.data.def.LongCell;
 import org.knime.core.data.def.StringCell;
-import org.knime.core.node.NodeLogger;
+
+import ch.res_ear.samthiriot.knime.shapefilesAsWKT.IWarningWriter;
 
 /**
  * Maps a KNIME column into a geotools attribute.  
@@ -27,13 +28,17 @@ public class DataTableToGeotoolsMapper {
 		Boolean,
 		Ignore
 	}
+
 	
-	protected final NodeLogger logger;
+	protected final IWarningWriter warnWriter;
 	protected final DataColumnSpec colspec;
 	protected final GeotoolTargetType targetType;
 	
-	public DataTableToGeotoolsMapper(NodeLogger logger, DataColumnSpec knimeColSpec) {
-		this.logger = logger;
+	public DataTableToGeotoolsMapper(
+			IWarningWriter warnWriter, 
+			DataColumnSpec knimeColSpec
+			) {
+		this.warnWriter =warnWriter;
 		this.colspec = knimeColSpec;
 		this.targetType = detectAttributeTypeForSpec(knimeColSpec);
 	}
@@ -66,11 +71,18 @@ public class DataTableToGeotoolsMapper {
 		
 		// TODO other?
 		
-		logger.warn("the column "+colspec.getName()+" is of unknown type "+colspec.getType()+"; it will be mapped to String");
+		warnWriter.warn("the column "+colspec.getName()+" is of unknown type "+colspec.getType()+"; it will be mapped to String");
 		
 		return GeotoolTargetType.Ignore;
 	}
 	
+	/**
+	 * returns a name compliant with the limitation
+	 * @return
+	 */
+	public String getName() {
+		return colspec.getName();
+	}
 
 	/**
 	 * Add the geotools attribute to this builder
@@ -84,22 +96,22 @@ public class DataTableToGeotoolsMapper {
 		switch (targetType) {
 		
 			case Integer:
-				builder.add(colspec.getName(), Integer.class);
+				builder.add(getName(), Integer.class);
 				break;
 			case String:
-				builder.add(colspec.getName(), String.class);
+				builder.add(getName(), String.class);
 				break;
 			case Double:
-				builder.add(colspec.getName(), Double.class);
+				builder.add(getName(), Double.class);
 				break;
 			case Long:
-				builder.add(colspec.getName(), Long.class);
+				builder.add(getName(), Long.class);
 				break;
 			case Boolean:
-				builder.add(colspec.getName(), Boolean.class);
+				builder.add(getName(), Boolean.class);
 				break;
 			case Ignore:
-				builder.add(colspec.getName(), String.class);
+				builder.add(getName(), String.class);
 				break;
 			default:
 				throw new RuntimeException("Program(er) error: we should have dealt with type "+targetType);
@@ -114,9 +126,15 @@ public class DataTableToGeotoolsMapper {
 		
 		switch (targetType) {
 			case Integer:
-				return ((IntCell)cell).getIntValue();
+				//System.out.println("Int value for "+colspec.getName()+": "+((IntCell)cell).getIntValue());
+				return new Integer(((IntCell)cell).getIntValue());
 			case String:
-				return ((StringCell)cell).getStringValue();
+				final String s = ((StringCell)cell).getStringValue(); 
+				if (s.length() > 254) {
+					warnWriter.warn("due to shapefile limitations, truncating for column "+colspec.getName()+" the value "+s);
+					return s.substring(0, 254);
+				}
+				return s;
 			case Double:
 				return ((DoubleCell)cell).getDoubleValue();
 			case Long:
@@ -124,7 +142,12 @@ public class DataTableToGeotoolsMapper {
 			case Boolean:
 				return ((BooleanCell)cell).getBooleanValue();
 			case Ignore:
-				return cell.toString();
+				final String s2 = cell.toString();
+				if (s2.length() > 254) {
+					warnWriter.warn("due to shapefile limitations, truncating for column "+colspec.getName()+" the value "+s2);
+					return s2.substring(0, 254);
+				}
+				return s2;
 			default:
 				throw new RuntimeException("Program(er) error: we should have dealt with type "+targetType);
 		}

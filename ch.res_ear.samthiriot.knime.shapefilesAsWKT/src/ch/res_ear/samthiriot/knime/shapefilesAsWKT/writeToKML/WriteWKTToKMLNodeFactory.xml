@@ -28,12 +28,9 @@
     				Check for the file to be readable by most programs like qGis or Google Maps. 
     				Enabled by default.</option>
     				
-    	<!-- to be used later; see https://github.com/samthiriot/knime-shapefiles-as-WKT/issues/19
-    	<option name="use KML specification v2.2">Write a file compliant with specifications v2.2
-    				instead of v2.1. Exportation in version 2.2 attempts 
-    				to also export the values of attributes. This support is experimental. 
-    				Disabled by default.</option>
-     	-->
+    	<option name="write attributes and use KML specification v2.2">Write a file compliant with specifications v2.2
+    				instead of v2.1. Also exports the values of attributes. 
+    				Enabled by default. Uncheck in case of exportation issues.</option>
     
     </fullDescription>
     
