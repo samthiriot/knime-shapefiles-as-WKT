@@ -41,14 +41,10 @@ public class WriteWKTToKMLNodeDialog extends DefaultNodeSettingsPane {
         		"remove KML namespace")
         		);
         
-        // to be used later
-        // https://github.com/samthiriot/knime-shapefiles-as-WKT/issues/19
-        /*
         addDialogComponent(new DialogComponentBoolean(
-        		new SettingsModelBoolean("useKMLv22", false), 
-        		"use KML specification v2.2")
+        		new SettingsModelBoolean("useKMLv22", true), 
+        		"write attributes and use KML specification v2.2")
         		);
-        */
     }
 }
 

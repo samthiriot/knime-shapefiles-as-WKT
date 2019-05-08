@@ -706,6 +706,7 @@ Public License instead of this License.  But first, please read
    <requires>
       <import plugin="org.knime.workbench.core"/>
       <import plugin="org.knime.base"/>
+      <import plugin="org.eclipse.xsd" version="2.13.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin

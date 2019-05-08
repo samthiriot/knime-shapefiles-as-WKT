@@ -6,7 +6,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.geotools.data.DataStore;
@@ -39,6 +41,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import ch.res_ear.samthiriot.knime.shapefilesAsWKT.NodeWarningWriter;
 import ch.res_ear.samthiriot.knime.shapefilesAsWKT.SpatialUtils;
 
 
@@ -60,6 +63,7 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
      */
     final static int BUFFER = 5000;
 	
+    final static int MAX_COLUMNS = 255;
 	
     private final SettingsModelString m_file = new SettingsModelString("filename", null);
 
@@ -102,10 +106,11 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
         
     	File file = FileUtil.getFileFromURL(url);
         
+    	NodeWarningWriter warnings = new NodeWarningWriter(getLogger());
+    	
     	// copy the input population into a datastore
     	exec.setMessage("storing entities");
         DataStore datastore = SpatialUtils.createDataStore(file, true);
-        
         
 		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
         builder.setName("entities");
@@ -123,12 +128,22 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
         		);
         
         // create mappers
-        
+        if (inputPopulation.getDataTableSpec().getNumColumns() > MAX_COLUMNS+1) {
+        	int count = (inputPopulation.getDataTableSpec().getNumColumns() - MAX_COLUMNS - 1);
+        	warnings.warn("Only "+MAX_COLUMNS+" columns can be stored in a shapefile format; will ignore the "+
+        			count + " last one(s)"
+        			);
+        }
+        Set<String> usedNames = new HashSet<>();
         List<DataTableToGeotoolsMapper> mappers = inputPopulation
         												.getDataTableSpec()
         												.stream()
         												.filter(colspec -> !SpatialUtils.GEOMETRY_COLUMN_NAME.equals((colspec.getName())))
-        												.map(colspec -> new DataTableToGeotoolsMapper(getLogger(), colspec))
+        												.limit(MAX_COLUMNS)
+        												.map(colspec -> new DataTableToGeotoolsMapperForShapefile(
+        														warnings, 
+        														colspec, 
+        														usedNames))
         												.collect(Collectors.toList());
         // add those to the builder type
         mappers.forEach(mapper -> mapper.addAttributeForSpec(builder));
@@ -184,7 +199,7 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
 				}
 	        	
 	        	int colId = 0;
-	        	for (int i=0; i<row.getNumCells(); i++) {
+	        	for (int i=0; i<row.getNumCells() && i < mappers.size(); i++) {
 	        		
 	        		if (i == idxColGeom) {
 	        			// skip the column with geom
@@ -195,7 +210,7 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
 	        	}
 	        	
 	        	// build this feature
-	            SimpleFeature feature = featureBuilder.buildFeature(null);
+	            SimpleFeature feature = featureBuilder.buildFeature(row.getKey().getString());
 	            // add this feature to the buffer
 	            toStore.add(feature);
 	            if (toStore.size() >= BUFFER) {
@@ -205,7 +220,7 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
 	            }
 	            
 	            if (currentRow % 10 == 0) {
-	        		exec.setProgress((double)currentRow / inputPopulation.size(), "processing entity "+currentRow);
+	        		exec.setProgress((double)currentRow / inputPopulation.size(), "processing row "+currentRow);
 	        		exec.checkCanceled();
 	            }
 	            currentRow++;
@@ -227,6 +242,8 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
             datastore.dispose();
         	
         }
+        
+        setWarningMessage(warnings.buildWarnings());
 
         return new BufferedDataTable[]{};
     }
@@ -260,9 +277,8 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
     		throw new IllegalArgumentException("the input table contains spatial data but no Coordinate Reference System");
     	
     	// check the parameters include a filename
-    	URL url;
 		try {
-			url = FileUtil.toURL(m_file.getStringValue());
+			FileUtil.toURL(m_file.getStringValue());
 		} catch (InvalidPathException | MalformedURLException e2) {
 			e2.printStackTrace();
 			throw new InvalidSettingsException("unable to open URL "+m_file.getStringValue()+": "+e2.getMessage());
