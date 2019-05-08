@@ -97,16 +97,16 @@ public class ReadWKTFromDatabaseNodeDialog extends DefaultNodeSettingsPane {
 			public void stateChanged(ChangeEvent e) {
 				final String type = ms.getStringValue();
 				
-				hostComponent.getComponentPanel().setVisible(
+				hostComponent.getModel().setEnabled(
 						type.equals("postgis") || type.equals("mysql"));
 				
-				portComponent.getComponentPanel().setVisible(
+				portComponent.getModel().setEnabled(
 						type.equals("postgis") || type.equals("mysql"));
 				
-				schemaComponent.getComponentPanel().setVisible(
+				schemaComponent.getModel().setEnabled(
 						type.equals("postgis"));
 				
-				passwordComponent.getComponentPanel().setVisible(
+				passwordComponent.getModel().setEnabled(
 						type.equals("postgis") || type.equals("mysql"));
 				
 			}
