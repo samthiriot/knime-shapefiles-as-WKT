@@ -13,7 +13,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 
-import org.eclipse.core.runtime.Platform;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.map.FeatureLayer;
 import org.geotools.map.Layer;
@@ -35,7 +34,6 @@ import org.geotools.swing.tool.PanTool;
 import org.geotools.swing.tool.ScrollWheelTool;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeView;
-import org.osgi.framework.Bundle;
 
 /**
  * <code>NodeView</code> for the "DisplaySpatialPopulation" Node.
@@ -201,9 +199,7 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
         }
         
         try {
-        	
-        	//System.out.println("layers:" + nodeModel.datastore1.getNames());
-        	
+        	        	
         	// add layer 1
     		SimpleFeatureSource shapefileSource = nodeModel.datastore1.getFeatureSource(
     				nodeModel.datastore1.getNames().get(0));
@@ -213,16 +209,11 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
     	    Layer shpLayer = new FeatureLayer(shapefileSource, shpStyle);       
             content.addLayer(shpLayer);
             mapPane.setDisplayArea(content.getMaxBounds());
-
-        	//System.out.println("added layer 1");
         	
             // add layer 2
             if (nodeModel.datastore2 != null) {
-            	System.out.println("display data source 2 "+nodeModel.datastore2.getNames());
             	SimpleFeatureSource shapefileSource2 = nodeModel.datastore2.getFeatureSource(
         				nodeModel.datastore2.getNames().get(0));
-        	    //Style shpStyle2 = SLD.createPolygonStyle(nodeModel.m_color2.getColorValue(), null, 0.0f);
-        		//Style shpStyle2 = SLD.createSimpleStyle(nodeModel.datastore2, geometryType, nodeModel.m_color2.getColorValue());
         		Style shpStyle2 = SLD.createSimpleStyle(shapefileSource2.getSchema(), nodeModel.m_color2.getColorValue());
 
         	    Layer shpLayer2 = new FeatureLayer(shapefileSource2, shpStyle2);       
