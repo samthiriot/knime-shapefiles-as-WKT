@@ -11,7 +11,6 @@ import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.factory.wms.AutoCRSFactory;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -34,12 +33,8 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
-import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.crs.ProjectedCRS;
-import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -146,15 +141,9 @@ public class SpatialPropertySurfaceNodeModel extends NodeModel {
 		CoordinateReferenceSystem crsOrig = SpatialUtils.decodeCRS(inputTable.getDataTableSpec());
 
 		CRSAuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory("AUTO", null);
-		//factory = ReferencingFactoryFinder.getCRSAuthorityFactory("AUTO", null);
-		DecimalFormat formatter = new DecimalFormat("#.00");
 
-		MathTransform transform1 = CRS.findMathTransform(
-				crsOrig, 
-				DefaultGeographicCRS.WGS84
-				);
-		
 		// iterate each geometry of each row
+		done = 0;
 		SpatialUtils.applyToEachGeometry(
 				inputTable, 
 				geomAndRow -> {
@@ -163,52 +152,16 @@ public class SpatialPropertySurfaceNodeModel extends NodeModel {
 						
 						Geometry transformed = null;
 						
-						// create a target CRS relevant and precise for this point
-						//CoordinateOperationAuthorityFactory factory = ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory("AUTO", null);
-						//ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory("AUTO", null);
-					      
-						try {
-							Point centroid = geomAndRow.geometry.getCentroid(); 
-							CoordinateReferenceSystem crsTarget = factory.createProjectedCRS(
-									"AUTO:42001," + String.format(Locale.ENGLISH, "%.1f", centroid.getX()) 
-									+ "," + String.format(Locale.ENGLISH, "%.1f", centroid.getY())
-									);
-							MathTransform transform2 = CRS.findMathTransform(
-									crsOrig, 
-									crsTarget, 
-									true);
-							transformed = JTS.transform(geomAndRow.geometry, transform2);
-						} catch (FactoryException e) {
-
-							Geometry transformedInter = JTS.transform(geomAndRow.geometry, transform1);
-							Point centroid = transformedInter.getCentroid();
-							CoordinateReferenceSystem crsTarget = factory.createProjectedCRS(
-									"AUTO:42001," + String.format(Locale.ENGLISH, "%.1f", centroid.getX()) 
-									+ "," + String.format(Locale.ENGLISH, "%.1f", centroid.getY())
-									);
-							MathTransform transform2 = CRS.findMathTransform(
-									crsOrig, 
-									crsTarget, 
-									true);
-							// project the geometry into this type
-							transformed = JTS.transform(transformedInter, transform2);
-									
-						}
-						
-						//ReferencingFactoryFinder.getCRSAuthorityFactory("AUTO", null);
-
-						//ProjectedCRS utm = new AutoCRSFactory().createProjectedCRS("AUTO:42001," + centroid.getX() + "," + centroid.getY());
-
-						
-						/*crsTarget = CRS.decode(
-								  "AUTO:42001," + (int)centroid.getX() + "," + (int)centroid.getY(),
-								  false);
-						*/
-						// AUTO:42001
-						// AUTO2:42003
-						// TODO EPSG:3005
-
-
+						Point centroid = geomAndRow.geometry.getCentroid(); 
+						CoordinateReferenceSystem crsTarget = factory.createProjectedCRS(
+								"AUTO:42001," + /*String.format(Locale.ENGLISH, "%.1f", */centroid.getX()//) 
+								+ "," + /*String.format(Locale.ENGLISH, "%.1f",*/ centroid.getY()//)
+								);
+						MathTransform transform2 = CRS.findMathTransform(
+								crsOrig, 
+								crsTarget, 
+								true);
+						transformed = JTS.transform(geomAndRow.geometry, transform2);
 						
 					    // compute the geometry
 					    double surfaceSquareMeter = transformed.getArea();
@@ -233,7 +186,7 @@ public class SpatialPropertySurfaceNodeModel extends NodeModel {
 						  
 					} catch (FactoryException | MismatchedDimensionException | TransformException e) {
 						e.printStackTrace();
-						throw new RuntimeException(e);
+						throw new InvalidSettingsException("An error occured during the reprojection of geometries; please reproject your geometries first: "+e.getMessage());
 					} 
 
 				}
