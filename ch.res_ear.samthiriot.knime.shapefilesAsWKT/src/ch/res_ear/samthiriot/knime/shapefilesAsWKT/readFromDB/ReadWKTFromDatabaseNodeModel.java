@@ -2,8 +2,11 @@ package ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromDB;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
@@ -41,6 +44,7 @@ public class ReadWKTFromDatabaseNodeModel extends AbstractReadWKTFromDatastoreNo
 	protected SettingsModelString m_database = new SettingsModelString("database", "database");
 	protected SettingsModelString m_user = new SettingsModelString("user", "postgres");
 	protected SettingsModelString m_password = new SettingsModelPassword("password", ENCRYPTION_KEY, "postgres");
+	protected SettingsModelString m_layer = new SettingsModelString("layer", null);
 
 
 	/**
@@ -54,6 +58,11 @@ public class ReadWKTFromDatabaseNodeModel extends AbstractReadWKTFromDatastoreNo
 	@Override
 	protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
 		
+		final String layer = m_layer.getStringValue();
+	
+		if (layer == null)
+			throw new InvalidSettingsException("please select one layer to read");
+	
 		final String dbtype = m_dbtype.getStringValue();
 		final String database = m_database.getStringValue();
 		
@@ -98,6 +107,28 @@ public class ReadWKTFromDatabaseNodeModel extends AbstractReadWKTFromDatastoreNo
 		return dataStore;
 	}
 	
+
+	
+	@Override
+	protected String getSchemaName(DataStore datastore) throws InvalidSettingsException {
+
+		final String layer = m_layer.getStringValue();
+		
+		Set<String> typeNames = new HashSet<>();
+		try {
+			typeNames.addAll(Arrays.asList(datastore.getTypeNames()));
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("error when trying to read the layers: "+e.getMessage(), e);
+		}
+		
+		if (!typeNames.contains(layer))
+			throw new InvalidSettingsException("There is no layer named \""+layer+"\" in this datastore");
+		
+		return layer;
+	}
+
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -112,6 +143,7 @@ public class ReadWKTFromDatabaseNodeModel extends AbstractReadWKTFromDatastoreNo
 		m_database.saveSettingsTo(settings);
 		m_user.saveSettingsTo(settings);
 		m_password.saveSettingsTo(settings);
+		m_layer.saveSettingsTo(settings);
 
 	}
 
@@ -128,7 +160,7 @@ public class ReadWKTFromDatabaseNodeModel extends AbstractReadWKTFromDatastoreNo
 		m_database.loadSettingsFrom(settings);
 		m_user.loadSettingsFrom(settings);
 		m_password.loadSettingsFrom(settings);
-
+		m_layer.loadSettingsFrom(settings);
 		
 	}
 
@@ -145,7 +177,7 @@ public class ReadWKTFromDatabaseNodeModel extends AbstractReadWKTFromDatastoreNo
 		m_database.validateSettings(settings);
 		m_user.validateSettings(settings);
 		m_password.validateSettings(settings);
-
+		m_layer.validateSettings(settings);
 	}
 
 	@Override

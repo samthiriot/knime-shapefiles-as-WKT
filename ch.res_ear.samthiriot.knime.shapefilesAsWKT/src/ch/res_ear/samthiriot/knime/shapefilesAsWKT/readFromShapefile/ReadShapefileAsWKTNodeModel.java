@@ -6,6 +6,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,6 +99,29 @@ public class ReadShapefileAsWKTNodeModel extends AbstractReadWKTFromDatastoreNod
     }
         
 
+	@Override
+	protected String getSchemaName(DataStore datastore) throws InvalidSettingsException {
+
+		String schemaName = null;
+		String[] existing = null;
+		try {
+			existing = datastore.getTypeNames();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Error while searching for a schema inside the shapefile: "+e, e);
+		}
+		
+		if (existing.length > 1)
+			getLogger().warn(
+					"there are several layers in this data store: "+
+							Arrays.toString(existing)+"; will open the first one: "+
+							schemaName
+							);
+		schemaName = existing[0];
+		
+		return null;
+	}
+    
 
     /**
      * {@inheritDoc}
@@ -176,7 +200,7 @@ public class ReadShapefileAsWKTNodeModel extends AbstractReadWKTFromDatastoreNod
     	m_charset.validateSettings(settings);
 
     }
-    
+
    
 }
 
