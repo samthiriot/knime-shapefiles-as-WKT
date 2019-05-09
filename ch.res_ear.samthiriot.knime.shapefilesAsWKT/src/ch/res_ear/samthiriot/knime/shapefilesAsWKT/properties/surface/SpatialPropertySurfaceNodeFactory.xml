@@ -6,16 +6,27 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
 		
-    <name>Compute Surface</name>
+    <name>Compute Surface of WKT geometries</name>
     
     <shortDescription>
-        Compute the surface of the geometry
+        Compute the surface of the geometry (m2)
     </shortDescription>
     
     <fullDescription>
         <intro>
-        Compute the surface of the geometry. 
-        Stores the result in a double column.
+        Compute the surface of WKT geometries in square meters. 
+        Stores the result in a novel column of type Double.
+       
+        <p>
+        In order to compute the size of the area in square meters, 
+        the node first reprojects the original parameters into a flat cartesian plane.
+        This might lead to errors in case your initial Coordinate Reference System 
+        is not an ESPG standard one. 
+        If you get errors related to Bursa Wolf parameters or similar errors due to projection, 
+        please try to use the "Reproject WKT geometries" in order to first reproject your
+        geometries into a welldefined CRS. 
+        </p>
+        
         </intro>
         
         <option name="column name">Name of the column which will be created with the surface of each geometry</option>
