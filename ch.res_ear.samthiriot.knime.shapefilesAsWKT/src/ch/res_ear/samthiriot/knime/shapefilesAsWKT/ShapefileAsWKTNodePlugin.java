@@ -5,6 +5,7 @@
 package ch.res_ear.samthiriot.knime.shapefilesAsWKT;
 
 import org.eclipse.core.runtime.Plugin;
+import org.geotools.util.factory.Hints;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -37,6 +38,8 @@ public class ShapefileAsWKTNodePlugin extends Plugin {
     @Override
     public void start(final BundleContext context) throws Exception {
         super.start(context);
+
+        Hints.putSystemDefault(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
 
     }
 

@@ -12,6 +12,7 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
@@ -19,6 +20,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelPassword;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.util.CheckUtils;
 
 import ch.res_ear.samthiriot.knime.shapefilesAsWKT.AbstractReadWKTFromDatastoreNodeModel;
 
@@ -67,7 +69,10 @@ public class ReadWKTFromDatabaseNodeModel extends AbstractReadWKTFromDatastoreNo
 		final String database = m_database.getStringValue();
 		
 		if (dbtype.equals("h2") || dbtype.equals("geopkg") ) {
+			CheckUtils.checkSourceFile(database);
+			
 			// ensure the file exists
+			/*
 			File f = new File(database);
 			if (!f.exists())
 				throw new InvalidSettingsException("For the database type "+dbtype+", the database field should contain the path to an existing file");
@@ -75,13 +80,14 @@ public class ReadWKTFromDatabaseNodeModel extends AbstractReadWKTFromDatastoreNo
 				throw new InvalidSettingsException("For the database type "+dbtype+", the database field should contain the path to a file");
 			if (!f.canRead())
 				throw new InvalidSettingsException("The file "+database+" cannot be read; please check permissions");
+			*/
 		}
 		
 		return super.configure(inSpecs);
 	}
 
 	@Override
-	protected DataStore openDataStore() throws InvalidSettingsException {
+	protected DataStore openDataStore(ExecutionContext exec) throws InvalidSettingsException {
 
 		// @see http://docs.geotools.org/stable/userguide/library/jdbc/postgis.html
         Map<String, Object> params = new HashMap<>();
@@ -97,7 +103,9 @@ public class ReadWKTFromDatabaseNodeModel extends AbstractReadWKTFromDatastoreNo
         //params.put(PostgisDataStoreFactory.PREPARED_STATEMENTS, true );
         DataStore dataStore;
 		try {
-	        getLogger().info("opening as a database: "+params.get("user")+"@"+params.get("host")+":"+params.get("port"));
+			final String dbg = "opening database: "+params.get("user")+"@"+params.get("host")+":"+params.get("port");
+			if (exec != null) exec.setMessage(dbg);
+	        getLogger().info(dbg);
 	        dataStore = DataStoreFinder.getDataStore(params);
 		} catch (IOException e1) {
 			e1.printStackTrace();
