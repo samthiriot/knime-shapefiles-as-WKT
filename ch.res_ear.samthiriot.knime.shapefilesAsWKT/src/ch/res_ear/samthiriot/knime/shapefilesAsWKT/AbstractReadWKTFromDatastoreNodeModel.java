@@ -3,6 +3,7 @@ package ch.res_ear.samthiriot.knime.shapefilesAsWKT;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -59,7 +60,21 @@ public abstract class AbstractReadWKTFromDatastoreNodeModel extends NodeModel {
 		return new DataTableSpec[] { null };
 	}
 
+	/**
+	 * Opens the datastore for reading. Should not create a file nor schema.
+	 * @return
+	 * @throws InvalidSettingsException
+	 */
 	protected abstract DataStore openDataStore() throws InvalidSettingsException;
+	
+	/**
+	 * Define which schema should be open in this datastore, either according to 
+	 * user parameters or by selecting automatically one of them.
+	 * @param datastore
+	 * @return
+	 * @throws InvalidSettingsException
+	 */
+	protected abstract String getSchemaName(DataStore datastore) throws InvalidSettingsException;
 	
     /**
      * {@inheritDoc}
@@ -72,14 +87,8 @@ public abstract class AbstractReadWKTFromDatastoreNodeModel extends NodeModel {
 
 		if (datastore.getTypeNames().length == 0)
 			throw new InvalidSettingsException("this database does not contain any schema");
-			
-		String schemaName;
-		try {
-			schemaName = datastore.getTypeNames()[0];
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Error while searching for a schema inside the shapefile: "+e, e);
-		}
+		
+		String schemaName = getSchemaName(datastore);
 		
 		SimpleFeatureType type;
 		try {

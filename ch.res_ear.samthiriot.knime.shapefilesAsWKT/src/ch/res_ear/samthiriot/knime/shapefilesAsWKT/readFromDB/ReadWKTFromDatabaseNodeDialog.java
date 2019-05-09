@@ -91,6 +91,13 @@ public class ReadWKTFromDatabaseNodeDialog extends DefaultNodeSettingsPane {
         		);
         this.addDialogComponent(passwordComponent);
         
+        DialogComponentString layerComponent = new DialogComponentString(
+        		new SettingsModelString("layer", ""),
+        		"layer"
+        		);
+        this.addDialogComponent(layerComponent);
+        
+        
         ms.addChangeListener(new ChangeListener() {
 			
 			@Override
@@ -109,6 +116,9 @@ public class ReadWKTFromDatabaseNodeDialog extends DefaultNodeSettingsPane {
 				passwordComponent.getModel().setEnabled(
 						type.equals("postgis") || type.equals("mysql"));
 				
+				/*layerComponent.getModel().setEnabled(
+						type.equals("postgis")  || type.equals("mysql"))
+						);*/
 			}
 		});
         

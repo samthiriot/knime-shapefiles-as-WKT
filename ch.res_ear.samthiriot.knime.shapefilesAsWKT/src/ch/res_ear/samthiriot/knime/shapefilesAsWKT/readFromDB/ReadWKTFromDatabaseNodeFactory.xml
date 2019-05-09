@@ -42,6 +42,7 @@
         you should write here the path to the file containing the database.</option>
         <option name="user">username for authentication</option>
         <option name="password">username for authentication</option>
+        <option name="layer">the name of the layer to read from the data source</option>
         
     </fullDescription>
     
