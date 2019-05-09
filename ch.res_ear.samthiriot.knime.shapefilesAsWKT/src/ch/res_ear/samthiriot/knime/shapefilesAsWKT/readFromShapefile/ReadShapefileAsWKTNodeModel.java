@@ -17,6 +17,7 @@ import org.geotools.data.DataStoreFinder;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeSettingsRO;
@@ -54,7 +55,7 @@ public class ReadShapefileAsWKTNodeModel extends AbstractReadWKTFromDatastoreNod
     }
     
     @Override
-    protected DataStore openDataStore() throws InvalidSettingsException {
+    protected DataStore openDataStore(ExecutionContext exec) throws InvalidSettingsException {
 
     	
     	// retrieve parameters
@@ -130,7 +131,7 @@ public class ReadShapefileAsWKTNodeModel extends AbstractReadWKTFromDatastoreNod
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
         
-		final DataStore datastore = openDataStore();
+		final DataStore datastore = openDataStore(null);
 
 		String schemaName;
 		try {

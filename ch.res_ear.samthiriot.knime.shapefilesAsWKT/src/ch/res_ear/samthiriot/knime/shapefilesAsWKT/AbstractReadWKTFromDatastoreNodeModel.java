@@ -3,7 +3,6 @@ package ch.res_ear.samthiriot.knime.shapefilesAsWKT;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -65,7 +64,7 @@ public abstract class AbstractReadWKTFromDatastoreNodeModel extends NodeModel {
 	 * @return
 	 * @throws InvalidSettingsException
 	 */
-	protected abstract DataStore openDataStore() throws InvalidSettingsException;
+	protected abstract DataStore openDataStore(ExecutionContext exec) throws InvalidSettingsException;
 	
 	/**
 	 * Define which schema should be open in this datastore, either according to 
@@ -83,12 +82,12 @@ public abstract class AbstractReadWKTFromDatastoreNodeModel extends NodeModel {
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
 
-		final DataStore datastore = openDataStore();
+		final DataStore datastore = openDataStore(exec);
 
 		if (datastore.getTypeNames().length == 0)
 			throw new InvalidSettingsException("this database does not contain any schema");
 		
-		String schemaName = getSchemaName(datastore);
+		final String schemaName = getSchemaName(datastore);
 		
 		SimpleFeatureType type;
 		try {

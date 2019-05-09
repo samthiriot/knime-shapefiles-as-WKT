@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shapefilesAsWKT.png"  
+		type="Other" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+		
+    <name>Compute Surface</name>
+    
+    <shortDescription>
+        Compute the surface of the geometry
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        Compute the surface of the geometry. 
+        Stores the result in a double column.
+        </intro>
+        
+        <option name="column name">Name of the column which will be created with the surface of each geometry</option>
+
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="spatial population">A table with spatial data</inPort>
+        <outPort index="0" name="spatial population">The table with an additional column containing the surface</outPort>
+    </ports>    
+
+</knimeNode>

@@ -138,6 +138,8 @@ public class ReprojectNodeModel extends NodeModel {
         BufferedDataContainer container = exec.createDataContainer(novelSpec);
         Iterator<DataRow> itRow = inputPopulation.iterator();
         
+        // TODO use http://docs.geotools.org/latest/tutorials/geometry/geometrycrs.html
+        
         SimpleFeatureCollection features = datastore.getFeatureSource(datastore.getNames().get(0)).getFeatures();
 
         ReprojectingFeatureCollection rfc = new ReprojectingFeatureCollection(

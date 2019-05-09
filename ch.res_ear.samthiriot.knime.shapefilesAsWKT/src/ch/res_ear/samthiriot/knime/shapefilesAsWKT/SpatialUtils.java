@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Random;
+import java.util.function.Consumer;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.collection.ListFeatureCollection;
@@ -30,9 +31,11 @@ import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.container.CloseableRowIterator;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
+import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.util.FileUtil;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -216,6 +219,75 @@ public class SpatialUtils {
         
 	}
 
+	public static class RowAndGeometry {
+		
+		public final Geometry geometry;
+		public final DataRow row;
+		
+		public RowAndGeometry(Geometry geometry, DataRow row) {
+			super();
+			this.geometry = geometry;
+			this.row = row;
+		}
+		
+		
+	}
+	
+	public interface IRowAndGeometryConsumer {
+	    void accept(RowAndGeometry rowAndGeom) throws CanceledExecutionException;
+	}
+	
+	/**
+	 * Decodes every cell of the geometry column of the sample, 
+	 * and passes it to the consumer.
+	 * 
+	 * @param sample
+	 * @param rowConsumer
+	 * @throws CanceledExecutionException 
+	 */
+	public static void applyToEachGeometry(
+						BufferedDataTable sample, 
+						IRowAndGeometryConsumer geometryConsumer
+						) throws CanceledExecutionException {
+
+		GeometryFactory geomFactory = JTSFactoryFinder.getGeometryFactory( null );
+		WKTReader reader = new WKTReader(geomFactory);
+		
+		final int idxColGeom = sample.getDataTableSpec().findColumnIndex(GEOMETRY_COLUMN_NAME);
+		
+		CloseableRowIterator itRow = sample.iterator();
+		try {
+	    	while (itRow.hasNext()) {
+	    		final DataRow row = itRow.next();
+	    		final DataCell cellGeom = row.getCell(idxColGeom);
+
+            	if (cellGeom.isMissing()) {
+            		//System.out.println("ignoring line "+currentRow.getKey()+" which has no geometry");
+            		continue; // ignore data with missing elements
+            	}
+            	
+            	// add geometry
+            	try {
+    				Geometry geom = reader.read(cellGeom.toString());
+    				geometryConsumer.accept(
+    						new RowAndGeometry(geom, row));
+
+    			} catch (ParseException e) {
+    				e.printStackTrace();
+    				throw new IllegalArgumentException(
+    						"Invalid WKT geometry on row "+
+    						row.getKey()+":"+
+    						e.getMessage(), 
+    						e
+    						);    			
+    			}
+            	
+	    	}
+		} finally {
+			itRow.close();
+		}
+		
+	}
 
 	private static class AddRowsRunnable implements Runnable {
 
@@ -262,69 +334,75 @@ public class SpatialUtils {
 			int current = 0;
 			
 			//System.out.println(Thread.currentThread().getName()+"  will store total "+this.sample.size());
-			Iterator<DataRow> itRow = sample.iterator();
+			CloseableRowIterator itRow = sample.iterator();
+			try {
+				
+				while (itRow.hasNext()) {
+	        		DataRow currentRow = itRow.next();
+	        		
+	        		DataCell cellGeom = currentRow.getCell(idxColGeom);
+	        		
+	            	if (cellGeom.isMissing()) {
+	            		System.out.println("ignoring line "+currentRow.getKey()+" which has no geometry");
+	            		continue; // ignore data with missing elements
+	            	}
+	            	
+	            	// add geometry
+	            	try {
+	    				Geometry geom = reader.read(cellGeom.toString());
+	    				featureBuilder.add(geom);
+	    			} catch (ParseException e) {
+	    				e.printStackTrace();
+	    				throw new IllegalArgumentException(
+	    						"Invalid WKT geometry on row "+
+	    						currentRow.getKey()+":"+
+	    						e.getMessage(), 
+	    						e);    			
+	    			}
+	            	
+	            	// add row id
+	            	final String rowid = currentRow.getKey().getString();
+	            	
+	                // add incrementalId
+	            	SimpleFeature feature = null;
+	                if (addIncrementalId) {
+	                    feature = featureBuilder.buildFeature(
+	                    		rowid, new Object[] { rowid, current }
+	                    		);
+	                } else {
+	                    feature = featureBuilder.buildFeature(
+	                    		rowid, new Object[] { rowid }
+	                    		);
+	                }
+	                
+	
+	                toStore.add(feature);
+	                
+					if (toStore.size() >= BUFFER) {
+		    			//System.out.println(Thread.currentThread().getName()+" Storing buffer "+toStore.size());
+						storeBufferedSpatialData();
+					}
+	 
+	        		if (current % 100 == 0) {
+		        		this.execProgress.setProgress((double)current/total);
+		        		try {
+							this.execProgress.checkCanceled();
+						} catch (CanceledExecutionException e) {
+							return;
+						} 
+	        		}
+	        		
+	        		current++;
+	
+	        	}
+
+	        	// store data remaining in the buffer
+	        	storeBufferedSpatialData();
+	        	
+			} finally {
+				itRow.close();
+			}
 			
-        	while (itRow.hasNext()) {
-        		DataRow currentRow = itRow.next();
-        		
-        		DataCell cellGeom = currentRow.getCell(idxColGeom);
-        		
-            	if (cellGeom.isMissing()) {
-            		System.out.println("ignoring line "+currentRow.getKey()+" which has no geometry");
-            		continue; // ignore data with missing elements
-            	}
-            	
-            	// add geometry
-            	try {
-    				Geometry geom = reader.read(cellGeom.toString());
-    				featureBuilder.add(geom);
-    			} catch (ParseException e) {
-    				e.printStackTrace();
-    				throw new IllegalArgumentException(
-    						"Invalid WKT geometry on row "+
-    						currentRow.getKey()+":"+
-    						e.getMessage(), 
-    						e);    			
-    			}
-            	
-            	// add row id
-            	final String rowid = currentRow.getKey().getString();
-            	
-                // add incrementalId
-            	SimpleFeature feature = null;
-                if (addIncrementalId) {
-                    feature = featureBuilder.buildFeature(
-                    		rowid, new Object[] { rowid, current }
-                    		);
-                } else {
-                    feature = featureBuilder.buildFeature(
-                    		rowid, new Object[] { rowid }
-                    		);
-                }
-                
-
-                toStore.add(feature);
-                
-				if (toStore.size() >= BUFFER) {
-	    			//System.out.println(Thread.currentThread().getName()+" Storing buffer "+toStore.size());
-					storeBufferedSpatialData();
-				}
- 
-        		if (current % 100 == 0) {
-	        		this.execProgress.setProgress((double)current/total);
-	        		try {
-						this.execProgress.checkCanceled();
-					} catch (CanceledExecutionException e) {
-						return;
-					} 
-        		}
-        		
-        		current++;
-
-        	}
-        	
-        	// store data remaining in the buffer
-        	storeBufferedSpatialData();
     		this.execProgress.setProgress(1.0);
 
 		}
