@@ -10,6 +10,7 @@ import java.util.Locale;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
+import org.geotools.referencing.crs.DefaultGeocentricCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
@@ -142,6 +143,16 @@ public class SpatialPropertySurfaceNodeModel extends NodeModel {
 
 		CRSAuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory("AUTO", null);
 
+		/*
+		// depending to the original CRS, it might be necessary to pass through an intermediate CRS
+		CoordinateReferenceSystem crsInter = DefaultGeocentricCRS.CARTESIAN;
+		MathTransform transform1 = CRS.findMathTransform(
+				crsOrig, 
+				crsInter, 
+				true);
+		boolean reprojectInter = false;
+		*/
+		
 		// iterate each geometry of each row
 		done = 0;
 		SpatialUtils.applyToEachGeometry(
@@ -152,17 +163,37 @@ public class SpatialPropertySurfaceNodeModel extends NodeModel {
 						
 						Geometry transformed = null;
 						
-						Point centroid = geomAndRow.geometry.getCentroid(); 
-						CoordinateReferenceSystem crsTarget = factory.createProjectedCRS(
-								"AUTO:42001," + /*String.format(Locale.ENGLISH, "%.1f", */centroid.getX()//) 
-								+ "," + /*String.format(Locale.ENGLISH, "%.1f",*/ centroid.getY()//)
-								);
-						MathTransform transform2 = CRS.findMathTransform(
-								crsOrig, 
-								crsTarget, 
-								true);
-						transformed = JTS.transform(geomAndRow.geometry, transform2);
-						
+
+						//try {
+							Point centroid = geomAndRow.geometry.getCentroid(); 
+
+							CoordinateReferenceSystem crsTarget = factory.createProjectedCRS(
+									"AUTO:42001," + centroid.getX()//String.format(Locale.ENGLISH, "%.2f", centroid.getX()) 
+									+ "," + centroid.getY()//String.format(Locale.ENGLISH, "%.5f", centroid.getY())
+									);
+							MathTransform transform2 = CRS.findMathTransform(
+									crsOrig, 
+									crsTarget, 
+									true);
+							transformed = JTS.transform(geomAndRow.geometry, transform2);
+							/*
+						} catch (FactoryException | TransformException e) {
+							e.printStackTrace();
+							System.out.println("using a second projection");
+							Geometry geomInter = JTS.transform(geomAndRow.geometry, transform1);
+							Point centroid = geomInter.getCentroid(); 
+							CoordinateReferenceSystem crsTarget = factory.createProjectedCRS(
+									"AUTO:42001," + centroid.getX()//String.format(Locale.ENGLISH, "%.2f", centroid.getX()) 
+									+ "," + centroid.getY()//String.format(Locale.ENGLISH, "%.5f", centroid.getY())
+									);
+							MathTransform transform2 = CRS.findMathTransform(
+									crsInter, 
+									crsTarget, 
+									true);
+							transformed = JTS.transform(geomInter, transform2);
+
+						}
+						*/
 					    // compute the geometry
 					    double surfaceSquareMeter = transformed.getArea();
 						
