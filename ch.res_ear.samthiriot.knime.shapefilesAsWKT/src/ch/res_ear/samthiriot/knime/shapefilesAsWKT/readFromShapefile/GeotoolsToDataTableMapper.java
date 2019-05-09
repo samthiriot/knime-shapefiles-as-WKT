@@ -116,11 +116,19 @@ public class GeotoolsToDataTableMapper {
     		
     	} 
 
-    	DataColumnSpecCreator creator = new DataColumnSpecCreator(
-    			gtDesc.getLocalName(), 
-    			knimeType
-    			);
-
+    	DataColumnSpecCreator creator = null;
+    	if (gtDetectedType == GeotoolDetectedType.SPATIAL) {
+    		creator = new DataColumnSpecCreator(
+        			SpatialUtils.GEOMETRY_COLUMN_NAME, 
+        			knimeType
+        			);
+    	} else {
+    		creator = new DataColumnSpecCreator(
+        			gtDesc.getLocalName(), 
+        			knimeType
+        			);
+    	}
+    	 
     	if (this.gtDetectedType == GeotoolDetectedType.SPATIAL) {
     		
     		Map<String,String> properties = new HashMap<String, String>();
