@@ -234,7 +234,8 @@ public class SpatialUtils {
 	}
 	
 	public interface IRowAndGeometryConsumer {
-	    void accept(RowAndGeometry rowAndGeom) throws CanceledExecutionException;
+	    void accept(RowAndGeometry rowAndGeom) 
+	    		throws CanceledExecutionException, InvalidSettingsException;
 	}
 	
 	/**
@@ -248,7 +249,7 @@ public class SpatialUtils {
 	public static void applyToEachGeometry(
 						BufferedDataTable sample, 
 						IRowAndGeometryConsumer geometryConsumer
-						) throws CanceledExecutionException {
+						) throws CanceledExecutionException, InvalidSettingsException {
 
 		GeometryFactory geomFactory = JTSFactoryFinder.getGeometryFactory( null );
 		WKTReader reader = new WKTReader(geomFactory);
