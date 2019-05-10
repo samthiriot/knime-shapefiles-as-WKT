@@ -27,7 +27,7 @@
         <p>
         In the resulting table, a line is created for each spatial feature. 
         A string column "the_geom" contains the geometry in <a href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">WKT (Well-known Text Representation)</a>.
-        Each other attribute in the shapefile is mapped to a KNIME type: if a column in an integer in the shapefile, it will be translated as an integer (same for double, Boolean).
+        Each other attribute in the shapefile is mapped to a KNIME type: if a column in an integer in the shapefile, it will be translated as an integer (same for double, Boolean, long, string).
         </p>
         <p>
         A property "crs WKT" is sent along with the result which contains the description of the Coordinate Reference System read in the shapefile (if any).
