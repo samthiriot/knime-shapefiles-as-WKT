@@ -19,14 +19,24 @@
        
         <p>
         In order to compute the size of the area in square meters, 
-        the node first reprojects the original parameters into a flat cartesian plane.
-        This might lead to errors in case your initial Coordinate Reference System 
+        the node reprojects on the fly the geometries into an automatic projection [1] as defined by the 
+        Open Geospatial Consortium [2]. 
+        This might lead to conversion errors in case your initial Coordinate Reference System 
         is not an ESPG standard one. 
         If you get errors related to Bursa Wolf parameters or similar errors due to projection, 
         please try to use the "Reproject WKT geometries" in order to first reproject your
         geometries into a welldefined CRS. 
         </p>
-        
+        <p>
+		The actual computation is done by the powerful <a href="https://geotools.org/">Geotools library</a>.
+		</p>
+        <p>
+        <ul>
+			<li>[1] Web Mapping Testbed, "WM Automatic Projections", <a href="http://web.archive.org/web/20010430015937/http://www.digitalearth.gov/wmt/auto.html">http://www.digitalearth.gov/wmt/auto.html</a></li>
+	        <li>[2] Open Geospatial Consortium, Inc. (2000) "OpenGIS® Web Map Server Interface
+	Implementation Specification", OpenGIS Project Document 00-028, <a href="https://portal.opengeospatial.org/files/?artifact_id=7196">url</a></li>
+		</ul>
+        </p>
         </intro>
         
         <option name="column name">Name of the column which will be created with the surface of each geometry</option>

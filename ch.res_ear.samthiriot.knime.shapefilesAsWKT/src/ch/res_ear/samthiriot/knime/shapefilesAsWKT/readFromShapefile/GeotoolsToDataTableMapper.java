@@ -15,6 +15,8 @@ import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.DoubleCell.DoubleCellFactory;
 import org.knime.core.data.def.IntCell;
 import org.knime.core.data.def.IntCell.IntCellFactory;
+import org.knime.core.data.def.LongCell;
+import org.knime.core.data.def.LongCell.LongCellFactory;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.data.def.StringCell.StringCellFactory;
 import org.knime.core.node.NodeLogger;
@@ -41,6 +43,7 @@ public class GeotoolsToDataTableMapper {
 		ATTRIBUTE_INTEGER,
 		ATTRIBUTE_DOUBLE,
 		ATTRIBUTE_BOOLEAN,
+		ATTRIBUTE_LONG,
 		
 		ATTRIBUTE_OTHER,
 		
@@ -105,6 +108,9 @@ public class GeotoolsToDataTableMapper {
     		} else if (gtDescAtt.getType().getBinding().equals(Boolean.class)) {
     			knimeType = BooleanCell.TYPE;
     			gtDetectedType = GeotoolDetectedType.ATTRIBUTE_BOOLEAN;
+    		} else if (gtDescAtt.getType().getBinding().equals(Long.class)) {
+    			knimeType = LongCell.TYPE;
+    			gtDetectedType = GeotoolDetectedType.ATTRIBUTE_LONG;
     		} else {
     			logger.warn("the column "+gtDesc.getName()
     						+" which is of unknown type: "+gtDesc.getType()
@@ -169,6 +175,8 @@ public class GeotoolsToDataTableMapper {
 			return IntCellFactory.create((Integer)gtObject);
 		case ATTRIBUTE_DOUBLE:
 			return DoubleCellFactory.create((Double)gtObject);
+		case ATTRIBUTE_LONG:
+			return LongCellFactory.create((Long)gtObject);
 		case ATTRIBUTE_STRING:
 		case ATTRIBUTE_OTHER:
 		case SPATIAL:

@@ -120,7 +120,7 @@ public class ReadShapefileAsWKTNodeModel extends AbstractReadWKTFromDatastoreNod
 							);
 		schemaName = existing[0];
 		
-		return null;
+		return schemaName;
 	}
     
 
