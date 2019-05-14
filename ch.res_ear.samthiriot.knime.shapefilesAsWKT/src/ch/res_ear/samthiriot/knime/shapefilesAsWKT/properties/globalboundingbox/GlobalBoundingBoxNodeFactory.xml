@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shapefilesAsWKT.png"  
+		type="Other" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+		
+    <name>Global bounding box of WKT geometries</name>
+    
+    <shortDescription>
+        Compute the envelope of all the WKT geometries of the input table
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        Computes the bounding box for all the entities of the input collection.
+        Returns a collection containing only one line containing this geometry.
+        <p>
+		The actual computation is done by the powerful <a href="https://geotools.org/">Geotools library</a>.
+		</p>
+        </intro>
+        
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="spatial population">A table with spatial data</inPort>
+        <outPort index="0" name="bounding box">A table containing the global bounding box</outPort>
+    </ports>    
+
+</knimeNode>
