@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shp-wkt-writer-icon.png" 
+		type="Sink" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+		
+    <name>Write WKT into Database</name>
+    
+    <shortDescription>
+        Stores the WKT data into a Database
+    </shortDescription>
+    
+    <fullDescription>
+      <intro>
+	        Write WKT geometries into a database such as a PostGIS database.
+	        <p>
+	        Supports the following database types:
+	        <ul>
+	        	<li>Connect <a href="https://postgis.net/">PostGIS databases</a>, which run over PostgreSQL databases engines.</li>
+	        	<li>Connect <a href="https://www.mysql.com">MySQL databases</a></li>
+		        <li>write a  <a href="https://www.h2database.com/html/main.html">H2 databases</a></li>
+		        <li>write a <a href="https://www.geopackage.org/">GeoPackage database files</a></li>
+	        </ul>
+	        </p>
+	        <p>
+	        Depending to the database type you choose, some of the options might not be required and 
+	        will be disabled in the configuration dialog.
+	        </p>
+            <p>
+			The actual reading is done by the amazing <a href="https://geotools.org/">Geotools library</a>.
+			</p>
+		</intro>
+
+        <option name="database type">The type of database you want to connect to: PostGIS, MySQL, H2 or GeoPackage.</option>
+        <option name="hostname">the IP of hostname of the database server</option>
+        <option name="port">the server port (by default 5432)</option>
+        <option name="schema">schema in the database. Defaults to "public"</option>
+        <option name="database">Name of the database. In the case of file-based databases like "h2" or "GeoPackage", 
+        you should write here the path to the file containing the database.</option>
+        <option name="user">username for authentication</option>
+        <option name="password">username for authentication</option>
+        <option name="layer">the name of the layer to create</option>
+        
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="WKT data">Table with a the_geom column</inPort>
+       
+    </ports>    
+   
+</knimeNode>

@@ -48,9 +48,9 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import ch.res_ear.samthiriot.knime.shapefilesAsWKT.DataTableToGeotoolsMapper;
 import ch.res_ear.samthiriot.knime.shapefilesAsWKT.NodeWarningWriter;
 import ch.res_ear.samthiriot.knime.shapefilesAsWKT.SpatialUtils;
-import ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToShapefile.DataTableToGeotoolsMapper;
 import ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToShapefile.WriteWKTAsShapefileNodeModel;
 
 

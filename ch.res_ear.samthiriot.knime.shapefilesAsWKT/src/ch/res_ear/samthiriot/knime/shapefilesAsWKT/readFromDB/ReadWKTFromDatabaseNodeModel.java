@@ -23,6 +23,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.util.CheckUtils;
 
 import ch.res_ear.samthiriot.knime.shapefilesAsWKT.AbstractReadWKTFromDatastoreNodeModel;
+import ch.res_ear.samthiriot.knime.shapefilesAsWKT.SpatialUtils;
 
 
 /**
@@ -65,8 +66,14 @@ public class ReadWKTFromDatabaseNodeModel extends AbstractReadWKTFromDatastoreNo
 		if (layer == null)
 			throw new InvalidSettingsException("please select one layer to read");
 	
+		if (inSpecs.length < 1)
+			throw new InvalidSettingsException("missing input table");
+			
 		final String dbtype = m_dbtype.getStringValue();
 		final String database = m_database.getStringValue();
+		
+		if (!SpatialUtils.hasGeometry(inSpecs[0]))
+			throw new InvalidSettingsException("the input table contains no WKT geometry");
 		
 		if (dbtype.equals("h2") || dbtype.equals("geopkg") ) {
 			CheckUtils.checkSourceFile(database);

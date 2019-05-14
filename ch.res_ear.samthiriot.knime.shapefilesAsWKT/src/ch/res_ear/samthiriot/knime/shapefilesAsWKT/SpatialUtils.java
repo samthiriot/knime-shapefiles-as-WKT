@@ -6,13 +6,16 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.collection.ListFeatureCollection;
@@ -651,5 +654,7 @@ public class SpatialUtils {
 		int idx = dataTableSpec.findColumnIndex(GEOMETRY_COLUMN_NAME);
 		return (idx >= 0);
 	}
+	
+	 
 
 }
