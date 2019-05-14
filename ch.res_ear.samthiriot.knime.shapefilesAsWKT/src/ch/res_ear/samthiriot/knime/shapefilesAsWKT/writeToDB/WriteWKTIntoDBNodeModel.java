@@ -1,17 +1,18 @@
-package ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToShapefile;
+package ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToDB;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
 import org.geotools.data.collection.ListFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
@@ -31,8 +32,9 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
+import org.knime.core.node.defaultnodesettings.SettingsModelPassword;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.core.util.FileUtil;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.io.ParseException;
@@ -42,7 +44,6 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import ch.res_ear.samthiriot.knime.shapefilesAsWKT.DataTableToGeotoolsMapper;
-import ch.res_ear.samthiriot.knime.shapefilesAsWKT.DataTableToGeotoolsMapperForShapefile;
 import ch.res_ear.samthiriot.knime.shapefilesAsWKT.NodeWarningWriter;
 import ch.res_ear.samthiriot.knime.shapefilesAsWKT.SpatialUtils;
 
@@ -53,30 +54,103 @@ import ch.res_ear.samthiriot.knime.shapefilesAsWKT.SpatialUtils;
  *
  * @author Samuel Thiriot
  */
-public class WriteWKTAsShapefileNodeModel extends NodeModel {
+public class WriteWKTIntoDBNodeModel extends NodeModel {
     
+	final static String ENCRYPTION_KEY = "KnimeWKT";
+
+	protected SettingsModelString m_dbtype = new SettingsModelString("dbtype", "postgis");
+	protected SettingsModelString m_host = new SettingsModelString("host", "127.0.0.1");
+	protected SettingsModelIntegerBounded m_port = new SettingsModelIntegerBounded("port", 5432, 1, 65535);
+	protected SettingsModelString m_schema = new SettingsModelString("schema", "public");
+	protected SettingsModelString m_database = new SettingsModelString("database", "database");
+	protected SettingsModelString m_user = new SettingsModelString("user", "postgres");
+	protected SettingsModelString m_password = new SettingsModelPassword("password", ENCRYPTION_KEY, "postgres");
+	protected SettingsModelString m_layer = new SettingsModelString("layer", "my_geometries");
 
     // the logger instance
     private static final NodeLogger logger = NodeLogger
-            .getLogger(WriteWKTAsShapefileNodeModel.class);
+            .getLogger(WriteWKTIntoDBNodeModel.class);
     
     /**
      * Count of entities to write at once
      */
     final static int BUFFER = 5000;
 	
-    final static int MAX_COLUMNS = 255;
 	
-    private final SettingsModelString m_file = new SettingsModelString("filename", null);
-
 
     /**
      * Constructor for the node model.
      */
-    protected WriteWKTAsShapefileNodeModel() {
+    protected WriteWKTIntoDBNodeModel() {
     
         super(1, 0);
     }
+    
+
+	protected DataStore openDataStore(ExecutionContext exec) throws InvalidSettingsException {
+
+		// @see http://docs.geotools.org/stable/userguide/library/jdbc/postgis.html
+        Map<String, Object> params = new HashMap<>();
+        params.put("dbtype", 	m_dbtype.getStringValue());
+        params.put("host", 		m_host.getStringValue());
+        params.put("port",  	m_port.getIntValue());
+        params.put("schema", 	m_schema.getStringValue());
+        params.put("database", 	m_database.getStringValue());
+        params.put("user", 		m_user.getStringValue());
+        params.put("passwd", 	m_password.getStringValue());
+
+        //params.put(PostgisDataStoreFactory.LOOSEBBOX, true );
+        //params.put(PostgisDataStoreFactory.PREPARED_STATEMENTS, true );
+        DataStore dataStore;
+		try {
+			final String dbg = "opening database: "+params.get("user")+"@"+params.get("host")+":"+params.get("port");
+			if (exec != null) exec.setMessage(dbg);
+	        getLogger().info(dbg);
+	        dataStore = DataStoreFinder.getDataStore(params);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			throw new InvalidSettingsException("Unable to open the url as a shape file: "+e1.getMessage());
+		}
+
+		return dataStore;
+	}
+	
+
+	protected String getSchemaName(DataStore datastore) throws InvalidSettingsException {
+
+		final String layer = m_layer.getStringValue();
+		
+		Set<String> typeNames = new HashSet<>();
+		try {
+			typeNames.addAll(Arrays.asList(datastore.getTypeNames()));
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("error when trying to read the layers: "+e.getMessage(), e);
+		}
+		
+		//if (!typeNames.contains(layer))
+		//	throw new InvalidSettingsException("There is no layer named \""+layer+"\" in this datastore");
+		
+		return layer;
+	}
+
+
+	@Override
+	protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+		
+		final String layer = m_layer.getStringValue();
+	
+		if (layer == null)
+			throw new InvalidSettingsException("please select one layer to read");
+	
+		if (inSpecs.length < 1)
+			throw new InvalidSettingsException("missing input table");
+			
+		if (!SpatialUtils.hasGeometry(inSpecs[0]))
+			throw new InvalidSettingsException("the input table contains no WKT geometry");
+		
+		return new DataTableSpec[] {};
+	}
 
     /**
      * {@inheritDoc}
@@ -97,28 +171,19 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
     	    	
     	CoordinateReferenceSystem crsOrig = SpatialUtils.decodeCRS(inputPopulation.getSpec());
     	
-    	URL url;
-		try {
-			
-			url = FileUtil.toURL(m_file.getStringValue());
-		} catch (InvalidPathException | MalformedURLException e2) {
-			e2.printStackTrace();
-			throw new InvalidSettingsException("unable to open URL "+m_file.getStringValue()+": "+e2.getMessage());
-		}
-        
-    	File file = FileUtil.getFileFromURL(url);
         
     	NodeWarningWriter warnings = new NodeWarningWriter(getLogger());
-    	
+
+    	// open the resulting datastore
+    	DataStore datastore = openDataStore(exec);
+
     	// copy the input population into a datastore
     	exec.setMessage("storing entities");
-        DataStore datastore = SpatialUtils.createDataStore(file, true);
         
 		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
         builder.setName("entities");
         builder.setCRS(crsOrig); 
         
-        // TODO improve: create different files for different geom types (?)
         Class<?> geomClassToBeStored = SpatialUtils.detectGeometryClassFromData(	
         										inputPopulation, 
         										SpatialUtils.GEOMETRY_COLUMN_NAME);
@@ -130,22 +195,13 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
         		);
         
         // create mappers
-        if (inputPopulation.getDataTableSpec().getNumColumns() > MAX_COLUMNS+1) {
-        	int count = (inputPopulation.getDataTableSpec().getNumColumns() - MAX_COLUMNS - 1);
-        	warnings.warn("Only "+MAX_COLUMNS+" columns can be stored in a shapefile format; will ignore the "+
-        			count + " last one(s)"
-        			);
-        }
-        Set<String> usedNames = new HashSet<>();
         List<DataTableToGeotoolsMapper> mappers = inputPopulation
         												.getDataTableSpec()
         												.stream()
         												.filter(colspec -> !SpatialUtils.GEOMETRY_COLUMN_NAME.equals((colspec.getName())))
-        												.limit(MAX_COLUMNS)
-        												.map(colspec -> new DataTableToGeotoolsMapperForShapefile(
+        												.map(colspec -> new DataTableToGeotoolsMapper(
         														warnings, 
-        														colspec, 
-        														usedNames))
+        														colspec))
         												.collect(Collectors.toList());
         // add those to the builder type
         mappers.forEach(mapper -> mapper.addAttributeForSpec(builder));
@@ -201,7 +257,7 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
 				}
 	        	
 	        	int colId = 0;
-	        	for (int i=0; i<row.getNumCells() && i < mappers.size(); i++) {
+	        	for (int i=0; i<row.getNumCells(); i++) {
 	        		
 	        		if (i == idxColGeom) {
 	        			// skip the column with geom
@@ -259,70 +315,57 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
     	// nothing to do
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
-    	
-    	DataTableSpec specs = inSpecs[0];
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void saveSettingsTo(final NodeSettingsWO settings) {
+	
 
-    	if (m_file.getStringValue() == null)
-    		throw new IllegalArgumentException("No filename was provided");
+		m_dbtype.saveSettingsTo(settings);
+		m_host.saveSettingsTo(settings);
+		m_port.saveSettingsTo(settings);
+		m_schema.saveSettingsTo(settings);
+		m_database.saveSettingsTo(settings);
+		m_user.saveSettingsTo(settings);
+		m_password.saveSettingsTo(settings);
+		m_layer.saveSettingsTo(settings);
 
-    	// check the input table contains a geometry
-    	if (!SpatialUtils.hasGeometry(specs))
-    		throw new IllegalArgumentException("the input table contains no spatial data (no column named "+SpatialUtils.GEOMETRY_COLUMN_NAME+")");
-    	
-    	if (!SpatialUtils.hasCRS(specs))
-    		throw new IllegalArgumentException("the input table contains spatial data but no Coordinate Reference System");
-    	
-    	// check the parameters include a filename
-		try {
-			FileUtil.toURL(m_file.getStringValue());
-		} catch (InvalidPathException | MalformedURLException e2) {
-			e2.printStackTrace();
-			throw new InvalidSettingsException("unable to open URL "+m_file.getStringValue()+": "+e2.getMessage());
-		}
-        
-    	
-        return new DataTableSpec[]{};
-    }
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveSettingsTo(final NodeSettingsWO settings) {
-        
-    	m_file.saveSettingsTo(settings);
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
+		
+		m_dbtype.loadSettingsFrom(settings);
+		m_host.loadSettingsFrom(settings);
+		m_port.loadSettingsFrom(settings);
+		m_schema.loadSettingsFrom(settings);
+		m_database.loadSettingsFrom(settings);
+		m_user.loadSettingsFrom(settings);
+		m_password.loadSettingsFrom(settings);
+		m_layer.loadSettingsFrom(settings);
+		
+	}
 
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+		
+		m_dbtype.validateSettings(settings);
+		m_host.validateSettings(settings);
+		m_port.validateSettings(settings);
+		m_schema.validateSettings(settings);
+		m_database.validateSettings(settings);
+		m_user.validateSettings(settings);
+		m_password.validateSettings(settings);
+		m_layer.validateSettings(settings);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
-            
-        
-    	m_file.loadSettingsFrom(settings);
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
-            
-    	m_file.validateSettings(settings);
-
-    }
-    
     /**
      * {@inheritDoc}
      */

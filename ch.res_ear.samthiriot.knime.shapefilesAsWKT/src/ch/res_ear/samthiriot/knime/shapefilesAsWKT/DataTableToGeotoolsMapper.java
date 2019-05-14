@@ -1,4 +1,4 @@
-package ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToShapefile;
+package ch.res_ear.samthiriot.knime.shapefilesAsWKT;
 
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.knime.core.data.DataCell;
@@ -8,8 +8,6 @@ import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.IntCell;
 import org.knime.core.data.def.LongCell;
 import org.knime.core.data.def.StringCell;
-
-import ch.res_ear.samthiriot.knime.shapefilesAsWKT.IWarningWriter;
 
 /**
  * Maps a KNIME column into a geotools attribute.  

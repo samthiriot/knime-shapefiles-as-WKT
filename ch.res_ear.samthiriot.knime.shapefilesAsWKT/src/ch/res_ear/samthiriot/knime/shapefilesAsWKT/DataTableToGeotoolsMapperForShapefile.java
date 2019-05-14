@@ -1,11 +1,9 @@
-package ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToShapefile;
+package ch.res_ear.samthiriot.knime.shapefilesAsWKT;
 
 import java.util.Set;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
-
-import ch.res_ear.samthiriot.knime.shapefilesAsWKT.IWarningWriter;
 
 /**
  * Converts Knime table data into shapefile data; 
