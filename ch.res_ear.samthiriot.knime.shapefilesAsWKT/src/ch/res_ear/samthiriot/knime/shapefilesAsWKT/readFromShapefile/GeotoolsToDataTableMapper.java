@@ -1,5 +1,6 @@
 package ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromShapefile;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,6 +45,7 @@ public class GeotoolsToDataTableMapper {
 		ATTRIBUTE_DOUBLE,
 		ATTRIBUTE_BOOLEAN,
 		ATTRIBUTE_LONG,
+		ATTRIBUTE_BIGDECIMAL,
 		
 		ATTRIBUTE_OTHER,
 		
@@ -111,6 +113,12 @@ public class GeotoolsToDataTableMapper {
     		} else if (gtDescAtt.getType().getBinding().equals(Long.class)) {
     			knimeType = LongCell.TYPE;
     			gtDetectedType = GeotoolDetectedType.ATTRIBUTE_LONG;
+    		} else if (gtDescAtt.getType().getBinding().equals(BigDecimal.class)) {
+    			knimeType = DoubleCell.TYPE;
+    			gtDetectedType = GeotoolDetectedType.ATTRIBUTE_BIGDECIMAL;
+    			logger.warn("the column "+gtDesc.getName()
+					+" of type BigDecimal will be converted to a Double, possibly with a loss of precision");
+		
     		} else {
     			logger.warn("the column "+gtDesc.getName()
     						+" which is of unknown type: "+gtDesc.getType()
@@ -177,6 +185,8 @@ public class GeotoolsToDataTableMapper {
 			return DoubleCellFactory.create((Double)gtObject);
 		case ATTRIBUTE_LONG:
 			return LongCellFactory.create((Long)gtObject);
+		case ATTRIBUTE_BIGDECIMAL:
+			return DoubleCellFactory.create(((BigDecimal)gtObject).doubleValue());
 		case ATTRIBUTE_STRING:
 		case ATTRIBUTE_OTHER:
 		case SPATIAL:
