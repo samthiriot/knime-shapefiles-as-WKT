@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
+import org.geotools.data.DefaultTransaction;
+import org.geotools.data.Transaction;
 import org.geotools.data.collection.ListFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
@@ -230,6 +232,8 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
         WKTReader reader = new WKTReader(geomFactory);
         
         SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(type);
+        
+        Transaction transaction = new DefaultTransaction();
 
         // the buffer of spatial features to be added soon (it's quicker to add several lines than only one)
 		List<SimpleFeature> toStore = new ArrayList<>(BUFFER);
@@ -273,7 +277,7 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 	            toStore.add(feature);
 	            if (toStore.size() >= BUFFER) {
 	        		exec.checkCanceled();
-	        		getLogger().info("storing "+BUFFER+" entities");
+	        		getLogger().info("storing "+toStore.size()+" entities");
 	            	featureStore.addFeatures( new ListFeatureCollection( type, toStore));
 	            	toStore.clear();
 	            }
@@ -289,14 +293,25 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 	
 	        // store last lines
 	        if (!toStore.isEmpty()) {
+        		getLogger().info("storing "+toStore.size()+" entities");
 	        	featureStore.addFeatures( new ListFeatureCollection( type, toStore));
 	        }
+	        
+	        transaction.commit();
+	        
 	        exec.setProgress(1.0);
+	        
 
         } finally {
         	if (itRow != null)
         		itRow.close();
         	
+        	if (transaction != null)
+                try {
+                	transaction.rollback();
+                } catch (IOException doubleEeek) {
+                    // rollback failed
+                }
             // close datastore
             datastore.dispose();
         	
