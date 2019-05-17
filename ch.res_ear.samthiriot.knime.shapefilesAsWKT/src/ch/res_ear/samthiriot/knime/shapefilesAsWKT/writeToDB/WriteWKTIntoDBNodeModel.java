@@ -234,7 +234,8 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
         SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(type);
         
         Transaction transaction = new DefaultTransaction();
-
+        featureStore.setTransaction(transaction);
+        
         // the buffer of spatial features to be added soon (it's quicker to add several lines than only one)
 		List<SimpleFeature> toStore = new ArrayList<>(BUFFER);
 		
@@ -280,9 +281,10 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 	        		getLogger().info("storing "+toStore.size()+" entities");
 	            	featureStore.addFeatures( new ListFeatureCollection( type, toStore));
 	            	toStore.clear();
-	    	        transaction.commit();
-	    	        transaction.close();
-	    	        transaction = new DefaultTransaction();
+	            	
+	    	        //transaction.commit();
+	    	        //transaction.close();
+	    	        //transaction = new DefaultTransaction();
 	            }
 	            
 	            if (currentRow % 10 == 0) {
@@ -298,9 +300,11 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 	        if (!toStore.isEmpty()) {
         		getLogger().info("storing "+toStore.size()+" entities");
 	        	featureStore.addFeatures( new ListFeatureCollection( type, toStore));
-		        transaction.commit();
 	        }
 	        
+	    	getLogger().info("commiting changes to database");
+	        transaction.commit();
+
 	        exec.setProgress(1.0);
 	        
 
