@@ -255,7 +255,6 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 		
 		        	Geometry geom = reader.read(cellGeom.toString());
 		        	featureBuilder.add(geom);
-	
 				} catch (ParseException e) {
 					e.printStackTrace();
 					throw new RuntimeException(e);
@@ -273,7 +272,7 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 	        	}
 	        	
 	        	// build this feature
-	            SimpleFeature feature = featureBuilder.buildFeature(row.getKey().getString());
+	            SimpleFeature feature = featureBuilder.buildFeature(Integer.toString(currentRow)); // row.getKey().getString()
 	            // add this feature to the buffer
 	            toStore.add(feature);
 	            if (toStore.size() >= BUFFER) {
