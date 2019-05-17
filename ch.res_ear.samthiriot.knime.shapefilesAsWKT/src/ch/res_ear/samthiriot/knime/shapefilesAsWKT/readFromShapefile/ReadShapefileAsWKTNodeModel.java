@@ -2,9 +2,11 @@ package ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromShapefile;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.eclipse.osgi.framework.util.FilePath;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.shapefile.ShapefileDataStore;
@@ -61,32 +64,47 @@ public class ReadShapefileAsWKTNodeModel extends AbstractReadWKTFromDatastoreNod
     	// retrieve parameters
         CheckUtils.checkSourceFile(m_file.getStringValue());
         
+        if (m_file.getStringValue() == null)
+        	throw new InvalidSettingsException("no file defined");
+       
         URL filename;
-		try {
+        try {
 			filename = FileUtil.toURL(m_file.getStringValue());
+			
 		} catch (InvalidPathException | MalformedURLException e2) {
 			e2.printStackTrace();
 			throw new InvalidSettingsException("unable to open URL "+m_file.getStringValue()+": "+e2.getMessage());
 		}
+
+        Path filePath = null;
+        try {
+			filePath = FileUtil.resolveToPath(filename);
+		} catch (IOException | URISyntaxException e2) {
+			throw new InvalidSettingsException("unable to resolve this URL to a path: "+filename);
+		}
         
-        if (filename == null)
-        	throw new InvalidSettingsException("no file defined");
-       
         String charset = m_charset.getStringValue();
 
 
         // open the 
 		Map<String,Object> parameters = new HashMap<>();
-		parameters.put("url", filename);
+		try {
+			parameters.put("url", filePath.toUri().toURL());
+		} catch (MalformedURLException e2) {
+			throw new RuntimeException("cannot convert the path "+filePath+" to an URL", e2);
+		}
 		DataStore datastore;
 		try {
-	        logger.info("opening as a shapefile: "+filename);
+	        getLogger().info("opening as a shapefile: "+filePath.toUri());
 
 			datastore = DataStoreFinder.getDataStore(parameters);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 			throw new InvalidSettingsException("Unable to open the url as a shape file: "+e1.getMessage());
 		}
+		
+		if (datastore == null)
+			throw new InvalidSettingsException("unable to open the shapefile from path "+filename);
 
 		// set the charset
 		try {

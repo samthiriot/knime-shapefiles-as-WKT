@@ -273,6 +273,7 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 	            toStore.add(feature);
 	            if (toStore.size() >= BUFFER) {
 	        		exec.checkCanceled();
+	        		getLogger().info("storing "+BUFFER+" entities");
 	            	featureStore.addFeatures( new ListFeatureCollection( type, toStore));
 	            	toStore.clear();
 	            }
