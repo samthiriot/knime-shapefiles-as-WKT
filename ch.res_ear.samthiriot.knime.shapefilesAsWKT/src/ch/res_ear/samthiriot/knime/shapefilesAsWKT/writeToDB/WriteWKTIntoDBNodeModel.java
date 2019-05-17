@@ -192,7 +192,7 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
         
         // add attributes in order
         builder.add(
-        		SpatialUtils.GEOMETRY_COLUMN_NAME, 
+        		"geom", //SpatialUtils.GEOMETRY_COLUMN_NAME,
         		geomClassToBeStored
         		);
         
@@ -282,9 +282,9 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 	            	featureStore.addFeatures( new ListFeatureCollection( type, toStore));
 	            	toStore.clear();
 	            	
-	    	        //transaction.commit();
-	    	        //transaction.close();
-	    	        //transaction = new DefaultTransaction();
+	    	        transaction.commit();
+	    	        transaction.close();
+	    	        transaction = new DefaultTransaction();
 	            }
 	            
 	            if (currentRow % 10 == 0) {
