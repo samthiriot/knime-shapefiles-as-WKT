@@ -127,12 +127,7 @@ public class DataTableToGeotoolsMapper {
 				//System.out.println("Int value for "+colspec.getName()+": "+((IntCell)cell).getIntValue());
 				return new Integer(((IntCell)cell).getIntValue());
 			case String:
-				final String s = ((StringCell)cell).getStringValue(); 
-				if (s.length() > 254) {
-					warnWriter.warn("due to shapefile limitations, truncating for column "+colspec.getName()+" the value "+s);
-					return s.substring(0, 254);
-				}
-				return s;
+				return ((StringCell)cell).getStringValue(); 
 			case Double:
 				return ((DoubleCell)cell).getDoubleValue();
 			case Long:
