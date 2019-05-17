@@ -201,7 +201,7 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
 				}
 	        	
 	        	int colId = 0;
-	        	for (int i=0; i<row.getNumCells() && i < mappers.size(); i++) {
+	        	for (int i=0; i<row.getNumCells() && colId < mappers.size(); i++) {
 	        		
 	        		if (i == idxColGeom) {
 	        			// skip the column with geom
