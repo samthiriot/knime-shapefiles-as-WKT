@@ -280,6 +280,9 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 	        		getLogger().info("storing "+toStore.size()+" entities");
 	            	featureStore.addFeatures( new ListFeatureCollection( type, toStore));
 	            	toStore.clear();
+	    	        transaction.commit();
+	    	        transaction.close();
+	    	        transaction = new DefaultTransaction();
 	            }
 	            
 	            if (currentRow % 10 == 0) {
@@ -295,9 +298,8 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 	        if (!toStore.isEmpty()) {
         		getLogger().info("storing "+toStore.size()+" entities");
 	        	featureStore.addFeatures( new ListFeatureCollection( type, toStore));
+		        transaction.commit();
 	        }
-	        
-	        transaction.commit();
 	        
 	        exec.setProgress(1.0);
 	        
@@ -306,12 +308,14 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
         	if (itRow != null)
         		itRow.close();
         	
-        	if (transaction != null)
+        	if (transaction != null) {
                 try {
                 	transaction.rollback();
                 } catch (IOException doubleEeek) {
                     // rollback failed
                 }
+                transaction.close();
+        	}
             // close datastore
             datastore.dispose();
         	
