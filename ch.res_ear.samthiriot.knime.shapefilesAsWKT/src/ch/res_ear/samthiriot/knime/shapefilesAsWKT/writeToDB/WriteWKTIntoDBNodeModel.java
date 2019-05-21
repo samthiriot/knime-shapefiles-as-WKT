@@ -279,10 +279,11 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 	        		exec.checkCanceled();
 	        		getLogger().info("storing "+toStore.size()+" entities");
 	            	featureStore.addFeatures( new ListFeatureCollection( type, toStore));
-	            	toStore.clear();
-	            	
 	    	        transaction.commit();
 	    	        transaction.close();
+	            	toStore.clear();
+	            	
+
 	    	        transaction = new DefaultTransaction();
 	            }
 	            
@@ -297,7 +298,7 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 	
 	        // store last lines
 	        if (!toStore.isEmpty()) {
-        		getLogger().info("storing "+toStore.size()+" entities");
+        		getLogger().info("storing "+toStore.size()+" entities (final)");
 	        	featureStore.addFeatures( new ListFeatureCollection( type, toStore));
 	        }
 	        
