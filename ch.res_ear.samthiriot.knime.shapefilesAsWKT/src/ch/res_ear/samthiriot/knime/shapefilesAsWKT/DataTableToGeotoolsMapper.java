@@ -1,8 +1,13 @@
 package ch.res_ear.samthiriot.knime.shapefilesAsWKT;
 
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.knime.core.data.BooleanValue;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
+import org.knime.core.data.DoubleValue;
+import org.knime.core.data.IntValue;
+import org.knime.core.data.LongValue;
+import org.knime.core.data.StringValue;
 import org.knime.core.data.def.BooleanCell;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.IntCell;
@@ -125,15 +130,15 @@ public class DataTableToGeotoolsMapper {
 		switch (targetType) {
 			case Integer:
 				//System.out.println("Int value for "+colspec.getName()+": "+((IntCell)cell).getIntValue());
-				return new Integer(((IntCell)cell).getIntValue());
+				return new Integer(((IntValue)cell).getIntValue());
 			case String:
-				return ((StringCell)cell).getStringValue(); 
+				return ((StringValue)cell).getStringValue(); 
 			case Double:
-				return ((DoubleCell)cell).getDoubleValue();
+				return ((DoubleValue)cell).getDoubleValue();
 			case Long:
-				return ((LongCell)cell).getLongValue();
+				return ((LongValue)cell).getLongValue();
 			case Boolean:
-				return ((BooleanCell)cell).getBooleanValue();
+				return ((BooleanValue)cell).getBooleanValue();
 			case Ignore:
 				final String s2 = cell.toString();
 				if (s2.length() > 254) {
@@ -154,15 +159,15 @@ public class DataTableToGeotoolsMapper {
 		
 		switch (targetType) {
 			case Integer:
-				return ((IntCell)cell).getIntValue();
+				return ((IntValue)cell).getIntValue();
 			case String:
-				return ((StringCell)cell).getStringValue();
+				return ((StringValue)cell).getStringValue();
 			case Double:
-				return ((DoubleCell)cell).getDoubleValue();
+				return ((DoubleValue)cell).getDoubleValue();
 			case Long:
-				return ((LongCell)cell).getLongValue();
+				return ((LongValue)cell).getLongValue();
 			case Boolean:
-				return ((BooleanCell)cell).getBooleanValue();
+				return ((BooleanValue)cell).getBooleanValue();
 			case Ignore:
 				return cell.toString();
 			default:
