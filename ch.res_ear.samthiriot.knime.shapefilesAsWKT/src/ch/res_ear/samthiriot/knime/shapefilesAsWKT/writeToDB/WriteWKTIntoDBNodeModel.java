@@ -220,7 +220,7 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 			datastore.createSchema(type);	
 		}
 		// retrieve it 
-		SimpleFeatureSource featureSource = datastore.getFeatureSource(type.getName());
+		SimpleFeatureSource featureSource = datastore.getFeatureSource(datastore.getTypeNames()[0]);
         if (!(featureSource instanceof SimpleFeatureStore)) {
             throw new IllegalStateException("Modification not supported");
         }
