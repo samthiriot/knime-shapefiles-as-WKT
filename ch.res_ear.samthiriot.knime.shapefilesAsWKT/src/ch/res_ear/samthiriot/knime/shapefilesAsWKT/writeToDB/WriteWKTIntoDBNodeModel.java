@@ -190,7 +190,7 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
     	exec.setMessage("storing entities");
         
 		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
-        builder.setName(m_layer.getStringValue());
+        builder.setName(layerName);
         builder.setCRS(crsOrig); 
         
         Class<?> geomClassToBeStored = SpatialUtils.detectGeometryClassFromData(	
