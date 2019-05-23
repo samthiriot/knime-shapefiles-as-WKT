@@ -123,7 +123,7 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 
 	protected String getSchemaName(DataStore datastore) throws InvalidSettingsException {
 
-		final String layer = m_layer.getStringValue();
+		final String layer = m_layer.getStringValue().trim();
 		
 		Set<String> typeNames = new HashSet<>();
 		try {
@@ -174,6 +174,10 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
     	if (!SpatialUtils.hasCRS(inputPopulation.getDataTableSpec()))
     		throw new IllegalArgumentException("the input table contains spatial data but no Coordinate Reference System");
     	    	
+    	final String layerName = m_layer.getStringValue().trim();
+    	if (layerName.isEmpty())
+    		throw new IllegalArgumentException("please provide a layer name");
+    		
     	CoordinateReferenceSystem crsOrig = SpatialUtils.decodeCRS(inputPopulation.getSpec());
     	
         
@@ -221,7 +225,7 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 			datastore.createSchema(type);	
 		}
 		// retrieve it 
-		SimpleFeatureSource featureSource = datastore.getFeatureSource(datastore.getNames().get(0));
+		SimpleFeatureSource featureSource = datastore.getFeatureSource(layerName);
         if (!(featureSource instanceof SimpleFeatureStore)) {
             throw new IllegalStateException("Modification not supported");
         }
@@ -345,19 +349,23 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
         // check the features were created (based on our tests, we got cases with no error but also nothing written!)
         if (m_checkWritten.getBooleanValue()) {
         	DataStore datastoreRead = openDataStore(exec);
-        	if (datastore == datastoreRead)
-        		getLogger().warn("got the same datastore, cannot test...");
-        	else {
-	        	exec.setMessage("checking the count of entities in the database");
-	    		SimpleFeatureSource featureSourceRead = datastoreRead.getFeatureSource(datastoreRead.getNames().get(0));
-	    		SimpleFeatureCollection collectionRead = featureSourceRead.getFeatures();
-	    		if (collectionRead.size() < inputPopulation.size())
-	    			throw new RuntimeException(
-	    					"we did not wrote the expected count of entities: there were "+
-	    							inputPopulation.size()+" lines, but only "+collectionRead.size()+
-	    							" features were created");
+        	try {
+	        	if (datastore == datastoreRead)
+	        		getLogger().warn("got the same datastore, cannot test...");
+	        	else {
+		        	exec.setMessage("checking the count of entities in the database");
+		    		SimpleFeatureSource featureSourceRead = datastoreRead.getFeatureSource(layerName);
+		    		SimpleFeatureCollection collectionRead = featureSourceRead.getFeatures();
+		    		if (collectionRead.size() < inputPopulation.size())
+		    			throw new RuntimeException(
+		    					"we did not wrote the expected count of entities: there were "+
+		    							inputPopulation.size()+" lines, but only "+collectionRead.size()+
+		    							" features were created");
+	        	}
+        	} finally {
+        		if (datastoreRead != null)
+        			datastoreRead.dispose();
         	}
-
         }
         
         
