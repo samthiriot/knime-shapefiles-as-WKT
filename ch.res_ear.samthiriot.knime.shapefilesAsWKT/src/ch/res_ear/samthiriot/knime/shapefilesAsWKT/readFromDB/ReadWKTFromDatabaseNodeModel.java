@@ -23,7 +23,6 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.util.CheckUtils;
 
 import ch.res_ear.samthiriot.knime.shapefilesAsWKT.AbstractReadWKTFromDatastoreNodeModel;
-import ch.res_ear.samthiriot.knime.shapefilesAsWKT.SpatialUtils;
 
 
 /**

@@ -213,14 +213,13 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
         // build the type
         final SimpleFeatureType type = builder.buildFeatureType();
         // get or create the type in the file store
-        
-		try {
+        try {
 			datastore.getSchema(type.getName());
 		} catch (IOException e) {
 			datastore.createSchema(type);	
 		}
 		// retrieve it 
-		SimpleFeatureSource featureSource = datastore.getFeatureSource(datastore.getTypeNames()[0]);
+		SimpleFeatureSource featureSource = datastore.getFeatureSource(datastore.getNames().get(0));
         if (!(featureSource instanceof SimpleFeatureStore)) {
             throw new IllegalStateException("Modification not supported");
         }
@@ -341,8 +340,9 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 
         // check the features were created (based on our tests, we got cases with no error but also nothing written!)
         {
+        	exec.setMessage("checking the count of entities in the database");
         	DataStore datastoreRead = openDataStore(exec);
-    		SimpleFeatureSource featureSourceRead = datastoreRead.getFeatureSource(type.getName());
+    		SimpleFeatureSource featureSourceRead = datastoreRead.getFeatureSource(datastore.getNames().get(0));
     		SimpleFeatureCollection collectionRead = featureSourceRead.getFeatures();
     		if (collectionRead.size() < inputPopulation.size())
     			throw new RuntimeException(
