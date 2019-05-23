@@ -21,6 +21,7 @@ import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.JTSFactoryFinder;
+import org.geotools.util.factory.Hints;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
@@ -211,7 +212,8 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
         
         // build the type
         final SimpleFeatureType type = builder.buildFeatureType();
-        // get or create the type in the file store 
+        // get or create the type in the file store
+        
 		try {
 			datastore.getSchema(type.getName());
 		} catch (IOException e) {
@@ -228,6 +230,7 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
         final int idxColGeom = inputPopulation.getDataTableSpec().findColumnIndex(SpatialUtils.GEOMETRY_COLUMN_NAME);
 		
         // prepare classes to create Geometries from WKT
+        
         GeometryFactory geomFactory = JTSFactoryFinder.getGeometryFactory( null );
         WKTReader reader = new WKTReader(geomFactory);
         
@@ -274,7 +277,9 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 	        	// build this feature
 	            SimpleFeature feature = featureBuilder.buildFeature(Integer.toString(currentRow)); // row.getKey().getString()
 	            // add this feature to the buffer
-	            toStore.add(feature);
+	            if (!toStore.add(feature))
+	            	warnings.warn("unknown problem when adding feature, it will be missing : "+feature);
+	            	
 	            if (toStore.size() >= BUFFER) {
 	        		exec.checkCanceled();
 	        		getLogger().info("storing "+toStore.size()+" entities");
@@ -294,8 +299,7 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 	            currentRow++;
 	            
 	        }
-	
-	
+
 	        // store last lines
 	        if (!toStore.isEmpty()) {
         		getLogger().info("storing "+toStore.size()+" entities (final)");
@@ -305,20 +309,27 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 	    	getLogger().info("commiting changes to database");
 	        transaction.commit();
 
+	        // clear mem
+        	toStore.clear();
+
 	        exec.setProgress(1.0);
 	        
 
-        } finally {
-        	if (itRow != null)
-        		itRow.close();
-        	
+        } catch (RuntimeException e) {
         	if (transaction != null) {
                 try {
                 	transaction.rollback();
                 } catch (IOException doubleEeek) {
                     // rollback failed
                 }
-                transaction.close();
+        	}
+        } finally {
+        
+        	if (itRow != null)
+        		itRow.close();
+        	
+        	if (transaction != null) {
+        		transaction.close();
         	}
             // close datastore
             datastore.dispose();
