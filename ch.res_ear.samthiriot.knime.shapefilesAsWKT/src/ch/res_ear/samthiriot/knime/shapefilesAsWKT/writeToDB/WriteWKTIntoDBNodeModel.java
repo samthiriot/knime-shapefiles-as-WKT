@@ -16,12 +16,12 @@ import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Transaction;
 import org.geotools.data.collection.ListFeatureCollection;
+import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.JTSFactoryFinder;
-import org.geotools.util.factory.Hints;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
@@ -220,7 +220,7 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 			datastore.createSchema(type);	
 		}
 		// retrieve it 
-		SimpleFeatureSource featureSource = datastore.getFeatureSource(datastore.getNames().get(0));
+		SimpleFeatureSource featureSource = datastore.getFeatureSource(type.getName());
         if (!(featureSource instanceof SimpleFeatureStore)) {
             throw new IllegalStateException("Modification not supported");
         }
@@ -318,26 +318,41 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
         } catch (RuntimeException e) {
         	if (transaction != null) {
                 try {
+                	getLogger().info("applying rollback to attempt remove our changes in the database");
                 	transaction.rollback();
                 } catch (IOException doubleEeek) {
                     // rollback failed
+                	getLogger().warn("error during rollback; maybe some garbage will remain in the database "+e.getMessage());
                 }
         	}
         } finally {
-        
+
+        	if (transaction != null)
+        		transaction.close();
+        	
         	if (itRow != null)
         		itRow.close();
         	
-        	if (transaction != null) {
-        		transaction.close();
-        	}
             // close datastore
             datastore.dispose();
-        	
         }
         
         setWarningMessage(warnings.buildWarnings());
 
+        // check the features were created (based on our tests, we got cases with no error but also nothing written!)
+        {
+        	DataStore datastoreRead = openDataStore(exec);
+    		SimpleFeatureSource featureSourceRead = datastoreRead.getFeatureSource(type.getName());
+    		SimpleFeatureCollection collectionRead = featureSourceRead.getFeatures();
+    		if (collectionRead.size() < inputPopulation.size())
+    			throw new RuntimeException(
+    					"we did not wrote the expected count of entities: there were "+
+    							inputPopulation.size()+" lines, but only "+collectionRead.size()+
+    							" features were created");
+    		
+
+        }
+        
         return new BufferedDataTable[]{};
     }
 
