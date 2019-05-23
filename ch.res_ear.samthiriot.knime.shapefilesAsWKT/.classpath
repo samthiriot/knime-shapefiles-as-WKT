@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
@@ -144,10 +144,12 @@
 	<classpathentry exported="true" kind="lib" path="lib/net.opengis.ows-22-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.w3.xlink-22-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/sqlite-jdbc-3.23.1.jar"/>
-	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry exported="true" kind="lib" path="lib/gt-app-schema-resolver-22-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-complex-22-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-wfs-ng-22-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-xsd-wfs-22-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/net.opengis.wfs-22-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sqlite-jdbc-3.27.2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xpp3_min-1.1.4c.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
