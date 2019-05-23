@@ -2,11 +2,13 @@ package ch.res_ear.samthiriot.knime.shapefilesAsWKT.view;
 
 import java.awt.Color;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FilenameUtils;
 import org.geotools.data.DataStore;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
@@ -14,7 +16,6 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -223,40 +224,66 @@ public class DisplaySpatialPopulationNodeModel extends NodeModel {
             final ExecutionMonitor exec) throws IOException,
             CanceledExecutionException {
         
+    	// we know the names expected for the files
+    	// we just have to reload the datastores from them
     	{
 	    	File bckp = new File(internDir, "datastore1");
-	    	if (!bckp.exists() || !bckp.canRead() || !bckp.isFile())
+	    	if (!bckp.exists() || !bckp.canRead() || !bckp.isDirectory()) {
+	    		//getLogger().error("cannot restore the state of the view: unable to find the directory "+bckp);
 	    		return;
+	    	}
 	    	
-	    	System.out.println("restoring datastore from "+bckp);
+	    	getLogger().debug("restoring datastore from "+bckp);
 	
-	    	tmpFile1 = FileUtil.createTempFile("shapefile", ".shp");
-	    	
-	    	FileUtil.copy(
-	    			bckp,
-	    			tmpFile1,
-	    			exec
-	    			);
+	    	tmpFile1 = new File(bckp, "shapefile.shp");
 	    	
 	        datastore1 = SpatialUtils.createDataStore(tmpFile1, false);
     	}
       	{
 	    	File bckp = new File(internDir, "datastore2");
-	    	if (!bckp.exists() || !bckp.canRead() || !bckp.isFile())
+	    	if (!bckp.exists() || !bckp.canRead() || !bckp.isDirectory()) {
 	    		return;
+	    	}
 	    	
-	    	System.out.println("restoring datastore from "+bckp);
+	    	getLogger().debug("restoring datastore from "+bckp);
 	
-	    	tmpFile2 = FileUtil.createTempFile("shapefile", ".shp");
-	    	
-	    	FileUtil.copy(
-	    			bckp,
-	    			tmpFile2,
-	    			exec
-	    			);
+	    	tmpFile2 = new File(bckp, "shapefile.shp");
 	    	
 	        datastore2 = SpatialUtils.createDataStore(tmpFile2, false);
     	}
+    	
+    }
+    
+    protected void copyAllShapefileFiles(
+    			File fileShp,
+    			File targetDirectory,
+    			ExecutionMonitor exec
+    			) throws IOException, CanceledExecutionException {
+    	
+    	
+    	targetDirectory.mkdirs();
+    	
+    	final String filenameBase = FilenameUtils.removeExtension(fileShp.getName());
+    	File origDirectory = fileShp.getParentFile();
+    	
+    	File [] filesToCopy = origDirectory.listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.startsWith(filenameBase);
+			}
+		});
+    	
+    	double progress = 1.0/filesToCopy.length;
+    	for (File fileToCopy: filesToCopy) {
+    		String extension = FilenameUtils.getExtension(fileToCopy.getName());
+	    	FileUtil.copy(
+	    			fileToCopy, 
+	    			new File(targetDirectory, "shapefile."+extension), 
+	    			exec.createSilentSubProgress(progress)
+	    			);
+    	}
+
+    	
     	
     }
     
@@ -268,23 +295,20 @@ public class DisplaySpatialPopulationNodeModel extends NodeModel {
             final ExecutionMonitor exec) throws IOException,
             CanceledExecutionException {
        
+    	// principle 
+    	// get the files behind the datastores
+    	// copy them and all related files with variations of extensions
+    	// (remember a shapefile is stored as truc.shp, along with truc.shx, .prj, etc.)
+    	
     	if (datastore1 != null) {
-
-	    	File bckp = new File(internDir, "datastore1");
-	    	FileUtil.copy(
-	    			tmpFile1, 
-	    			bckp, 
-	    			exec.createSilentSubProgress(0.5)
-	    			);
+	    	File dir1 = new File(internDir, "datastore1");
+	    	copyAllShapefileFiles(tmpFile1, dir1, exec.createSilentSubProgress(0.5));
     	}
     	if (datastore2 != null) {
 
-	    	File bckp = new File(internDir, "datastore2");
-	    	FileUtil.copy(
-	    			tmpFile2, 
-	    			bckp, 
-	    			exec.createSilentSubProgress(0.5)
-	    			);
+	    	File dir2 = new File(internDir, "datastore2");
+	    	copyAllShapefileFiles(tmpFile2, dir2, exec.createSilentSubProgress(0.5));
+
     	}
     	
     }
