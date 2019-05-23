@@ -35,6 +35,7 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelPassword;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
@@ -69,6 +70,7 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 	protected SettingsModelString m_user = new SettingsModelString("user", "postgres");
 	protected SettingsModelString m_password = new SettingsModelPassword("password", ENCRYPTION_KEY, "postgres");
 	protected SettingsModelString m_layer = new SettingsModelString("layer", "my_geometries");
+    protected SettingsModelBoolean m_checkWritten = new SettingsModelBoolean("check_written", true);
 
     // the logger instance
     private static final NodeLogger logger = NodeLogger
@@ -311,23 +313,9 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 	        // clear mem
         	toStore.clear();
 
-	        exec.setProgress(1.0);
-	        
-
-	        // check the features were created (based on our tests, we got cases with no error but also nothing written!)
-	        {
-	        	exec.setMessage("checking the count of entities in the database");
-	    		SimpleFeatureSource featureSourceRead = datastore.getFeatureSource(datastore.getNames().get(0));
-	    		SimpleFeatureCollection collectionRead = featureSourceRead.getFeatures();
-	    		if (collectionRead.size() < inputPopulation.size())
-	    			throw new RuntimeException(
-	    					"we did not wrote the expected count of entities: there were "+
-	    							inputPopulation.size()+" lines, but only "+collectionRead.size()+
-	    							" features were created");
-	    		
-
-	        }
-	        
+	    	getLogger().info("done");
+	    	exec.setProgress(1.0);
+	       
         } catch (RuntimeException e) {
         	if (transaction != null) {
                 try {
@@ -352,6 +340,26 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
         
         setWarningMessage(warnings.buildWarnings());
 
+        
+        
+        // check the features were created (based on our tests, we got cases with no error but also nothing written!)
+        if (m_checkWritten.getBooleanValue()) {
+        	DataStore datastoreRead = openDataStore(exec);
+        	if (datastore == datastoreRead)
+        		getLogger().warn("got the same datastore, cannot test...");
+        	else {
+	        	exec.setMessage("checking the count of entities in the database");
+	    		SimpleFeatureSource featureSourceRead = datastoreRead.getFeatureSource(datastoreRead.getNames().get(0));
+	    		SimpleFeatureCollection collectionRead = featureSourceRead.getFeatures();
+	    		if (collectionRead.size() < inputPopulation.size())
+	    			throw new RuntimeException(
+	    					"we did not wrote the expected count of entities: there were "+
+	    							inputPopulation.size()+" lines, but only "+collectionRead.size()+
+	    							" features were created");
+        	}
+
+        }
+        
         
         return new BufferedDataTable[]{};
     }
@@ -380,6 +388,7 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 		m_user.saveSettingsTo(settings);
 		m_password.saveSettingsTo(settings);
 		m_layer.saveSettingsTo(settings);
+		m_checkWritten.saveSettingsTo(settings);
 
 	}
 
@@ -397,6 +406,7 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 		m_user.loadSettingsFrom(settings);
 		m_password.loadSettingsFrom(settings);
 		m_layer.loadSettingsFrom(settings);
+		m_checkWritten.loadSettingsFrom(settings);
 		
 	}
 
@@ -414,6 +424,7 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 		m_user.validateSettings(settings);
 		m_password.validateSettings(settings);
 		m_layer.validateSettings(settings);
+		m_checkWritten.validateSettings(settings);
 	}
 
     /**
