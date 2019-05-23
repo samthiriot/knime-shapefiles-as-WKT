@@ -281,10 +281,10 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 	            	
 	            if (toStore.size() >= BUFFER) {
 	        		exec.checkCanceled();
-	        		getLogger().info("storing "+toStore.size()+" entities");
+	        		exec.setMessage("writing "+toStore.size()+" entities");
 	            	featureStore.addFeatures( new ListFeatureCollection( type, toStore));
-	    	        transaction.commit();
-	    	        transaction.close();
+	    	        //transaction.commit();
+	    	        //transaction.close();
 	            	toStore.clear();
 	            	
 
@@ -301,7 +301,7 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 
 	        // store last lines
 	        if (!toStore.isEmpty()) {
-        		getLogger().info("storing "+toStore.size()+" entities (final)");
+        		exec.setMessage("writing "+toStore.size()+" entities (final)");
 	        	featureStore.addFeatures( new ListFeatureCollection( type, toStore));
 	        }
 	        
@@ -314,6 +314,20 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 	        exec.setProgress(1.0);
 	        
 
+	        // check the features were created (based on our tests, we got cases with no error but also nothing written!)
+	        {
+	        	exec.setMessage("checking the count of entities in the database");
+	    		SimpleFeatureSource featureSourceRead = datastore.getFeatureSource(datastore.getNames().get(0));
+	    		SimpleFeatureCollection collectionRead = featureSourceRead.getFeatures();
+	    		if (collectionRead.size() < inputPopulation.size())
+	    			throw new RuntimeException(
+	    					"we did not wrote the expected count of entities: there were "+
+	    							inputPopulation.size()+" lines, but only "+collectionRead.size()+
+	    							" features were created");
+	    		
+
+	        }
+	        
         } catch (RuntimeException e) {
         	if (transaction != null) {
                 try {
@@ -338,20 +352,6 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
         
         setWarningMessage(warnings.buildWarnings());
 
-        // check the features were created (based on our tests, we got cases with no error but also nothing written!)
-        {
-        	exec.setMessage("checking the count of entities in the database");
-        	DataStore datastoreRead = openDataStore(exec);
-    		SimpleFeatureSource featureSourceRead = datastoreRead.getFeatureSource(datastore.getNames().get(0));
-    		SimpleFeatureCollection collectionRead = featureSourceRead.getFeatures();
-    		if (collectionRead.size() < inputPopulation.size())
-    			throw new RuntimeException(
-    					"we did not wrote the expected count of entities: there were "+
-    							inputPopulation.size()+" lines, but only "+collectionRead.size()+
-    							" features were created");
-    		
-
-        }
         
         return new BufferedDataTable[]{};
     }
