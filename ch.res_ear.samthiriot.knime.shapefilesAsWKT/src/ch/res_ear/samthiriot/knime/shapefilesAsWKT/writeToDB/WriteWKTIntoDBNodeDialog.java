@@ -6,10 +6,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
 import org.knime.core.node.defaultnodesettings.DialogComponentPasswordField;
 import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelPassword;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
@@ -89,6 +91,11 @@ public class WriteWKTIntoDBNodeDialog extends DefaultNodeSettingsPane {
         this.addDialogComponent(layerComponent);
         
 
+        addDialogComponent(new DialogComponentBoolean(
+        		new SettingsModelBoolean("check_written", true),
+        		"check the results after writing"
+        		));
+        
         ms.addChangeListener(new ChangeListener() {
 			
 			@Override

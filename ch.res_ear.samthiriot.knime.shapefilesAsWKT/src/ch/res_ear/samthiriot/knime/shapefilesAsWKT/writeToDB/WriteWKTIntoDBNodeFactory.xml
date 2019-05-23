@@ -42,7 +42,9 @@
         <option name="user">username for authentication</option>
         <option name="password">username for authentication</option>
         <option name="layer">the name of the layer to create</option>
-        
+        <option name="check the results after writing">if checked (default), we read the count of entities written in 
+        database to ensure they were written. Uncheck to save a bit of time, once you are sure your data 
+        is written correctly in your setting.</option>
     </fullDescription>
     
     <ports>
