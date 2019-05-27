@@ -8,22 +8,20 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.xml.namespace.QName;
-
+import org.apache.commons.io.FilenameUtils;
+import org.apache.xmlbeans.impl.common.XMLChar;
 import org.geotools.data.collection.ListFeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.JTSFactoryFinder;
-import org.geotools.gml.GMLException;
-import org.geotools.gml2.bindings.GMLUtil;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.wfs.GML;
 import org.geotools.wfs.GML.Version;
-import org.geotools.xsd.Configuration;
-import org.geotools.xsd.Encoder;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
@@ -37,6 +35,7 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.util.FileUtil;
 import org.locationtech.jts.geom.Geometry;
@@ -70,7 +69,8 @@ public class WriteWKTToGMLNodeModel extends NodeModel {
             .getLogger(WriteWKTAsShapefileNodeModel.class);
     
     private final SettingsModelString m_file = new SettingsModelString("filename", null);
-    private final SettingsModelString m_version = new SettingsModelString("version", "GML v2");
+    private final SettingsModelString m_version = new SettingsModelString("version", "GML v3");
+    protected final SettingsModelBoolean m_writeSchema = new SettingsModelBoolean("write_schema", true);
 
 	/**
 	 * Constructor for the node model.
@@ -92,24 +92,27 @@ public class WriteWKTToGMLNodeModel extends NodeModel {
 		final BufferedDataTable inputPopulation = inData[0];
     	
 		if (inputPopulation.size() > Integer.MAX_VALUE)
-			throw new IllegalArgumentException("sorry, we can not store more than "+Integer.MAX_VALUE+" with this node.");
+			throw new IllegalArgumentException(
+					"sorry, we can not store more than "+Integer.MAX_VALUE+" with this node.");
 
     	if (!SpatialUtils.hasGeometry(inputPopulation.getDataTableSpec()))
-    		throw new IllegalArgumentException("the input table contains no spatial data (no column named "+SpatialUtils.GEOMETRY_COLUMN_NAME+")");
+    		throw new IllegalArgumentException(
+    				"the input table contains no spatial data (no column named "+SpatialUtils.GEOMETRY_COLUMN_NAME+")");
     	
     	if (!SpatialUtils.hasCRS(inputPopulation.getDataTableSpec()))
-    		throw new IllegalArgumentException("the input table contains spatial data but no Coordinate Reference System");
+    		throw new IllegalArgumentException(
+    				"the input table contains spatial data but no Coordinate Reference System");
     	    	
     	
     	//CoordinateReferenceSystem crsOrig = SpatialUtils.decodeCRS(inputPopulation.getSpec());
     	
     	URL url;
 		try {
-			
 			url = FileUtil.toURL(m_file.getStringValue());
 		} catch (InvalidPathException | MalformedURLException e2) {
 			e2.printStackTrace();
-			throw new InvalidSettingsException("unable to open URL "+m_file.getStringValue()+": "+e2.getMessage());
+			throw new InvalidSettingsException(
+					"unable to open URL "+m_file.getStringValue()+": "+e2.getMessage());
 		}
         
     	File file = FileUtil.getFileFromURL(url);
@@ -144,7 +147,7 @@ public class WriteWKTToGMLNodeModel extends NodeModel {
         												.getDataTableSpec()
         												.stream()
         												.filter(colspec -> !SpatialUtils.GEOMETRY_COLUMN_NAME.equals((colspec.getName())))
-        												.map(colspec -> new DataTableToGeotoolsMapper(warnings, colspec))
+        												.map(colspec -> new GMLDataTableToGeotoolsMapper(warnings, colspec))
         												.collect(Collectors.toList());
         // add those to the builder type
         mappers.forEach(mapper -> mapper.addAttributeForSpec(builder));
@@ -157,6 +160,7 @@ public class WriteWKTToGMLNodeModel extends NodeModel {
 		
         // prepare classes to create Geometries from WKT
         GeometryFactory geomFactory = JTSFactoryFinder.getGeometryFactory( null );
+        //geomFactory.getPrecisionModel().
         WKTReader reader = new WKTReader(geomFactory);
         
         SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(type);
@@ -198,7 +202,7 @@ public class WriteWKTToGMLNodeModel extends NodeModel {
 	        	}
 	        	
 	        	// build this feature
-	            SimpleFeature feature = featureBuilder.buildFeature(null);
+	            SimpleFeature feature = featureBuilder.buildFeature(row.getKey().toString());
 	            // add this feature to the buffer
 	            toStore.add(feature);
 	            
@@ -229,37 +233,86 @@ public class WriteWKTToGMLNodeModel extends NodeModel {
 
         GML gml = null;
         
+        javax.xml.namespace.QName qName;
+        org.geotools.xsd.Configuration config;
+        
         final String version = m_version.getStringValue(); 
-        //QName xmlspace = null;
-        //Configuration configurationEncoder = null;
         if ("GML v2".equals(version)) {
-        	//configurationEncoder = new org.geotools.gml2.GMLConfiguration();
-        	//xmlspace = org.geotools.gml2.GML.getInstance();
             gml = new GML(Version.GML2);
             gml.setLegacy(true);
+            //qName = org.geotools.gml2.GML._FeatureCollection;
+            //config = new org.geotools.gml2.GMLConfiguration();
+            qName = null;
+            config = null;
+            
         } else if ("GML v3".equals(version)) {
         	//configurationEncoder = new org.geotools.gml3.GMLConfiguration();
         	//xmlspace = new org.geotools.gml3.GML();
-        	gml = new GML(Version.WFS1_0);
+        	gml = new GML(Version.WFS1_1);
         	gml.setNamespace("location", "location.xsd");
-
+        	
+            qName = org.geotools.gml3.GML.FeatureCollection;
+            config = new org.geotools.gml3.GMLConfiguration();
+            
+            // TODO 32 https://www.javatips.net/api/spatial_statistics_for_geotools_udig-master/uDig/org.locationtech.udig.processingtoolbox/src/org/locationtech/udig/processingtoolbox/tools/FormatTransformer.java
+            
         } else {
         	throw new InvalidSettingsException("unknown GML version "+version);
         }
-        gml.setBaseURL(file.toURI().toURL());
-        //gml.setIndenting(true);
-        gml.setCoordinateReferenceSystem(crs);
-        //gml.setLegacy(true);
         
-        exec.setProgress(0.5, "writing entities");
+        
+        org.geotools.xsd.Encoder encoder = null;
+        if (config != null) {
+        	encoder = new org.geotools.xsd.Encoder(config);
+            encoder.setIndenting(true);
+            encoder.setIndentSize(2);
+        }
+        //gml.setBaseURL(file.toURI().toURL());
+        gml.setCoordinateReferenceSystem(crs);
+        final URL baseurl = file.getParentFile().toURI().toURL();
+        
+        String filenameSchema = null;
+        if (m_writeSchema.getBooleanValue()) {
+	        exec.setProgress(0.5, "writing the schema");
+	        filenameSchema = FilenameUtils.removeExtension(file.getAbsolutePath())+".xsd";
+	        getLogger().info("writing the GML schema into "+filenameSchema);
+	        FileOutputStream xsd = new FileOutputStream(filenameSchema);
+	        
+	        gml.setBaseURL(new URL("http://schemas.opengis.net"));
 
+	        try {
+		        gml.encode(xsd, type);
+		        
+		        // we use the WFS features to write the type. That's a bit weird but the official way does not work.
+		        //final javax.xml.namespace.QName typeQName = new javax.xml.namespace.QName(type.getName().getNamespaceURI(), type.getName().getLocalPart());
+		        //encoder.setNamespace("location", url.toExternalForm());
+		        //final javax.xml.namespace.QName typeQName = new javax.xml.namespace.QName(type.getName().getNamespaceURI(), type.getTypeName());
+		        
+		        //encoder.encode(type, typeQName, xsd);
 
+	        } finally {
+	        	xsd.close();
+	        }
+        }
+        
+        // write the entities as GML
+        exec.setProgress(0.6, "writing entities");
+        getLogger().info("writing the GML features into "+file);
         OutputStream os = null;
         try {
     		os = new FileOutputStream(file);
 
-
-            gml.encode(os, featureCollection);
+    		if (config != null) {
+    			encoder.setSchemaLocation(baseurl.toExternalForm(), FilenameUtils.getName(filenameSchema));
+    			//featureCollection.getSchema().getCoordinateReferenceSystem()
+    			encoder.encode(featureCollection, qName, os);
+    		} else {
+    			if (filenameSchema != null)
+    	    		gml.setNamespace(baseurl.toExternalForm(), FilenameUtils.getName(filenameSchema));
+    			
+    			gml.encode(os, featureCollection);
+    			
+    		}
             
         } finally {
         	if (os != null) {
@@ -301,6 +354,26 @@ public class WriteWKTToGMLNodeModel extends NodeModel {
 			e2.printStackTrace();
 			throw new InvalidSettingsException("unable to open URL "+m_file.getStringValue()+": "+e2.getMessage());
 		}
+		
+		// ensures the input table does not contain column names with invalid names
+		Set<String> invalidColNames = new LinkedHashSet<String>();
+		for (String colname: specs.getColumnNames()) {
+			if (!XMLChar.isValidName(colname)) 
+				invalidColNames.add(colname);
+		}
+		if (!invalidColNames.isEmpty()) {
+			if (invalidColNames.size() == 1)
+				throw new IllegalArgumentException(
+					"The column \""+invalidColNames.iterator().next()+"\" contains special characters which cannot be stored as GML. "
+					+ "Please use the column rename node to remove these special characters first"
+					);
+			else 
+				throw new IllegalArgumentException(
+					invalidColNames.size()+" columns contains special characters which cannot be stored as GML. "
+					+ "Please use the column rename node to rename these columns: "
+					+ String.join(", ", invalidColNames)
+					);
+		}
     	
         return new DataTableSpec[]{};
         
@@ -314,6 +387,7 @@ public class WriteWKTToGMLNodeModel extends NodeModel {
         
     	m_file.saveSettingsTo(settings);
     	m_version.saveSettingsTo(settings);
+    	m_writeSchema.saveSettingsTo(settings);
     }
 
     /**
@@ -325,6 +399,7 @@ public class WriteWKTToGMLNodeModel extends NodeModel {
         
     	m_file.loadSettingsFrom(settings);
     	m_version.loadSettingsFrom(settings);
+    	m_writeSchema.loadSettingsFrom(settings);
     }
 
     /**
@@ -336,6 +411,7 @@ public class WriteWKTToGMLNodeModel extends NodeModel {
             
     	m_file.validateSettings(settings);
     	m_version.validateSettings(settings);
+    	m_writeSchema.validateSettings(settings);
     }
     
     /**

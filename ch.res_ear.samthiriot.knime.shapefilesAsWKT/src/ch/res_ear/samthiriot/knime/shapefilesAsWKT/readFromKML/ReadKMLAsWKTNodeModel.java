@@ -24,18 +24,9 @@ import org.knime.core.data.DataColumnProperties;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.DataType;
 import org.knime.core.data.MissingCell;
 import org.knime.core.data.RowKey;
-import org.knime.core.data.def.BooleanCell;
-import org.knime.core.data.def.BooleanCell.BooleanCellFactory;
 import org.knime.core.data.def.DefaultRow;
-import org.knime.core.data.def.DoubleCell;
-import org.knime.core.data.def.DoubleCell.DoubleCellFactory;
-import org.knime.core.data.def.IntCell;
-import org.knime.core.data.def.IntCell.IntCellFactory;
-import org.knime.core.data.def.LongCell;
-import org.knime.core.data.def.LongCell.LongCellFactory;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.data.def.StringCell.StringCellFactory;
 import org.knime.core.node.BufferedDataContainer;
@@ -57,6 +48,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.SAXException;
 
+import ch.res_ear.samthiriot.knime.shapefilesAsWKT.FeaturesDecodingUtils;
 import ch.res_ear.samthiriot.knime.shapefilesAsWKT.SpatialUtils;
 
 
@@ -187,26 +179,16 @@ public class ReadKMLAsWKTNodeModel extends NodeModel {
 	            			"Region".equals(name)
 	            			)
 	            			continue;
-	        		final Class<?> type = property.getType().getBinding();
-	        		final Object value = feature.getProperty(name).getValue();
+
+	        		DataCell resultCell = FeaturesDecodingUtils.getDataCellForProperty(
+							property,
+							feature
+							);
 	        		
-	        		DataCell resultCell = null;
-	        		if (value == null) {
-	        			resultCell = missing;
-	        		} else if (type.equals(Integer.class)) {
-	        			resultCell = IntCellFactory.create(value.toString());
-	        		} else if (type.equals(String.class)) {
-	        			resultCell = StringCellFactory.create(value.toString());
-	        		} else if (type.equals(Long.class)) {
-	        			resultCell = LongCellFactory.create(value.toString());
-	        		} else if (type.equals(Double.class) || type.equals(Float.class)) {
-	        			resultCell = DoubleCellFactory.create(value.toString());
-	        		} else if (type.equals(Boolean.class)) {
-	        			resultCell = BooleanCellFactory.create(value.toString());
-	        		} else {
-	        			resultCell = StringCellFactory.create(value.toString());
-	        		} 
-	        		cells.add(resultCell);
+	        		if (resultCell == null)
+	        			cells.add(missing);
+	        		else
+	        			cells.add(resultCell);
 	        	}
 	        	
 				container.addRowToTable(
@@ -290,27 +272,8 @@ public class ReadKMLAsWKTNodeModel extends NodeModel {
     			logger.warn("there was already a property named \""+name+"; we will rename this one "+name+"("+i+")");
     			name = name + "(" + i + ")";
     		}
-    		final Class<?> type = property.getType().getBinding();
-    		System.out.println("\t"+type);
-    		DataType knimeType = null;
-    		if (type.equals(Integer.class)) {
-    			knimeType = IntCell.TYPE;
-    		} else if (type.equals(String.class)) {
-    			knimeType = StringCell.TYPE;
-    		} else if (type.equals(Long.class)) {
-    			knimeType = LongCell.TYPE;
-    		} else if (type.equals(Double.class) || type.equals(Float.class)) {
-    			knimeType = DoubleCell.TYPE;
-    		} else if (type.equals(Boolean.class)) {
-    			knimeType = BooleanCell.TYPE;
-    		} else {
-    			logger.warn("The type of KML property "+name+" is not supported ("+property.getType()+"); we will convert it to String");
-    			knimeType = StringCell.TYPE;
-    		} 
-    		specs.add(new DataColumnSpecCreator(
-	    			name, 
-	    			knimeType
-	    			).createSpec());
+    		
+    		specs.add(FeaturesDecodingUtils.getColumnSpecForFeatureProperty(property, name, getLogger()));
     	}
 		
         return new DataTableSpec(
