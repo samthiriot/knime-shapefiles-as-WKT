@@ -15,10 +15,12 @@
     <fullDescription>
         <intro>
         Changes WKT geometries into their centroids
-        </intro>
+        
         <p>
 		The actual computation is done by the <a href="https://geotools.org/">Geotools library</a>.
 		</p>
+        </intro>
+        
     </fullDescription>
     
     <ports>

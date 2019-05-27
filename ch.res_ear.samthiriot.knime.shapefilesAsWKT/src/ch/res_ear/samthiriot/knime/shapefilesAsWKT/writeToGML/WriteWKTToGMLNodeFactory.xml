@@ -17,15 +17,22 @@
         Writes WKT geometries into 
         <a href="https://en.wikipedia.org/wiki/Geography_Markup_Language">Geography Markup Language (GML) format</a>. 
         <p>
+        GML is a complex format; it is not a totally defined format, but more a family of formats which can be tuned 
+        by schemas. There is no reference validation tool for developers to ensure their code writes or reads these
+        formats properly. As a consequence, writing and reading GML features remain uncertain. 
+        </p>
+        <p>
         The actual processing is done by the 
         efficient <a href="https://geotools.org/">geotools library</a>.
 		</p>
         </intro>        
         
-        <option name="filename">File to create or erase. If the filename ends with kmz, 
-        			the resulting file will be compressed.</option>
-        <option name="version">The version of the GML format to use.</option>
-    
+        <option name="filename">File to create or erase, ending with gml</option>
+        <option name="version">The version of the GML format to use. Today only v3 is available.</option>
+        <option name="write schema">If checked (default), will export the schema into a file having the same filename with extension xsd.</option>
+        	
+        
+     
     </fullDescription>
     
     <ports>

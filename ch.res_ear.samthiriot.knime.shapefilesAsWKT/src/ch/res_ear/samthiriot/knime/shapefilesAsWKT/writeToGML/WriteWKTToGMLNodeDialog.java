@@ -36,11 +36,18 @@ public class WriteWKTToGMLNodeDialog extends DefaultNodeSettingsPane {
         		JFileChooser.SAVE_DIALOG,
         		false
         		));  
+        SettingsModelString modelVersion = new SettingsModelString("version", "GML v3");
+        modelVersion.setEnabled(false);
         addDialogComponent(new DialogComponentStringSelection(
-        		new SettingsModelString("version", "GML v2"),
+        		modelVersion,
         		"version",
-        		"GML v2",
+        		//"GML v2",
         		"GML v3"
+        		));
+
+        addDialogComponent(new DialogComponentBoolean(
+        		new SettingsModelBoolean("write_schema", true),
+        		"write the schema"
         		));
     }
 }
