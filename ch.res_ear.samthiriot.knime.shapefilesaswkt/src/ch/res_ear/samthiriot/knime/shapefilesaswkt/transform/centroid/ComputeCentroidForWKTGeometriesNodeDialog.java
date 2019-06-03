@@ -8,7 +8,7 @@
  * Contributors:
  *     Samuel Thiriot - original version and contributions
  *******************************************************************************/
-package ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.centroid;
+package ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.centroid;
 
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 

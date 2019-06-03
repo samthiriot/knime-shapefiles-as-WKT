@@ -8,7 +8,7 @@
  * Contributors:
  *     Samuel Thiriot - original version and contributions
  *******************************************************************************/
-package ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.centroid;
+package ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.centroid;
 
 import java.io.File;
 import java.io.IOException;

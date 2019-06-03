@@ -8,7 +8,7 @@
  * Contributors:
  *     Samuel Thiriot - original version and contributions
  *******************************************************************************/
-package ch.res_ear.samthiriot.knime.shapefilesaswkt.compute_ecql;
+package ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.filter_ecql;
 
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
@@ -20,15 +20,15 @@ import org.knime.core.node.NodeView;
  *
  * @author Samuel Thiriot
  */
-public class ComputeECQLNodeFactory 
-        extends NodeFactory<ComputeECQLNodeModel> {
+public class FilterECQLNodeFactory 
+        extends NodeFactory<FilterECQLNodeModel> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ComputeECQLNodeModel createNodeModel() {
-        return new ComputeECQLNodeModel();
+    public FilterECQLNodeModel createNodeModel() {
+        return new FilterECQLNodeModel();
     }
 
     /**
@@ -43,8 +43,8 @@ public class ComputeECQLNodeFactory
      * {@inheritDoc}
      */
     @Override
-    public NodeView<ComputeECQLNodeModel> createNodeView(final int viewIndex,
-            final ComputeECQLNodeModel nodeModel) {
+    public NodeView<FilterECQLNodeModel> createNodeView(final int viewIndex,
+            final FilterECQLNodeModel nodeModel) {
         return null;
     }
 
@@ -61,7 +61,7 @@ public class ComputeECQLNodeFactory
      */
     @Override
     public NodeDialogPane createNodeDialogPane() {
-        return new ComputeECQLNodeDialog();
+        return new FilterECQLNodeDialog();
     }
 
 }

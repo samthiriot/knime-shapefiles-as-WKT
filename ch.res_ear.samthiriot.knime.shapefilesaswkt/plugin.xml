@@ -36,18 +36,18 @@
 </node>
    <node category-path="/community/spatialAsWKT/viewSpatialAsWKT" deprecated="false" factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.view.DisplaySpatialPopulationNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.view.DisplaySpatialPopulationNodeFactory">
    </node>
-   <node category-path="/community/spatialAsWKT/transformSpatialAsWKT" deprecated="false" factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.reproject.ReprojectNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.reproject.ReprojectNodeFactory">
+   <node category-path="/community/spatialAsWKT/transformSpatialAsWKT" deprecated="false" factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.reproject.ReprojectNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.reproject.ReprojectNodeFactory">
    </node>
    <node
          category-path="/community/spatialAsWKT/transformSpatialAsWKT"
          deprecated="false"
-         factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.filter_ecql.FilterECQLNodeFactory"
+         factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.filter_ecql.FilterECQLNodeFactory"
          id="ch.res_ear.samthiriot.knime.shapefilesaswkt.filter_ecql.FilterECQLNodeFactory">
    </node>
    <node
          category-path="/community/spatialAsWKT/transformSpatialAsWKT"
          deprecated="false"
-         factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.compute_ecql.ComputeECQLNodeFactory"
+         factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.compute_ecql.ComputeECQLNodeFactory"
          id="ch.res_ear.samthiriot.knime.shapefilesaswkt.compute_ecql.ComputeECQLNodeFactory">
    </node>
 <node category-path="/community/spatialAsWKT/transformSpatialAsWKT" factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.surface.SpatialPropertySurfaceNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.properties.surface.SpatialPropertySurfaceNodeFactory"/>
@@ -82,7 +82,7 @@
       factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.write.write_to_db.WriteWKTIntoDBNodeFactory"
       id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToDB.WriteWKTIntoDBNodeFactory">
 </node>
-<node category-path="/community/spatialAsWKT/transformSpatialAsWKT" factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.centroid.ComputeCentroidForWKTGeometriesNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.properties.centroid.ComputeCentroidForWKTGeometriesNodeFactory"/>
+<node category-path="/community/spatialAsWKT/transformSpatialAsWKT" factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.centroid.ComputeCentroidForWKTGeometriesNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.properties.centroid.ComputeCentroidForWKTGeometriesNodeFactory"/>
 <node
       category-path="/community/spatialAsWKT/propertiesSpatialAsWKT"
       deprecated="false"
