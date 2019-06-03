@@ -144,7 +144,7 @@ Bundle-ClassPath: readshapefileaskml.jar,
  lib/sqlite-jdbc-3.27.2.1.jar,
  lib/xpp3_min-1.1.4c.jar
 Bundle-Activator: ch.res_ear.samthiriot.knime.shapefilesaswkt.ShapefileAsWKTNodePlugin
-Bundle-Vendor: EIFER
+Bundle-Vendor: EIFER (European Institute for Energy Research)
 Require-Bundle: org.knime.workbench.core,
  org.knime.base,
  org.eclipse.xsd;bundle-version="2.13.0",
