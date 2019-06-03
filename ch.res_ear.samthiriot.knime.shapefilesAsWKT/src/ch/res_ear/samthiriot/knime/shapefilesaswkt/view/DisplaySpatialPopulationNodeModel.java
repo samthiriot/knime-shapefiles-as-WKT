@@ -223,6 +223,7 @@ public class DisplaySpatialPopulationNodeModel extends NodeModel {
     	m_color2.validateSettings(settings);
     	m_opacity1.validateSettings(settings);
     	m_opacity2.validateSettings(settings);
+
     }
     
     /**

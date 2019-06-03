@@ -25,7 +25,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 
-import ch.res_ear.samthiriot.knime.shapefilesaswkt.readFromShapefile.GeotoolsToDataTableMapper;
+import ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_shapefile.GeotoolsToDataTableMapper;
 
 
 /**
