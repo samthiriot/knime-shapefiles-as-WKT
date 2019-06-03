@@ -8,7 +8,7 @@
  * Contributors:
  *     Samuel Thiriot - original version and contributions
  *******************************************************************************/
-package ch.res_ear.samthiriot.knime.shapefilesaswkt.reproject;
+package ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.reproject;
 
 import java.io.File;
 import java.io.IOException;

@@ -8,7 +8,7 @@
  * Contributors:
  *     Samuel Thiriot - original version and contributions
  *******************************************************************************/
-package ch.res_ear.samthiriot.knime.shapefilesaswkt.compute_ecql;
+package ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.compute_ecql;
 
 import java.io.File;
 import java.io.IOException;

@@ -8,27 +8,28 @@
  * Contributors:
  *     Samuel Thiriot - original version and contributions
  *******************************************************************************/
-package ch.res_ear.samthiriot.knime.shapefilesaswkt.reproject;
+package ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.centroid;
 
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
- * <code>NodeFactory</code> for the "Reproject" Node.
- * Reprojects a spatialized population
+ * This is an example implementation of the node factory of the
+ * "ComputeCentroidForWKTGeometries" node.
  *
  * @author Samuel Thiriot
  */
-public class ReprojectNodeFactory 
-        extends NodeFactory<ReprojectNodeModel> {
+public class ComputeCentroidForWKTGeometriesNodeFactory 
+        extends NodeFactory<ComputeCentroidForWKTGeometriesNodeModel> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ReprojectNodeModel createNodeModel() {
-        return new ReprojectNodeModel();
+    public ComputeCentroidForWKTGeometriesNodeModel createNodeModel() {
+		// Create and return a new node model.
+        return new ComputeCentroidForWKTGeometriesNodeModel();
     }
 
     /**
@@ -36,6 +37,7 @@ public class ReprojectNodeFactory
      */
     @Override
     public int getNrNodeViews() {
+		// The number of views the node should have, in this cases there is none.
         return 0;
     }
 
@@ -43,9 +45,10 @@ public class ReprojectNodeFactory
      * {@inheritDoc}
      */
     @Override
-    public NodeView<ReprojectNodeModel> createNodeView(final int viewIndex,
-            final ReprojectNodeModel nodeModel) {
-        return null;
+    public NodeView<ComputeCentroidForWKTGeometriesNodeModel> createNodeView(final int viewIndex,
+            final ComputeCentroidForWKTGeometriesNodeModel nodeModel) {
+		// We return null as this example node does not provide a view. Also see "getNrNodeViews()".
+		return null;
     }
 
     /**
@@ -53,6 +56,7 @@ public class ReprojectNodeFactory
      */
     @Override
     public boolean hasDialog() {
+		// Indication whether the node has a dialog or not.
         return true;
     }
 
@@ -61,7 +65,8 @@ public class ReprojectNodeFactory
      */
     @Override
     public NodeDialogPane createNodeDialogPane() {
-        return new ReprojectNodeDialog();
+		// This example node has a dialog, hence we create and return it here. Also see "hasDialog()".
+        return new ComputeCentroidForWKTGeometriesNodeDialog();
     }
 
 }

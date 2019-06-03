@@ -8,11 +8,13 @@
  * Contributors:
  *     Samuel Thiriot - original version and contributions
  *******************************************************************************/
-package ch.res_ear.samthiriot.knime.shapefilesaswkt.filter_ecql;
+package ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.reproject;
 
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
-import org.knime.core.node.defaultnodesettings.DialogComponentMultiLineString;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+
+import ch.res_ear.samthiriot.knime.shapefilesaswkt.DialogComponentReferenceSystem;
+import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
 
 
 /**
@@ -26,25 +28,19 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
  * 
  * @author Samuel Thiriot
  */
-public class FilterECQLNodeDialog extends DefaultNodeSettingsPane {
+public class ReprojectNodeDialog extends DefaultNodeSettingsPane {
 
     /**
      * New pane for configuring Reproject node dialog.
      * This is just a suggestion to demonstrate possible default dialog
      * components.
      */
-    protected FilterECQLNodeDialog() {
+    protected ReprojectNodeDialog() {
         super();
         
-        addDialogComponent(new DialogComponentMultiLineString(
-        		new SettingsModelString(
-        				"query",
-        				"area(the_geom) < 15"
-        				),
-        		"query",
-        		true,
-        		50,
-        		5
+        addDialogComponent(new DialogComponentReferenceSystem(
+        		new SettingsModelString(ReprojectNodeModel.MODEL_KEY_CRS, SpatialUtils.getDefaultCRSString()),
+        		"Coordinate Reference System"
         		));
     }
 }
