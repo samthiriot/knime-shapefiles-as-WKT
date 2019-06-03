@@ -1,5 +1,6 @@
 package ch.res_ear.samthiriot.knime.shapefilesAsWKT;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -31,6 +32,7 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.container.CloseableRowIterator;
+import org.knime.core.data.property.ColorAttr;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
@@ -80,9 +82,10 @@ public class SpatialUtils {
 	}
 	
 	public static CoordinateReferenceSystem getCRSforString(String s) {
-		if (s == null)
-			throw new IllegalArgumentException("No CRS provided");
 		
+		if (s == null || s.equalsIgnoreCase("null"))
+			throw new IllegalArgumentException("No CRS provided");
+			
 		try {
 			return CRS.decode(s);
 		} catch (FactoryException e1) {
@@ -166,7 +169,8 @@ public class SpatialUtils {
 				String colNameGeom,
 				String featureName,
 				CoordinateReferenceSystem crs,
-				boolean addIncrementalId
+				boolean addIncrementalId,
+				boolean addColor
 				)
 				throws IllegalArgumentException {
 		
@@ -183,6 +187,12 @@ public class SpatialUtils {
         		);
         builder.add("rowid", String.class);
         
+        if (addColor)
+        	builder.add("color", String.class);
+
+        // TODO add color?
+        //sample.getDataTableSpec().
+        //sample.getDataTableSpec().getRowColor(row)
         if (addIncrementalId)
         	builder.add(ATTRIBUTE_NAME_INCREMENTAL_ID, Integer.class);
         
@@ -303,6 +313,7 @@ public class SpatialUtils {
 		private final SimpleFeatureType type;
 		private final ExecutionMonitor execProgress;
 		private final boolean addIncrementalId;
+		private final Color defaultColor;
 		
 		public AddRowsRunnable(
 				BufferedDataTable sample, 
@@ -310,7 +321,8 @@ public class SpatialUtils {
 				SimpleFeatureStore featureStore,
 				SimpleFeatureType type,
 				ExecutionMonitor execProgress,
-				boolean addIncrementalId
+				boolean addIncrementalId, 
+				Color defaultColor
 				) {
 			this.sample = sample;
 			this.idxColGeom = idxColGeom;
@@ -319,6 +331,7 @@ public class SpatialUtils {
 			this.execProgress = execProgress;
 	        this.featureBuilder = new SimpleFeatureBuilder(type);
 	        this.addIncrementalId = addIncrementalId;
+	        this.defaultColor = defaultColor;
 	        
 			GeometryFactory geomFactory = JTSFactoryFinder.getGeometryFactory( null );
 	        reader = new WKTReader(geomFactory);
@@ -336,9 +349,11 @@ public class SpatialUtils {
 			//System.out.println(Thread.currentThread().getName()+"  will store total "+this.sample.size());
 			CloseableRowIterator itRow = sample.iterator();
 			try {
-				
+        		
 				while (itRow.hasNext()) {
 	        		DataRow currentRow = itRow.next();
+	        		
+	        		LinkedList<Object> cells = new LinkedList<>();
 	        		
 	        		DataCell cellGeom = currentRow.getCell(idxColGeom);
 	        		
@@ -362,19 +377,30 @@ public class SpatialUtils {
 	            	
 	            	// add row id
 	            	final String rowid = currentRow.getKey().getString();
+	            	cells.add(rowid);
 	            	
 	                // add incrementalId
 	            	SimpleFeature feature = null;
 	                if (addIncrementalId) {
-	                    feature = featureBuilder.buildFeature(
-	                    		rowid, new Object[] { rowid, current }
-	                    		);
-	                } else {
-	                    feature = featureBuilder.buildFeature(
-	                    		rowid, new Object[] { rowid }
-	                    		);
+	                	cells.add(current);
 	                }
 	                
+	                // color?
+	                if (defaultColor != null) {
+	    				ColorAttr colorAttr = sample.getDataTableSpec().getRowColor(currentRow);
+	            		boolean hasColor = !colorAttr.equals(ColorAttr.DEFAULT);
+		        		if (hasColor) {
+		        			Color rowColor = sample.getDataTableSpec().getRowColor(currentRow).getColor();
+		        			cells.add("#"+Integer.toHexString(rowColor.getRGB()).substring(2));
+		        		} else {
+		        			cells.add(null);
+		        			//cells.add("#"+Integer.toHexString(defaultColor.getRGB()).substring(2));
+		        		}
+	                }
+	        			  
+	        		feature = featureBuilder.buildFeature(
+                    		rowid, cells.toArray(new Object[cells.size()])
+                    		);
 	
 	                toStore.add(feature);
 	                
@@ -425,7 +451,11 @@ public class SpatialUtils {
 		
 	}
 
-
+	/**
+	 * Returns a Runnable which decodes a KNIME data table 
+	 * and stores it as GeoTools features. 
+	 * Adds a string attribute for color.
+	 */
 	public static Runnable decodeAsFeaturesRunnable(
 			BufferedDataTable sample,
 			String colNameGeom,
@@ -433,15 +463,16 @@ public class SpatialUtils {
 			DataStore datastore,
 			String featureName,
 			CoordinateReferenceSystem crs,
-			boolean addIncrementalId
+			boolean addIncrementalId,
+			Color defaultColor
 			) throws IOException {
 		
-		SimpleFeatureType type = createGeotoolsType(sample, colNameGeom, featureName, crs, addIncrementalId);
+		SimpleFeatureType type = createGeotoolsType(sample, colNameGeom, featureName, crs, addIncrementalId, defaultColor != null);
 		SimpleFeatureStore store = createFeatureStore(sample, datastore, type, featureName);
 
 		final int idxColGeom = sample.getDataTableSpec().findColumnIndex(colNameGeom);
 
-        return new AddRowsRunnable(sample, idxColGeom, store, type, execProgress, addIncrementalId);
+        return new AddRowsRunnable(sample, idxColGeom, store, type, execProgress, addIncrementalId, defaultColor);
         		
 	}
 		
