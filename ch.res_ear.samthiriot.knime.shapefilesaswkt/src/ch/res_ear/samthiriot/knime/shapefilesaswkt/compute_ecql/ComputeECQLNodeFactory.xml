@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode icon="./shapefilesAsWKT.png" 
+			type="Other" 
+			xmlns="http://knime.org/node/v2.8" 
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+			
+    <name>Add column using ECQL expressions</name>
+    
+    <shortDescription>
+        Adds a column using ECQL expressions.
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        Add to <a href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">WKT (Well-known Text) geometries</a> 
+		a column computed using the <a href="https://en.wikipedia.org/wiki/Contextual_Query_Language">Contextual Query Language</a>
+
+		<p>
+		When your expression returns a numeric, Boolean or String result, you have to define 
+		the type of the column into which this results will be stored and the name of this column.
+		If your expression returns a geometry, you can either process it as a geometry, and replace the original 
+		geometry; or store it as a String into a novel column.
+		</p>
+				
+        <p>
+		Examples of queries:
+		<ul>
+		<li>compute the area: "area(the_geom)"</li>
+		<li>compute a centroid: "centroid(the_geom)"</li>
+		<li>compute a buffer: "buffer(the_geom, 10)"</li>
+		</ul>
+		More examples can be found here: <a href="https://docs.geoserver.org/latest/en/user/filter/ecql_reference.html">Geoserver ECQL Tutorial </a>
+        </p>
+        
+        <p>
+        Note that the units used in the query depend on the Coordinate Reference System.
+        </p>
+        
+        <p>
+        The actual processing is done by the awesome <a href="https://geotools.org/">geotools library</a>.
+        </p>
+        </intro>
+  
+        <option name="query">The query in Contextual Query Language</option>
+        <option name="type">The type of the column to create. Ensure it is consistent with the result of the query</option>
+        <option name="name">The name of the column to create</option>
+
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="Spatialized entities">Entities with spatial features</inPort>
+        <outPort index="0" name="Filtered entities">The filtered entities</outPort>
+    </ports>
+</knimeNode>

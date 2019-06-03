@@ -34,6 +34,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
+import org.opengis.filter.expression.Expression;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
@@ -124,6 +125,7 @@ public class FilterECQLNodeModel extends NodeModel {
     			crs
     			);
     	
+    	Expression exp = ECQL.toExpression("area(the_geom)*2");
 
     	exec.setMessage("filtering");
         SimpleFeatureCollection features = datastore.getFeatureSource(datastore.getNames().get(0)).getFeatures(
@@ -154,7 +156,11 @@ public class FilterECQLNodeModel extends NodeModel {
 		        	}
 		        	final SimpleFeature feature = itFeatures.next();
 		        	rowid = (String) feature.getAttribute("rowid");
+		        	
+		        	Object res = exp.evaluate(feature);
+		        	System.out.println(res);
 	        	}
+	        	
 	        	
 	        	
 	        	final DataRow row = itRow.next();

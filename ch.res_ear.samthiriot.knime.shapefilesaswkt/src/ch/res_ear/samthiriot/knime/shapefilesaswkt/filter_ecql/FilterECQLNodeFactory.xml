@@ -20,7 +20,8 @@
         <p>
 		Examples of queries:
 		<ul>
-		<li>Select entities whom geometry is smaller than 10 units: "area(the_geom) &#8804; 10"</li>
+		<li>Select entities whom area is smaller than 10 units: "area(the_geom) &#8804; 10"</li>
+		<li>Select entities whom area between 10000 and 30000: "area(the_geom) BETWEEN 10000 AND 30000"</li>
 		</ul>
 		More examples can be found here: <a href="https://docs.geoserver.org/latest/en/user/tutorials/cql/cql_tutorial.html">Geoserver CQG Tutorial </a>
         </p>
