@@ -6,7 +6,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>ch.res_ear.samthiriot.knime</groupId>
   <artifactId>ch.res_ear.samthiriot.knime.shapefilesKML</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.2.2-SNAPSHOT</version>
   <name>KNIME nodes to manipulate Shapefiles as KML</name>
   
   <description>
