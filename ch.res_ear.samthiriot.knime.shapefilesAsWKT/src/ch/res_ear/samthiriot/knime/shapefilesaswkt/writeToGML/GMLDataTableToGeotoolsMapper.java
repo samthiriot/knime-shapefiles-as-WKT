@@ -1,0 +1,38 @@
+package ch.res_ear.samthiriot.knime.shapefilesaswkt.writeToGML;
+
+import org.apache.commons.text.StringEscapeUtils;
+import org.apache.xmlbeans.impl.common.XMLChar;
+import org.knime.core.data.DataColumnSpec;
+
+import ch.res_ear.samthiriot.knime.shapefilesaswkt.DataTableToGeotoolsMapper;
+import ch.res_ear.samthiriot.knime.shapefilesaswkt.IWarningWriter;
+
+/**
+ * Specific declination of the mapper for GML.
+ * Converts names of attributes by stripping 
+ * characters creating encoding issues.
+ * 
+ * @author Samuel Thiriot
+ *
+ */
+public class GMLDataTableToGeotoolsMapper extends DataTableToGeotoolsMapper {
+
+	public GMLDataTableToGeotoolsMapper(IWarningWriter warnWriter, DataColumnSpec knimeColSpec) {
+		super(warnWriter, knimeColSpec);
+		
+	}
+
+	@Override
+	public String getName() {
+		//return StringEscapeUtils.escapeXml10(colspec.getName());
+		if (!XMLChar.isValidName(colspec.getName())) {
+			this.warnWriter.warn(
+					"the column named "+colspec.getName()+" is not valid for XML; "
+					+ "this will probably make the GML file impossible to use. "
+					+ "You might rename these columns to avoid problems");
+		} 
+		return colspec.getName();
+		//return StringEscapeUtils.escapeHtml4(colspec.getName());
+	}
+}
+
