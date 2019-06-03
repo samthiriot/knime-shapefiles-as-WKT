@@ -1,5 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2019 EIfER[1] (European Institute for Energy Research).
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU GENERAL PUBLIC LICENSE
+ * which accompanies this distribution, and is available at
+ * https://www.gnu.org/licenses/gpl-3.0.html
+ *
+ * Contributors:
+ *     Samuel Thiriot - original version and contributions
+ *******************************************************************************/
 package ch.res_ear.samthiriot.knime.shapefilesaswkt;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -31,6 +42,7 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.container.CloseableRowIterator;
+import org.knime.core.data.property.ColorAttr;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
@@ -80,9 +92,10 @@ public class SpatialUtils {
 	}
 	
 	public static CoordinateReferenceSystem getCRSforString(String s) {
-		if (s == null)
-			throw new IllegalArgumentException("No CRS provided");
 		
+		if (s == null || s.equalsIgnoreCase("null"))
+			throw new IllegalArgumentException("No CRS provided");
+			
 		try {
 			return CRS.decode(s);
 		} catch (FactoryException e1) {
@@ -166,7 +179,8 @@ public class SpatialUtils {
 				String colNameGeom,
 				String featureName,
 				CoordinateReferenceSystem crs,
-				boolean addIncrementalId
+				boolean addIncrementalId,
+				boolean addColor
 				)
 				throws IllegalArgumentException {
 		
@@ -183,6 +197,12 @@ public class SpatialUtils {
         		);
         builder.add("rowid", String.class);
         
+        if (addColor)
+        	builder.add("color", String.class);
+
+        // TODO add color?
+        //sample.getDataTableSpec().
+        //sample.getDataTableSpec().getRowColor(row)
         if (addIncrementalId)
         	builder.add(ATTRIBUTE_NAME_INCREMENTAL_ID, Integer.class);
         
@@ -303,6 +323,7 @@ public class SpatialUtils {
 		private final SimpleFeatureType type;
 		private final ExecutionMonitor execProgress;
 		private final boolean addIncrementalId;
+		private final Color defaultColor;
 		
 		public AddRowsRunnable(
 				BufferedDataTable sample, 
@@ -310,7 +331,8 @@ public class SpatialUtils {
 				SimpleFeatureStore featureStore,
 				SimpleFeatureType type,
 				ExecutionMonitor execProgress,
-				boolean addIncrementalId
+				boolean addIncrementalId, 
+				Color defaultColor
 				) {
 			this.sample = sample;
 			this.idxColGeom = idxColGeom;
@@ -319,6 +341,7 @@ public class SpatialUtils {
 			this.execProgress = execProgress;
 	        this.featureBuilder = new SimpleFeatureBuilder(type);
 	        this.addIncrementalId = addIncrementalId;
+	        this.defaultColor = defaultColor;
 	        
 			GeometryFactory geomFactory = JTSFactoryFinder.getGeometryFactory( null );
 	        reader = new WKTReader(geomFactory);
@@ -336,14 +359,17 @@ public class SpatialUtils {
 			//System.out.println(Thread.currentThread().getName()+"  will store total "+this.sample.size());
 			CloseableRowIterator itRow = sample.iterator();
 			try {
-				
+        		
 				while (itRow.hasNext()) {
 	        		DataRow currentRow = itRow.next();
+	        		
+	        		LinkedList<Object> cells = new LinkedList<>();
 	        		
 	        		DataCell cellGeom = currentRow.getCell(idxColGeom);
 	        		
 	            	if (cellGeom.isMissing()) {
-	            		System.out.println("ignoring line "+currentRow.getKey()+" which has no geometry");
+	            		//System.out.println("ignoring line "+currentRow.getKey()+" which has no geometry");
+	            		// TODO add an option in order to keep them?
 	            		continue; // ignore data with missing elements
 	            	}
 	            	
@@ -362,19 +388,30 @@ public class SpatialUtils {
 	            	
 	            	// add row id
 	            	final String rowid = currentRow.getKey().getString();
+	            	cells.add(rowid);
 	            	
 	                // add incrementalId
 	            	SimpleFeature feature = null;
 	                if (addIncrementalId) {
-	                    feature = featureBuilder.buildFeature(
-	                    		rowid, new Object[] { rowid, current }
-	                    		);
-	                } else {
-	                    feature = featureBuilder.buildFeature(
-	                    		rowid, new Object[] { rowid }
-	                    		);
+	                	cells.add(current);
 	                }
 	                
+	                // color?
+	                if (defaultColor != null) {
+	    				ColorAttr colorAttr = sample.getDataTableSpec().getRowColor(currentRow);
+	            		boolean hasColor = !colorAttr.equals(ColorAttr.DEFAULT);
+		        		if (hasColor) {
+		        			Color rowColor = sample.getDataTableSpec().getRowColor(currentRow).getColor();
+		        			cells.add("#"+Integer.toHexString(rowColor.getRGB()).substring(2));
+		        		} else {
+		        			cells.add(null);
+		        			//cells.add("#"+Integer.toHexString(defaultColor.getRGB()).substring(2));
+		        		}
+	                }
+	        			  
+	        		feature = featureBuilder.buildFeature(
+                    		rowid, cells.toArray(new Object[cells.size()])
+                    		);
 	
 	                toStore.add(feature);
 	                
@@ -425,7 +462,11 @@ public class SpatialUtils {
 		
 	}
 
-
+	/**
+	 * Returns a Runnable which decodes a KNIME data table 
+	 * and stores it as GeoTools features. 
+	 * Adds a string attribute for color.
+	 */
 	public static Runnable decodeAsFeaturesRunnable(
 			BufferedDataTable sample,
 			String colNameGeom,
@@ -433,15 +474,16 @@ public class SpatialUtils {
 			DataStore datastore,
 			String featureName,
 			CoordinateReferenceSystem crs,
-			boolean addIncrementalId
+			boolean addIncrementalId,
+			Color defaultColor
 			) throws IOException {
 		
-		SimpleFeatureType type = createGeotoolsType(sample, colNameGeom, featureName, crs, addIncrementalId);
+		SimpleFeatureType type = createGeotoolsType(sample, colNameGeom, featureName, crs, addIncrementalId, defaultColor != null);
 		SimpleFeatureStore store = createFeatureStore(sample, datastore, type, featureName);
 
 		final int idxColGeom = sample.getDataTableSpec().findColumnIndex(colNameGeom);
 
-        return new AddRowsRunnable(sample, idxColGeom, store, type, execProgress, addIncrementalId);
+        return new AddRowsRunnable(sample, idxColGeom, store, type, execProgress, addIncrementalId, defaultColor);
         		
 	}
 		
@@ -548,7 +590,7 @@ public class SpatialUtils {
 
 		for (Integer bufferDistance: distances) {
 
-			System.out.println("searching around "+bufferDistance);
+			//System.out.println("searching around "+bufferDistance);
 			FeatureIterator<SimpleFeature> itNeighboors = findClosestNeighboorFixBuffer(geom, source, bufferDistance);
 
 			// compute distances
@@ -568,7 +610,7 @@ public class SpatialUtils {
 			
 			// if we found something, stop searching far
 			if (!closestPoints.isEmpty()) {
-				System.out.println("at distance "+bufferDistance+", found "+closestPoints.size()+" neighboors");
+				//System.out.println("at distance "+bufferDistance+", found "+closestPoints.size()+" neighboors");
 				break;
 			}
 			
@@ -580,7 +622,7 @@ public class SpatialUtils {
 		} else if (closestPoints.size() > 1) {
 			// or one random
 			Random random = new Random(); // TODO?!
-			System.err.println("selecting one random neighboor among "+closestPoints.size());
+			//System.err.println("selecting one random neighboor among "+closestPoints.size());
 			return closestPoints.get(random.nextInt(closestPoints.size()));
 		}
 		
