@@ -323,7 +323,7 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
         final double opacity2 = nodeModel.m_opacity1.getDoubleValue();
 
         if (nodeModel == null || nodeModel.datastore1 == null) {
-        	System.err.println("No node model");
+        	logger.warn("nothing to display");
         	return;
         }
         

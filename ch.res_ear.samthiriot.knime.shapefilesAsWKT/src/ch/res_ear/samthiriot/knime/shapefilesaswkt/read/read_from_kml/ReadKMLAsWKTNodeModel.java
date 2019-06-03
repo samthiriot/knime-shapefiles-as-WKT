@@ -153,18 +153,7 @@ public class ReadKMLAsWKTNodeModel extends NodeModel {
         if (placemarks != null) {
 	        double total = placemarks.size();
 	        for (Object p: placemarks) {
-	        	System.out.println(p);
-	
 	        	SimpleFeatureImpl feature = (SimpleFeatureImpl)p;
-	        	
-	        	System.out.println("\t"+feature.getID());
-	        	System.out.println("\t"+feature.getName());
-	        	
-	        	System.out.println("\t"+feature.getAttributes());
-	        	for (Object attRaw: feature.getAttributes()) {
-	        		System.out.println("\t\t"+attRaw);
-	        	}
-	        	System.out.println("\t"+feature.getDefaultGeometry());
 	        	
 	        	ArrayList<DataCell> cells = new ArrayList<DataCell>(2+f.getProperties().size());
 	        	
@@ -271,7 +260,6 @@ public class ReadKMLAsWKTNodeModel extends NodeModel {
     			"Region".equals(name)
     			)
     			continue;
-    		System.out.println(name);
     		if (!foundNames.add(name)) {
     			
     			int i = 1;
