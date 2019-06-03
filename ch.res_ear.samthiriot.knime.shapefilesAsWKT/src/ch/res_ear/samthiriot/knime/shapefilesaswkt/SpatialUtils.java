@@ -368,7 +368,8 @@ public class SpatialUtils {
 	        		DataCell cellGeom = currentRow.getCell(idxColGeom);
 	        		
 	            	if (cellGeom.isMissing()) {
-	            		System.out.println("ignoring line "+currentRow.getKey()+" which has no geometry");
+	            		//System.out.println("ignoring line "+currentRow.getKey()+" which has no geometry");
+	            		// TODO add an option in order to keep them?
 	            		continue; // ignore data with missing elements
 	            	}
 	            	
@@ -589,7 +590,7 @@ public class SpatialUtils {
 
 		for (Integer bufferDistance: distances) {
 
-			System.out.println("searching around "+bufferDistance);
+			//System.out.println("searching around "+bufferDistance);
 			FeatureIterator<SimpleFeature> itNeighboors = findClosestNeighboorFixBuffer(geom, source, bufferDistance);
 
 			// compute distances
@@ -609,7 +610,7 @@ public class SpatialUtils {
 			
 			// if we found something, stop searching far
 			if (!closestPoints.isEmpty()) {
-				System.out.println("at distance "+bufferDistance+", found "+closestPoints.size()+" neighboors");
+				//System.out.println("at distance "+bufferDistance+", found "+closestPoints.size()+" neighboors");
 				break;
 			}
 			
@@ -621,7 +622,7 @@ public class SpatialUtils {
 		} else if (closestPoints.size() > 1) {
 			// or one random
 			Random random = new Random(); // TODO?!
-			System.err.println("selecting one random neighboor among "+closestPoints.size());
+			//System.err.println("selecting one random neighboor among "+closestPoints.size());
 			return closestPoints.get(random.nextInt(closestPoints.size()));
 		}
 		

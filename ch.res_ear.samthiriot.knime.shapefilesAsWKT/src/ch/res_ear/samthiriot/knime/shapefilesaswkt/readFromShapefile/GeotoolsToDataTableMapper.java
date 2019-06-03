@@ -87,26 +87,16 @@ public class GeotoolsToDataTableMapper {
 	}
 		
     protected void createKnimeSpecForGeoToolDescriptor() {
-    	
 
-    	System.out.println(gtDesc);
-    	
-    	System.out.println(gtDesc.getType());
-    	
     	if (gtDesc instanceof GeometryDescriptor) {
     		GeometryDescriptor gtDescGeom = (GeometryDescriptor)gtDesc;
     		// TODO ((GeometryDescriptor) gtDesc).getCoordinateReferenceSystem();
-    		System.out.println(gtDescGeom.getType());
     		
     		knimeType = StringCell.TYPE;
 			gtDetectedType = GeotoolDetectedType.SPATIAL;
 
     	} else if (gtDesc instanceof AttributeDescriptor) {
     		AttributeDescriptor gtDescAtt = (AttributeDescriptor)gtDesc;
-    		
-    		
-    		System.out.println(gtDescAtt);
-    		System.out.println(gtDescAtt.getType());
     		
     		if (gtDescAtt.getType().getBinding().equals(String.class)) {
     			knimeType = StringCell.TYPE;
