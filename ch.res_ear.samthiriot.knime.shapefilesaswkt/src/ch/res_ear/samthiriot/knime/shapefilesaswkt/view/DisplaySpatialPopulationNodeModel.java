@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2019 EIfER[1] (European Institute for Energy Research).
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU GENERAL PUBLIC LICENSE
+ * which accompanies this distribution, and is available at
+ * https://www.gnu.org/licenses/gpl-3.0.html
+ *
+ * Contributors:
+ *     Samuel Thiriot - original version and contributions
+ *******************************************************************************/
 package ch.res_ear.samthiriot.knime.shapefilesaswkt.view;
 
 import java.awt.Color;
@@ -20,6 +30,7 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelColor;
+import org.knime.core.node.defaultnodesettings.SettingsModelDoubleBounded;
 import org.knime.core.node.port.PortType;
 import org.knime.core.util.FileUtil;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -45,6 +56,8 @@ public class DisplaySpatialPopulationNodeModel extends NodeModel {
     protected SettingsModelColor m_color1 = new SettingsModelColor("color1", Color.GRAY);
     protected SettingsModelColor m_color2 = new SettingsModelColor("color2", Color.BLUE);
     
+    protected SettingsModelDoubleBounded m_opacity1 = new SettingsModelDoubleBounded("opacity1", 0.5, 0.0, 1.0);
+    protected SettingsModelDoubleBounded m_opacity2 = new SettingsModelDoubleBounded("opacity2", 0.7, 0.0, 1.0);
     
     /**
      * Constructor for the node model.
@@ -109,7 +122,8 @@ public class DisplaySpatialPopulationNodeModel extends NodeModel {
         		datastore1, 
         		"entities1", 
         		crsOrig1,
-        		false
+        		false,
+        		m_color1.getColorValue()
         		);
     	exec.setMessage("storing entities");
 
@@ -129,7 +143,8 @@ public class DisplaySpatialPopulationNodeModel extends NodeModel {
 	        		datastore2, 
 	        		"entities2", 
 	        		crsOrig2,
-	        		false
+	        		false,
+	        		m_color2.getColorValue()
 	        		);
 	        executor.execute(runnableSpatialize2);
 
@@ -190,7 +205,8 @@ public class DisplaySpatialPopulationNodeModel extends NodeModel {
     protected void saveSettingsTo(final NodeSettingsWO settings) {
     	m_color1.saveSettingsTo(settings);
     	m_color2.saveSettingsTo(settings);
-    	
+    	m_opacity1.saveSettingsTo(settings);
+    	m_opacity2.saveSettingsTo(settings);
     }
 
     /**
@@ -202,7 +218,8 @@ public class DisplaySpatialPopulationNodeModel extends NodeModel {
 
     	m_color1.loadSettingsFrom(settings);
     	m_color2.loadSettingsFrom(settings);
-
+    	m_opacity1.loadSettingsFrom(settings);
+    	m_opacity2.loadSettingsFrom(settings);
     }
 
     /**
@@ -214,6 +231,9 @@ public class DisplaySpatialPopulationNodeModel extends NodeModel {
             
     	m_color1.validateSettings(settings);
     	m_color2.validateSettings(settings);
+    	m_opacity1.validateSettings(settings);
+    	m_opacity2.validateSettings(settings);
+
     }
     
     /**

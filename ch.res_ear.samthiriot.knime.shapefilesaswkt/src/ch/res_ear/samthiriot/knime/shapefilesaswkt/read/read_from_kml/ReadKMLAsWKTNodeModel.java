@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2019 EIfER[1] (European Institute for Energy Research).
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU GENERAL PUBLIC LICENSE
+ * which accompanies this distribution, and is available at
+ * https://www.gnu.org/licenses/gpl-3.0.html
+ *
+ * Contributors:
+ *     Samuel Thiriot - original version and contributions
+ *******************************************************************************/
 package ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_kml;
 
 import java.io.File;
@@ -143,18 +153,7 @@ public class ReadKMLAsWKTNodeModel extends NodeModel {
         if (placemarks != null) {
 	        double total = placemarks.size();
 	        for (Object p: placemarks) {
-	        	System.out.println(p);
-	
 	        	SimpleFeatureImpl feature = (SimpleFeatureImpl)p;
-	        	
-	        	System.out.println("\t"+feature.getID());
-	        	System.out.println("\t"+feature.getName());
-	        	
-	        	System.out.println("\t"+feature.getAttributes());
-	        	for (Object attRaw: feature.getAttributes()) {
-	        		System.out.println("\t\t"+attRaw);
-	        	}
-	        	System.out.println("\t"+feature.getDefaultGeometry());
 	        	
 	        	ArrayList<DataCell> cells = new ArrayList<DataCell>(2+f.getProperties().size());
 	        	
@@ -261,7 +260,6 @@ public class ReadKMLAsWKTNodeModel extends NodeModel {
     			"Region".equals(name)
     			)
     			continue;
-    		System.out.println(name);
     		if (!foundNames.add(name)) {
     			
     			int i = 1;

@@ -1,10 +1,22 @@
+/*******************************************************************************
+ * Copyright (c) 2019 EIfER[1] (European Institute for Energy Research).
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU GENERAL PUBLIC LICENSE
+ * which accompanies this distribution, and is available at
+ * https://www.gnu.org/licenses/gpl-3.0.html
+ *
+ * Contributors:
+ *     Samuel Thiriot - original version and contributions
+ *******************************************************************************/
 package ch.res_ear.samthiriot.knime.shapefilesaswkt.view;
 
 import java.awt.Color;
 
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentColorChooser;
+import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
 import org.knime.core.node.defaultnodesettings.SettingsModelColor;
+import org.knime.core.node.defaultnodesettings.SettingsModelDoubleBounded;
 
 /**
  * <code>NodeDialog</code> for the "DisplaySpatialPopulation" Node.
@@ -27,14 +39,25 @@ public class DisplaySpatialPopulationNodeDialog extends DefaultNodeSettingsPane 
     protected DisplaySpatialPopulationNodeDialog() {
         super();
         
+        createNewGroup("top table");
         addDialogComponent(new DialogComponentColorChooser(
         		new SettingsModelColor("color1", Color.GRAY),
-        		"color for entities 1 (top table)",
+        		"default color",
         		true));
+        addDialogComponent(new DialogComponentNumber(
+        		new SettingsModelDoubleBounded("opacity1", 0.7, 0.0, 1.0),
+        		"opacity",
+        		0.1));
+        
+        createNewGroup("bottom table");
         addDialogComponent(new DialogComponentColorChooser(
         		new SettingsModelColor("color2", Color.BLUE),
-        		"color for entities 2 (bottom table)",
+        		"default color",
         		true));
+        addDialogComponent(new DialogComponentNumber(
+        		new SettingsModelDoubleBounded("opacity2", 0.5, 0.0, 1.0),
+        		"opacity",
+        		0.1));
 
     }
 }

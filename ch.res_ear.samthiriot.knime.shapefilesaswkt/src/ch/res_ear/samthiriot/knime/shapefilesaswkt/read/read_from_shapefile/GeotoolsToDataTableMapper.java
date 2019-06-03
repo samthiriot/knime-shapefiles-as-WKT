@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2019 EIfER[1] (European Institute for Energy Research).
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU GENERAL PUBLIC LICENSE
+ * which accompanies this distribution, and is available at
+ * https://www.gnu.org/licenses/gpl-3.0.html
+ *
+ * Contributors:
+ *     Samuel Thiriot - original version and contributions
+ *******************************************************************************/
 package ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_shapefile;
 
 import java.math.BigDecimal;
@@ -77,26 +87,16 @@ public class GeotoolsToDataTableMapper {
 	}
 		
     protected void createKnimeSpecForGeoToolDescriptor() {
-    	
 
-    	System.out.println(gtDesc);
-    	
-    	System.out.println(gtDesc.getType());
-    	
     	if (gtDesc instanceof GeometryDescriptor) {
     		GeometryDescriptor gtDescGeom = (GeometryDescriptor)gtDesc;
     		// TODO ((GeometryDescriptor) gtDesc).getCoordinateReferenceSystem();
-    		System.out.println(gtDescGeom.getType());
     		
     		knimeType = StringCell.TYPE;
 			gtDetectedType = GeotoolDetectedType.SPATIAL;
 
     	} else if (gtDesc instanceof AttributeDescriptor) {
     		AttributeDescriptor gtDescAtt = (AttributeDescriptor)gtDesc;
-    		
-    		
-    		System.out.println(gtDescAtt);
-    		System.out.println(gtDescAtt.getType());
     		
     		if (gtDescAtt.getType().getBinding().equals(String.class)) {
     			knimeType = StringCell.TYPE;
