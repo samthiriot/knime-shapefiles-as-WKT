@@ -1,8 +1,11 @@
 package ch.res_ear.samthiriot.knime.shapefilesAsWKT.view;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
@@ -14,13 +17,24 @@ import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 
 import org.geotools.data.simple.SimpleFeatureSource;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.simple.SimpleSchema;
 import org.geotools.map.FeatureLayer;
 import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.lite.StreamingRenderer;
+import org.geotools.styling.FeatureTypeStyle;
+import org.geotools.styling.Fill;
+import org.geotools.styling.Graphic;
+import org.geotools.styling.Mark;
+import org.geotools.styling.Rule;
 import org.geotools.styling.SLD;
+import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
+import org.geotools.styling.StyleBuilder;
+import org.geotools.styling.StyleFactory;
+import org.geotools.styling.Symbolizer;
 import org.geotools.swing.JMapPane;
 import org.geotools.swing.action.InfoAction;
 import org.geotools.swing.action.MapAction;
@@ -34,6 +48,13 @@ import org.geotools.swing.tool.PanTool;
 import org.geotools.swing.tool.ScrollWheelTool;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeView;
+import org.locationtech.jts.geom.MultiPoint;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryType;
+import org.opengis.filter.FilterFactory;
 
 /**
  * <code>NodeView</code> for the "DisplaySpatialPopulation" Node.
@@ -180,19 +201,117 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
     @Override
     protected void onClose() {
     
-    	content.dispose();
-
+    	try {
+    		for (Layer l: content.layers()) {
+    			l.dispose();
+    		}
+    		content.dispose();
+    	} catch (RuntimeException e) {
+    		logger.warn("error when disposing the view: "+e.getMessage(), e);
+    	}
     }
     
+    protected Symbolizer createDefaultSymbolizer(SimpleFeatureSource shapefileSource, Fill fill, Stroke stroke, double opacity) {
+    	
+        StyleFactory sf = CommonFactoryFinder.getStyleFactory(null);
+		StyleBuilder sb = new StyleBuilder();
+
+    	GeometryType geomType = shapefileSource.getSchema().getGeometryDescriptor().getType(); 
+        Symbolizer sym = null;
+        if (Point.class.isAssignableFrom(geomType.getBinding()) || MultiPoint.class.isAssignableFrom(geomType.getBinding())) { 
+        //if (geomType.equals(SimpleSchema.POINT) || geomType.equals(SimpleSchema.MULTIPOINT)) {
+        	Mark circle = sb.createMark(StyleBuilder.MARK_CIRCLE, fill, stroke);
+        	Graphic graph = sb.createGraphic(null, circle, null, 1.0, 5.0, 0); // opacity
+        	sym = sf.createPointSymbolizer(graph, null);
+        } else if (Polygon.class.isAssignableFrom(geomType.getBinding()) || MultiPolygon.class.isAssignableFrom(geomType.getBinding()) )
+        	sym = sf.createPolygonSymbolizer(stroke, fill, null);
+        else 
+        	sym = sf.createLineSymbolizer(stroke, null);
+        
+        return sym;
+    }
+    
+    protected Style createStyleForStore(SimpleFeatureSource shapefileSource, Color color, double opacity) {
+    	
+		Style shpStyle = null;
+		AttributeDescriptor desc = shapefileSource.getSchema().getDescriptor("color");
+		if (desc != null) {
+			
+	        
+			// a color is defined; use it 
+    		StyleBuilder sb = new StyleBuilder();
+            FilterFactory ff = sb.getFilterFactory();
+            Style style = sb.createStyle();
+            style.setName("MyStyle");
+
+            StyleFactory sf = CommonFactoryFinder.getStyleFactory(null);
+            
+            Stroke stroke = sf.createStroke(sb.attributeExpression("color"), ff.literal(1));
+            Fill fill = sf.createFill(sb.attributeExpression("color"), ff.literal(opacity));
+            Symbolizer sym = createDefaultSymbolizer(shapefileSource, fill, stroke, opacity);
+
+	        FeatureTypeStyle featureTypeStyle = sf.createFeatureTypeStyle();
+
+            // add a rule which, when the color attribute is not null, uses this color to display the geometry
+	        Rule rule1 = sf.createRule();
+	        rule1.setName("rule1");
+	        rule1.getDescription().setTitle("City");
+	        rule1.getDescription().setAbstract("Rule for drawing cities");
+	        rule1.setFilter(ff.not(ff.isNull(ff.property("color"))));
+            
+            rule1.symbolizers().add(sym);
+
+            featureTypeStyle.rules().add(rule1);
+            
+            
+            //shpStyle = SLD.wrapSymbolizers(sym);
+            List<org.opengis.style.Symbolizer> symbolizers = new ArrayList<>();
+            Stroke strokeDefault = sf.createStroke(sb.colorExpression(color), ff.literal(1));
+            Fill fillDefault = sf.createFill(sb.colorExpression(color), ff.literal(opacity));
+            Symbolizer sym2 = createDefaultSymbolizer(shapefileSource, fillDefault, strokeDefault, opacity);
+            symbolizers.add(sym2);
+           
+            Rule rule2 = sf.rule(
+                            "default",
+                            null,
+                            null,
+                            Double.MIN_VALUE,
+                            Double.MAX_VALUE,
+                            symbolizers,
+                            null
+                            );
+            featureTypeStyle.rules().add(rule2);
+            
+            style.featureTypeStyles().add(featureTypeStyle);
+            
+            shpStyle = style;
+		} else {
+			// create a default style
+        /*
+        Style shpStyle = SLD.createSimpleStyle(
+        		shapefileSource.getSchema(), 
+        		
+        		sb.createFill(sb.attributeExpression("color"),sb.attributeExpression("opacity"))
+        		);
+        		*/
+			shpStyle = SLD.createSimpleStyle(shapefileSource.getSchema(), color);
+		}
+		
+		return shpStyle;
+    }
     /**
      * {@inheritDoc}
      */
     @Override
     protected void onOpen() {
 
+    	
         DisplaySpatialPopulationNodeModel nodeModel = 
                 (DisplaySpatialPopulationNodeModel)getNodeModel();
-        
+
+        final double opacity1 = nodeModel.m_opacity1.getDoubleValue();
+        final double opacity2 = nodeModel.m_opacity1.getDoubleValue();
+
         if (nodeModel == null || nodeModel.datastore1 == null) {
         	System.err.println("No node model");
         	return;
@@ -204,8 +323,8 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
     		SimpleFeatureSource shapefileSource = nodeModel.datastore1.getFeatureSource(
     				nodeModel.datastore1.getNames().get(0));
     		
-    		Style shpStyle = SLD.createSimpleStyle(shapefileSource.getSchema(), nodeModel.m_color1.getColorValue());
-    		
+    		Style shpStyle = createStyleForStore(shapefileSource, nodeModel.m_color1.getColorValue(), opacity1);
+            
     	    Layer shpLayer = new FeatureLayer(shapefileSource, shpStyle);       
             content.addLayer(shpLayer);
             mapPane.setDisplayArea(content.getMaxBounds());
@@ -214,8 +333,8 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
             if (nodeModel.datastore2 != null) {
             	SimpleFeatureSource shapefileSource2 = nodeModel.datastore2.getFeatureSource(
         				nodeModel.datastore2.getNames().get(0));
-        		Style shpStyle2 = SLD.createSimpleStyle(shapefileSource2.getSchema(), nodeModel.m_color2.getColorValue());
-
+        		Style shpStyle2 = createStyleForStore(shapefileSource2, nodeModel.m_color2.getColorValue(), opacity2);
+        		        		
         	    Layer shpLayer2 = new FeatureLayer(shapefileSource2, shpStyle2);       
                 content.addLayer(shpLayer2);
 

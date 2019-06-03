@@ -27,15 +27,32 @@
         </ul> 
         </p>
         <p>
+        You can color the geometries by tuning the default colors in the configuration pane. 
+        You also can use the color manager node, and assign colors to each line based on its
+        characteristics; this leads to more interesting symbologies.
+        </p>
+        <p>
         The actual visualization is done using the wonderful <a href="https://geotools.org/">geotools library</a>.
         </p>
         </intro>
                
-        <option name="color for entities 1 (top table))">
-        Color that will be used to draw the entities from the first connection</option>
+        <option name="top table: default color">
+        The color to use if there is no color assigned to each line
+        </option>
 
-        <option name="color for entities 2 (bottom table))">
-        Color that will be used to draw the entities from the second connection</option>
+        <option name="top table: opacity">
+        Opacity of the geometries of the first table. Keeping a bit of transparency is good (defaults to 0.7), as it helps to 
+        detect overlapping geometries.  
+        </option>
+
+		<option name="bottom table: default color">
+        The color to use if there is no color assigned to each line
+        </option>
+
+        <option name="bottom table: opacity">
+        Opacity of the geometries of the first table. Keeping a bit of transparency is good (defaults to 0.5), as it helps to 
+        detect overlapping geometries, and enables to views the geometries of the first table below.
+        </option>
         
     </fullDescription>
     

@@ -4,7 +4,9 @@ import java.awt.Color;
 
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentColorChooser;
+import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
 import org.knime.core.node.defaultnodesettings.SettingsModelColor;
+import org.knime.core.node.defaultnodesettings.SettingsModelDoubleBounded;
 
 /**
  * <code>NodeDialog</code> for the "DisplaySpatialPopulation" Node.
@@ -27,15 +29,25 @@ public class DisplaySpatialPopulationNodeDialog extends DefaultNodeSettingsPane 
     protected DisplaySpatialPopulationNodeDialog() {
         super();
         
+        createNewGroup("top table");
         addDialogComponent(new DialogComponentColorChooser(
         		new SettingsModelColor("color1", Color.GRAY),
-        		"color for entities 1 (top table)",
+        		"default color",
         		true));
+        addDialogComponent(new DialogComponentNumber(
+        		new SettingsModelDoubleBounded("opacity1", 0.7, 0.0, 1.0),
+        		"opacity",
+        		0.1));
+        
+        createNewGroup("bottom table");
         addDialogComponent(new DialogComponentColorChooser(
         		new SettingsModelColor("color2", Color.BLUE),
-        		"color for entities 2 (bottom table)",
+        		"default color",
         		true));
-
+        addDialogComponent(new DialogComponentNumber(
+        		new SettingsModelDoubleBounded("opacity2", 0.5, 0.0, 1.0),
+        		"opacity",
+        		0.1));
     }
 }
 

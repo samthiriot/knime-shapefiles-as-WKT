@@ -101,7 +101,8 @@ public class ReprojectNodeModel extends NodeModel {
         		datastore, 
         		"entities", 
         		crsOrig,
-        		false
+        		false,
+        		null
         		);
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(runnableSpatialize);
