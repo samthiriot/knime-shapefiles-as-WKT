@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shapefilesAsWKT.png"  
+		type="Other" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+    
+    <name>Type of WKT Geometries</name>
+    
+    <shortDescription>
+        Type of WKT geometries
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        For each geometry, extract the type of geometry and stores it into an additional column. 
+        The type might be for instance "Point", "Polygon", "Multipolygon", etc.
+        
+        <p>
+		The actual computation is done by the <a href="https://geotools.org/">Geotools library</a>.
+		</p>
+        </intro>
+
+		<option name="column name">name of the column to create</option>
+		        
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="datatable with WKT geometries">Description of first input port...</inPort>
+        <outPort index="0" name="datatable with WKT geometries">Table with geometries changed into their centroid</outPort>
+    </ports>    
+</knimeNode>

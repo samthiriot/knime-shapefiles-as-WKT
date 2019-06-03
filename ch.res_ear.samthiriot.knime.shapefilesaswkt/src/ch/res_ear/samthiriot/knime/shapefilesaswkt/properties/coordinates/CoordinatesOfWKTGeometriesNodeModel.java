@@ -8,21 +8,22 @@
  * Contributors:
  *     Samuel Thiriot - original version and contributions
  *******************************************************************************/
-package ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.surface;
+package ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.coordinates;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.geotools.geometry.jts.JTS;
-import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.collection.CollectionCellFactory;
+import org.knime.core.data.collection.ListCell;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.DoubleCell.DoubleCellFactory;
@@ -36,21 +37,14 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Point;
-import org.opengis.geometry.MismatchedDimensionException;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
+import org.locationtech.jts.geom.Coordinate;
 
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
 
 
 /**
  * This is an example implementation of the node model of the
- * "SpatialPropertySurface" node.
+ * "ComputeCentroidForWKTGeometries" node.
  * 
  * This example node performs simple number formatting
  * ({@link String#format(String, Object...)}) using a user defined format string
@@ -58,41 +52,21 @@ import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
  *
  * @author Samuel Thiriot
  */
-public class SpatialPropertySurfaceNodeModel extends NodeModel {
+public class CoordinatesOfWKTGeometriesNodeModel extends NodeModel {
     
-	
-	private final SettingsModelString m_colname = new SettingsModelString(
-					"colname", 
-					"geom_surface");
 
+	SettingsModelString m_colname = new SettingsModelString(
+											"colname", 
+											"coordinates"
+											);
+		
+	
 	/**
 	 * Constructor for the node model.
 	 */
-	protected SpatialPropertySurfaceNodeModel() {
+	protected CoordinatesOfWKTGeometriesNodeModel() {
 		super(1, 1);
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
-		
-		final DataTableSpec spec = inSpecs[0];
-		if (spec == null)
-			throw new InvalidSettingsException("no table as input");
-		
-		if (!SpatialUtils.hasGeometry(spec))
-			throw new InvalidSettingsException("the input table contains no WKT geometry");
-			
-		final String colname = m_colname.getStringValue();
-		
-		if (spec.containsName(colname))
-			throw new InvalidSettingsException("the table already contains a column named "+colname);
-		
-		return new DataTableSpec[] { createOutputSpec(spec) };
-	}
-	
 
 
 	/**
@@ -115,7 +89,9 @@ public class SpatialPropertySurfaceNodeModel extends NodeModel {
 		}
 		
 		newColumnSpecs.add(
-				new DataColumnSpecCreator(colname, DoubleCell.TYPE).createSpec()
+				new DataColumnSpecCreator(
+						colname, 
+						ListCell.getCollectionType(DoubleCell.TYPE)).createSpec()
 				);
 		
 		return new DataTableSpec(
@@ -123,8 +99,29 @@ public class SpatialPropertySurfaceNodeModel extends NodeModel {
 						new DataColumnSpec[newColumnSpecs.size()]));
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+		
+		final DataTableSpec spec = inSpecs[0];
+		if (spec == null)
+			throw new InvalidSettingsException("no table as input");
+		
+		if (!SpatialUtils.hasGeometry(spec))
+			throw new InvalidSettingsException("the input table contains no WKT geometry");
+					
+		final String colname = m_colname.getStringValue();
+
+		if (spec.containsName(colname))
+			throw new InvalidSettingsException("the table already contains a column named "+colname);
+
+		return new DataTableSpec[] { createOutputSpec(spec) };
+	}
+
 	long done = 0;
-	
+
 	/**
 	 * 
 	 * {@inheritDoc}
@@ -145,87 +142,38 @@ public class SpatialPropertySurfaceNodeModel extends NodeModel {
 				
 		final int numberOfCells = inputTable.getDataTableSpec().getNumColumns();
 
-		CoordinateReferenceSystem crsOrig = SpatialUtils.decodeCRS(inputTable.getDataTableSpec());
 
-		CRSAuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory("AUTO", null);
-
-		/*
-		// depending to the original CRS, it might be necessary to pass through an intermediate CRS
-		CoordinateReferenceSystem crsInter = DefaultGeocentricCRS.CARTESIAN;
-		MathTransform transform1 = CRS.findMathTransform(
-				crsOrig, 
-				crsInter, 
-				true);
-		boolean reprojectInter = false;
-		*/
-		
 		// iterate each geometry of each row
 		done = 0;
 		SpatialUtils.applyToEachGeometry(
 				inputTable, 
 				geomAndRow -> {
-			      
-					try {
+		     								
+					List<DataCell> cells = new ArrayList<>(numberOfCells+1);
+					
+					cells.addAll(geomAndRow.row.stream().collect(Collectors.toList()));
+					
+					
+					Coordinate[] coords = geomAndRow.geometry.getCoordinates();
+					List<DataCell> cellsInside = new ArrayList<>(coords.length*2);
+					for (int i=0; i<coords.length; i++) {
+						cellsInside.add(DoubleCellFactory.create(coords[i].x));
+						cellsInside.add(DoubleCellFactory.create(coords[i].y));
+					}
 						
-						Geometry transformed = null;
+					cells.add(CollectionCellFactory.createListCell(cellsInside));
 						
-
-						//try {
-							Point centroid = geomAndRow.geometry.getCentroid(); 
-
-							CoordinateReferenceSystem crsTarget = factory.createProjectedCRS(
-									"AUTO:42001," + centroid.getX()//String.format(Locale.ENGLISH, "%.2f", centroid.getX()) 
-									+ "," + centroid.getY()//String.format(Locale.ENGLISH, "%.5f", centroid.getY())
-									);
-							MathTransform transform2 = CRS.findMathTransform(
-									crsOrig, 
-									crsTarget, 
-									true);
-							transformed = JTS.transform(geomAndRow.geometry, transform2);
-							/*
-						} catch (FactoryException | TransformException e) {
-							e.printStackTrace();
-							System.out.println("using a second projection");
-							Geometry geomInter = JTS.transform(geomAndRow.geometry, transform1);
-							Point centroid = geomInter.getCentroid(); 
-							CoordinateReferenceSystem crsTarget = factory.createProjectedCRS(
-									"AUTO:42001," + centroid.getX()//String.format(Locale.ENGLISH, "%.2f", centroid.getX()) 
-									+ "," + centroid.getY()//String.format(Locale.ENGLISH, "%.5f", centroid.getY())
-									);
-							MathTransform transform2 = CRS.findMathTransform(
-									crsInter, 
-									crsTarget, 
-									true);
-							transformed = JTS.transform(geomInter, transform2);
-
-						}
-						*/
-					    // compute the geometry
-					    double surfaceSquareMeter = transformed.getArea();
-						
-					    // create the row
-						DataCell[] cells = new DataCell[numberOfCells+1];
-						for (int i=0; i<numberOfCells; i++)
-							cells[i] = geomAndRow.row.getCell(i);
-							
-						cells[numberOfCells] = DoubleCellFactory.create(surfaceSquareMeter);
-						
-						DataRow row = new DefaultRow(
-				    		  geomAndRow.row.getKey(), 
-				    		  cells
-				    		  );
-						container.addRowToTable(row);
-						  
-						if (done++ % 100 == 0) {
-							exec.checkCanceled();
-							exec.setProgress(done/total, "computing surface of row "+done);
-						}
-						  
-					} catch (FactoryException | MismatchedDimensionException | TransformException e) {
-						e.printStackTrace();
-						throw new InvalidSettingsException("An error occured during the reprojection of geometries; please reproject your geometries first: "+e.getMessage());
-					} 
-
+					DataRow row = new DefaultRow(
+			    		  geomAndRow.row.getKey(), 
+			    		  cells
+			    		  );
+					container.addRowToTable(row);
+					  
+					if (done++ % 10 == 0) {
+						exec.checkCanceled();
+						exec.setProgress(done/total, "computing surface of row "+done);
+					}
+			
 				}
 				);
 
@@ -249,7 +197,7 @@ public class SpatialPropertySurfaceNodeModel extends NodeModel {
 	 */
 	@Override
 	protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-		
+	
 		m_colname.loadSettingsFrom(settings);
 	}
 
@@ -272,7 +220,7 @@ public class SpatialPropertySurfaceNodeModel extends NodeModel {
 	@Override
 	protected void saveInternals(File nodeInternDir, ExecutionMonitor exec)
 			throws IOException, CanceledExecutionException {
-		
+	
 		// nothing to do
 	}
 

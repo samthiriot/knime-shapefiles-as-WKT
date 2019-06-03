@@ -10,7 +10,6 @@
  *******************************************************************************/
 package ch.res_ear.samthiriot.knime.shapefilesaswkt.write.write_to_gml;
 
-import org.apache.commons.text.StringEscapeUtils;
 import org.apache.xmlbeans.impl.common.XMLChar;
 import org.knime.core.data.DataColumnSpec;
 

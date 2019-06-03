@@ -8,16 +8,22 @@
  * Contributors:
  *     Samuel Thiriot - original version and contributions
  *******************************************************************************/
-package ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.centroid;
+package ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.type;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.knime.core.data.DataCell;
+import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.DataTableSpecCreator;
 import org.knime.core.data.def.DefaultRow;
+import org.knime.core.data.def.StringCell;
 import org.knime.core.data.def.StringCell.StringCellFactory;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
@@ -28,9 +34,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.locationtech.jts.io.WKTWriter;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
 
@@ -45,15 +49,29 @@ import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
  *
  * @author Samuel Thiriot
  */
-public class ComputeCentroidForWKTGeometriesNodeModel extends NodeModel {
+public class TypeOfWKTGeometriesNodeModel extends NodeModel {
     
+	SettingsModelString m_colname = new SettingsModelString(
+											"colname", 
+											"geom_type"
+											);
+									
 	/**
 	 * Constructor for the node model.
 	 */
-	protected ComputeCentroidForWKTGeometriesNodeModel() {
+	protected TypeOfWKTGeometriesNodeModel() {
 		super(1, 1);
 	}
 
+	protected DataTableSpec createSpec(DataTableSpec inSpec) {
+		DataTableSpecCreator creator = new DataTableSpecCreator(inSpec);
+		creator.addColumns(
+				new DataColumnSpecCreator(
+						m_colname.getStringValue(),
+						StringCell.TYPE
+						).createSpec());
+		return creator.createSpec();
+	}
 	
 	/**
 	 * {@inheritDoc}
@@ -67,8 +85,12 @@ public class ComputeCentroidForWKTGeometriesNodeModel extends NodeModel {
 		
 		if (!SpatialUtils.hasGeometry(spec))
 			throw new InvalidSettingsException("the input table contains no WKT geometry");
-					
-		return new DataTableSpec[] { spec };
+		
+		if (spec.containsName(m_colname.getStringValue()))
+			throw new InvalidSettingsException("the input table already contains a column named "+m_colname.getStringValue());
+		
+		
+		return new DataTableSpec[] { createSpec(spec) };
 	}
 
 	long done = 0;
@@ -86,47 +108,40 @@ public class ComputeCentroidForWKTGeometriesNodeModel extends NodeModel {
 		
 		BufferedDataTable inputTable = inData[0];
 
-		DataTableSpec outputSpec = inputTable.getDataTableSpec();
+		DataTableSpec outputSpec = createSpec(inputTable.getDataTableSpec());
 		BufferedDataContainer container = exec.createDataContainer(outputSpec);
 
 		final double total = inputTable.size();
 				
 		final int numberOfCells = inputTable.getDataTableSpec().getNumColumns();
 
-		CoordinateReferenceSystem crsOrig = SpatialUtils.decodeCRS(inputTable.getDataTableSpec());
-
-		CRSAuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory("AUTO", null);
-
-		final int idxGeomCol = inputTable.getDataTableSpec().findColumnIndex(SpatialUtils.GEOMETRY_COLUMN_NAME);
-		
-		WKTWriter writer = new WKTWriter();
 
 		// iterate each geometry of each row
 		done = 0;
 		SpatialUtils.applyToEachGeometry(
 				inputTable, 
 				geomAndRow -> {
-		     																	
-				    // create the row
-					DataCell[] cells = new DataCell[numberOfCells];
-					for (int i=0; i<numberOfCells; i++) {
-						if (i == idxGeomCol)
-							// convert geometry
-							cells[i] = StringCellFactory.create(writer.write(geomAndRow.geometry.getCentroid()));
-						else 
-							cells[i] = geomAndRow.row.getCell(i);
-						
-					}
-												
+		     		
+					// copy all cells
+					List<DataCell> cells = new ArrayList<>(numberOfCells+1);
+					cells.addAll(geomAndRow.row.stream().collect(Collectors.toList()));
+					
+					// add the cell with the type
+					cells.add(StringCellFactory.create(geomAndRow.geometry.getClass().getSimpleName()));
+					
+					//geomAndRow.geometry.getCoordinate().x
+					//geomAndRow.geometry.getCoordinate().y
+					
+					// append the row
 					DataRow row = new DefaultRow(
 			    		  geomAndRow.row.getKey(), 
 			    		  cells
 			    		  );
 					container.addRowToTable(row);
 					  
-					if (done++ % 100 == 0) {
+					if (done++ % 10 == 0) {
 						exec.checkCanceled();
-						exec.setProgress(done/total, "computing surface of row "+done);
+						exec.setProgress(done/total, "computing row "+done);
 					}
 			
 				}
@@ -144,7 +159,8 @@ public class ComputeCentroidForWKTGeometriesNodeModel extends NodeModel {
 	@Override
 	protected void saveSettingsTo(final NodeSettingsWO settings) {
 		
-		// nothing to do
+		m_colname.saveSettingsTo(settings);
+		
 	}
 
 	/**
@@ -153,7 +169,8 @@ public class ComputeCentroidForWKTGeometriesNodeModel extends NodeModel {
 	@Override
 	protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
 	
-		// nothing to do
+		m_colname.loadSettingsFrom(settings);
+		
 	}
 
 	/**
@@ -162,7 +179,9 @@ public class ComputeCentroidForWKTGeometriesNodeModel extends NodeModel {
 	@Override
 	protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
 		
-		// nothing to do
+		m_colname.validateSettings(settings);
+		
+		
 	}
 
 	@Override

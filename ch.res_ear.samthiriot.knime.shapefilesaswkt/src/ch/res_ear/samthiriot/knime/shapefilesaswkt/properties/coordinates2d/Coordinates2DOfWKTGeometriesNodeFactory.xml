@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shapefilesAsWKT.png"  
+		type="Other" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+    
+    <name>2D Coordinates of WKT Geometries</name>
+    
+    <shortDescription>
+        2D Coordinates of WKT geometries
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        For each geometry, extract the x and y coordinates into double columns.
+        
+        <p>
+		The actual computation is done by the <a href="https://geotools.org/">Geotools library</a>.
+		</p>
+        </intro>
+
+		<option name="column name X">name of the column to create to store the X coordinate</option>
+    	<option name="column name Y">name of the column to create to store the Y coordinate</option>
+		        
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="datatable with WKT geometries">Description of first input port...</inPort>
+        <outPort index="0" name="datatable with WKT geometries">Table with geometries changed into their centroid</outPort>
+    </ports>    
+</knimeNode>
