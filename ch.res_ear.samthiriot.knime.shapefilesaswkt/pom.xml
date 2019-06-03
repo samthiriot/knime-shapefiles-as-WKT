@@ -119,6 +119,14 @@
 	    <artifactId>gt-opengis</artifactId>
 	    <version>${geotools.version}</version>
 	</dependency>
+	
+	
+	<dependency>
+		<groupId>org.geotools</groupId>
+		<artifactId>gt-cql</artifactId>
+		<version>${geotools.version}</version>
+	</dependency>
+	
 	  
 	<dependency>
 	    <groupId>org.geotools.xsd</groupId>
