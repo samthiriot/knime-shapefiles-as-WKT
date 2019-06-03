@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KNIME Shapefile WKT manipulation
-Bundle-SymbolicName: ch.res_ear.samthiriot.knime.shapefilesAsWKT;singleton:=true
+Bundle-SymbolicName: ch.res_ear.samthiriot.knime.shapefilesaswkt;singleton:=true
 Bundle-Version: 1.2.2.qualifier
 Bundle-ClassPath: readshapefileaskml.jar,
  lib/animal-sniffer-annotations-1.17.jar,
@@ -143,7 +143,7 @@ Bundle-ClassPath: readshapefileaskml.jar,
  lib/net.opengis.wfs-22-SNAPSHOT.jar,
  lib/sqlite-jdbc-3.27.2.1.jar,
  lib/xpp3_min-1.1.4c.jar
-Bundle-Activator: ch.res_ear.samthiriot.knime.shapefilesAsWKT.ShapefileAsWKTNodePlugin
+Bundle-Activator: ch.res_ear.samthiriot.knime.shapefilesaswkt.ShapefileAsWKTNodePlugin
 Bundle-Vendor: EIFER
 Require-Bundle: org.knime.workbench.core,
  org.knime.base,
@@ -152,14 +152,20 @@ Bundle-ActivationPolicy: lazy
 Export-Package: .,
  au.com.objectix.jgridshift,
  ch.res_ear.samthiriot.knime.dialogs,
- ch.res_ear.samthiriot.knime.shapefilesAsWKT,
- ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromDB,
- ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromKML,
- ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromShapefile,
- ch.res_ear.samthiriot.knime.shapefilesAsWKT.reproject,
- ch.res_ear.samthiriot.knime.shapefilesAsWKT.view,
- ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToKML,
- ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToShapefile,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.centroid,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.globalboundingbox,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.surface,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.readFromDB,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.readFromGML,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.readFromKML,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.readFromShapefile,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.reproject,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.view,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.writeToDB,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.writeToGML,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.writeToKML,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.writeToShapefile,
  com.conversantmedia.util.collection,
  com.conversantmedia.util.concurrent,
  com.conversantmedia.util.estimation,
