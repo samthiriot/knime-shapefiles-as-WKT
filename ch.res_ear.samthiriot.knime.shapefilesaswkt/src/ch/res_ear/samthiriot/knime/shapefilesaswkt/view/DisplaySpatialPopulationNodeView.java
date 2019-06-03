@@ -28,7 +28,6 @@ import javax.swing.JRadioButtonMenuItem;
 
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.simple.SimpleSchema;
 import org.geotools.map.FeatureLayer;
 import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
