@@ -486,6 +486,39 @@ public class SpatialUtils {
         return new AddRowsRunnable(sample, idxColGeom, store, type, execProgress, addIncrementalId, defaultColor);
         		
 	}
+	
+	/**
+	 * Decodes the data in the sample data table as geotools features,
+	 * in the provided datastore. 
+	 * 
+	 * @param sample
+	 * @param colNameGeom
+	 * @param execProgress
+	 * @param datastore
+	 * @param featureName
+	 * @param crs
+	 * @throws IOException
+	 */
+	public static void decodeAsFeatures(
+			BufferedDataTable sample,
+			String colNameGeom,
+			ExecutionMonitor execProgress,
+			DataStore datastore,
+			String featureName,
+			CoordinateReferenceSystem crs
+			) throws IOException {
+
+		SimpleFeatureType type = createGeotoolsType(sample, colNameGeom, featureName, crs, false, false);
+		SimpleFeatureStore store = createFeatureStore(sample, datastore, type, featureName);
+
+		final int idxColGeom = sample.getDataTableSpec().findColumnIndex(colNameGeom);
+
+		AddRowsRunnable runnable = new AddRowsRunnable(sample, idxColGeom, store, type, execProgress, false, null);
+
+		runnable.run();
+		
+		
+	}
 		
 	
 	/**
