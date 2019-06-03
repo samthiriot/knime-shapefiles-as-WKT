@@ -36,6 +36,12 @@
          factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.filter_ecql.FilterECQLNodeFactory"
          id="ch.res_ear.samthiriot.knime.shapefilesaswkt.filter_ecql.FilterECQLNodeFactory">
    </node>
+   <node
+         category-path="/community/spatialAsWKT/transformSpatialAsWKT"
+         deprecated="false"
+         factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.compute_ecql.ComputeECQLNodeFactory"
+         id="ch.res_ear.samthiriot.knime.shapefilesaswkt.compute_ecql.ComputeECQLNodeFactory">
+   </node>
 <node category-path="/community/spatialAsWKT/transformSpatialAsWKT" factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.surface.SpatialPropertySurfaceNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.properties.surface.SpatialPropertySurfaceNodeFactory"/>
 <node
       category-path="/community/spatialAsWKT/transformSpatialAsWKT"
