@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 19.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="Ebene_1"
+   x="0px"
+   y="0px"
+   viewBox="-412 290.3 16 16"
+   style="enable-background:new -412 290.3 16 16;"
+   xml:space="preserve"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="shp-wkt-writer-icon.svg"
+   inkscape:export-filename="/home/sam/workspaces/workspace-knime/ch.res_ear.samthiriot.gosp.knime.shapefilesAsWKT/src/ch/res_ear/samthiriot/gosp/knime/shapefilesAsWKT/writeToShapefile/shp-wkt-writer-icon.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90"><metadata
+     id="metadata29"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:Work></rdf:RDF></metadata><defs
+     id="defs27" /><sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1764"
+     inkscape:window-height="944"
+     id="namedview25"
+     showgrid="false"
+     inkscape:zoom="14.75"
+     inkscape:cx="9.8216288"
+     inkscape:cy="12.993304"
+     inkscape:window-x="119"
+     inkscape:window-y="27"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="Ebene_1" /><style
+     type="text/css"
+     id="style3">
+	.st0{fill:#FFFFFF;}
+	.st1{fill:#F1933B;}
+</style><g
+     id="XMLID_11_"
+     transform="translate(-6.3728814,0)"><polygon
+       id="XMLID_12_"
+       points="-399.9,301.8 -399.9,303.5 -405.6,303.5 -405.6,304.5 -399.9,304.5 -399.9,306.3 -396,304 " /></g><rect
+     style="opacity:0.51499999;fill:#098100;fill-opacity:1"
+     id="rect4144"
+     width="16.135593"
+     height="7.3114405"
+     x="-412"
+     y="292.98318" /><text
+     xml:space="preserve"
+     style="font-style:normal;font-weight:normal;font-size:49.58333206px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="-410.99152"
+     y="299.03409"
+     id="text4140"
+     sodipodi:linespacing="125%"><tspan
+       sodipodi:role="line"
+       id="tspan4142"
+       x="-410.99152"
+       y="299.03409"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:6.19791651px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#ffffff">SHP</tspan></text>
+</svg>

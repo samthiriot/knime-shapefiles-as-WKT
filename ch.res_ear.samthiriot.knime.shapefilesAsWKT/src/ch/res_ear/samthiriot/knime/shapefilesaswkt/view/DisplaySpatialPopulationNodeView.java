@@ -334,7 +334,7 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
             	SimpleFeatureSource shapefileSource2 = nodeModel.datastore2.getFeatureSource(
         				nodeModel.datastore2.getNames().get(0));
         		Style shpStyle2 = createStyleForStore(shapefileSource2, nodeModel.m_color2.getColorValue(), opacity2);
-        		        		
+
         	    Layer shpLayer2 = new FeatureLayer(shapefileSource2, shpStyle2);       
                 content.addLayer(shpLayer2);
 

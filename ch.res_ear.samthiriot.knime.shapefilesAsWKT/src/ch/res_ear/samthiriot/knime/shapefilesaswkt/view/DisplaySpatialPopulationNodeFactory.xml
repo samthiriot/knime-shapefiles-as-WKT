@@ -53,6 +53,7 @@
         Opacity of the geometries of the first table. Keeping a bit of transparency is good (defaults to 0.5), as it helps to 
         detect overlapping geometries, and enables to views the geometries of the first table below.
         </option>
+
         
     </fullDescription>
     

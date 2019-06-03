@@ -48,6 +48,7 @@ public class DisplaySpatialPopulationNodeDialog extends DefaultNodeSettingsPane 
         		new SettingsModelDoubleBounded("opacity2", 0.5, 0.0, 1.0),
         		"opacity",
         		0.1));
+
     }
 }
 

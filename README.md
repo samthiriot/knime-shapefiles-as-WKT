@@ -29,7 +29,15 @@ Later it would be available as part of the KNIME community nodes.
 
 Download the last release from this site, then follow the [KNIME instructions to install a plugin](https://www.knime.com/downloads/update).
 
-## Development environment
+## Developers
+
+### Development environment
 
 In order to create a development environment, follow the [instructions to create a KNIME development environment](https://github.com/knime/knime-sdk-setup).
+
+### Build
+
+The plugin includes a Maven pom file in order to package the dependancies of geotools into the lib directory. 
+This only has to be done by hand from time to time (to upgrade the geotools version, or to add novel geotools dependancies).
+Else the build is pure Java/RCP. 
 
