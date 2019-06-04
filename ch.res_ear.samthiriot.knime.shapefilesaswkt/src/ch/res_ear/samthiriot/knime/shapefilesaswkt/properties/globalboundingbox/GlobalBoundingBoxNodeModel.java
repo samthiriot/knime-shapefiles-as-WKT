@@ -17,7 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.ReferencingFactoryFinder;
+import org.knime.base.util.flowvariable.FlowVariableResolver;
 import org.knime.core.data.DataColumnProperties;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -39,6 +41,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.workflow.FlowVariable;
 import org.locationtech.jts.geom.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -149,13 +152,22 @@ public class GlobalBoundingBoxNodeModel extends NodeModel {
 		
 		BufferedDataTable inputTable = inData[0];
 
+		CoordinateReferenceSystem crs = SpatialUtils.decodeCRS(inputTable.getDataTableSpec());
 
-		Envelope globalEnvelope = new Envelope();
+		ReferencedEnvelope globalEnvelope = new ReferencedEnvelope(crs);
 	
+		final double total = inputTable.size();
+				
 		// iterate each geometry of each row
 		SpatialUtils.applyToEachGeometry(
 				inputTable, 
-				geomAndRow -> globalEnvelope.expandToInclude(geomAndRow.geometry.getEnvelopeInternal())
+				geomAndRow -> {
+					if (done++ % 10 == 0) {
+						exec.checkCanceled();
+						exec.setProgress(done/total);
+					}
+					globalEnvelope.expandToInclude(geomAndRow.geometry.getEnvelopeInternal());
+				}
 				);
 
 		// add one unique line with the result
