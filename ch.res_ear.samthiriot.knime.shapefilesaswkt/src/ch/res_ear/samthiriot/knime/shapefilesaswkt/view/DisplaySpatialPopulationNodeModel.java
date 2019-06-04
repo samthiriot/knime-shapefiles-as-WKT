@@ -256,7 +256,10 @@ public class DisplaySpatialPopulationNodeModel extends NodeModel {
 	    	getLogger().debug("restoring datastore from "+bckp);
 	
 	    	tmpFile1 = new File(bckp, "shapefile.shp");
-	    	
+	    	if (!tmpFile1.exists() || !tmpFile1.canRead() || !tmpFile1.isFile()) {
+	    		return;
+	    	}
+	
 	        datastore1 = SpatialUtils.createDataStore(tmpFile1, false);
     	}
       	{
@@ -268,6 +271,9 @@ public class DisplaySpatialPopulationNodeModel extends NodeModel {
 	    	getLogger().debug("restoring datastore from "+bckp);
 	
 	    	tmpFile2 = new File(bckp, "shapefile.shp");
+	    	if (!tmpFile2.exists() || !tmpFile2.canRead() || !tmpFile2.isFile()) {
+	    		return;
+	    	}
 	    	
 	        datastore2 = SpatialUtils.createDataStore(tmpFile2, false);
     	}

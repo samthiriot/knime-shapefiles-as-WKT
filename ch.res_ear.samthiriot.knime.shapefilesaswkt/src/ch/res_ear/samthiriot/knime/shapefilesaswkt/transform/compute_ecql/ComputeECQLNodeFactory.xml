@@ -29,7 +29,7 @@
 		<li>compute the area: "area(the_geom)"</li>
 		<li>compute a centroid: "centroid(the_geom)"</li>
 		<li>compute a buffer: "buffer(the_geom, 10)"</li>
-		<li>compute the distance to a point defined by flow variables x and y: "distance(the_geom,$x$,$y$)"</li>
+		<li>compute the distance to a point defined by flow two Double flow variables x and y: "distance(the_geom,$${Dx}}$,$${Dy}}$)"</li>
 		</ul>
 		More examples can be found here: <a href="https://docs.geoserver.org/latest/en/user/filter/ecql_reference.html">Geoserver ECQL Tutorial </a>
         </p>
