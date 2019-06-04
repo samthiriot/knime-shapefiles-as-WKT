@@ -10,6 +10,7 @@
       <category description="Read spatial data to WKT format" icon="icons/shp-wkt-reader-icon.png" level-id="readSpatialAsWKT" locked="false" name="Read spatial as WKT" path="/community/spatialAsWKT">
       </category>
       <category
+            after="readSpatialAsWKT"
             description="Extract the properties of geometries"
             icon="icons/shapefilesAsWKT.png"
             level-id="propertiesSpatialAsWKT"
@@ -17,11 +18,32 @@
             name="Properties of WKT geometries"
             path="/community/spatialAsWKT">
       </category>
-      <category description="Transform spatial data in WKT format" icon="icons/shapefilesAsWKT.png" level-id="transformSpatialAsWKT" locked="false" name="Transform WKT spatial data" path="/community/spatialAsWKT">
+      <category
+            after="propertiesSpatialAsWKT"
+            description="Transform spatial data in WKT format"
+            icon="icons/shapefilesAsWKT.png"
+            level-id="transformSpatialAsWKT"
+            locked="false"
+            name="Transform WKT spatial data"
+            path="/community/spatialAsWKT">
       </category>
-      <category description="View spatial data in WKT format" icon="icons/shapefilesAsWKT.png" level-id="viewSpatialAsWKT" locked="false" name="View spatial as WKT" path="/community/spatialAsWKT">
+      <category
+            after="transformSpatialAsWKT"
+            description="View spatial data in WKT format"
+            icon="icons/shapefilesAsWKT.png"
+            level-id="viewSpatialAsWKT"
+            locked="false"
+            name="View spatial as WKT"
+            path="/community/spatialAsWKT">
       </category>
-      <category description="Writes WKT spatial data" icon="icons/shp-wkt-writer-icon.png" level-id="writeSpatialAsWKT" locked="false" name="Write spatial as WKT" path="/community/spatialAsWKT">
+      <category
+            after="viewSpatialAsWKT"
+            description="Writes WKT spatial data"
+            icon="icons/shp-wkt-writer-icon.png"
+            level-id="writeSpatialAsWKT"
+            locked="false"
+            name="Write spatial as WKT"
+            path="/community/spatialAsWKT">
       </category>
    </extension>
 
@@ -50,6 +72,13 @@
          factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.compute_ecql.ComputeECQLNodeFactory"
          id="ch.res_ear.samthiriot.knime.shapefilesaswkt.compute_ecql.ComputeECQLNodeFactory">
    </node>
+<node category-path="/community/spatialAsWKT/transformSpatialAsWKT" factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.centroid.ComputeCentroidForWKTGeometriesNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.properties.centroid.ComputeCentroidForWKTGeometriesNodeFactory"/>
+   <node
+         category-path="/community/spatialAsWKT/transformSpatialAsWKT"
+         deprecated="false"
+         factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.union.UnionOfWKTGeometriesNodeFactory"
+         id="ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.union.UnionOfWKTGeometriesNodeFactory">
+   </node>
 <node category-path="/community/spatialAsWKT/transformSpatialAsWKT" factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.surface.SpatialPropertySurfaceNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.properties.surface.SpatialPropertySurfaceNodeFactory"/>
 <node
       category-path="/community/spatialAsWKT/propertiesSpatialAsWKT"
@@ -68,6 +97,12 @@
       factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.globalboundingbox.GlobalBoundingBoxNodeFactory"
       id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.properties.globalboundingbox.GlobalBoundingBoxNodeFactory">
 </node>
+<node
+      category-path="/community/spatialAsWKT/propertiesSpatialAsWKT"
+      deprecated="false"
+      factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.type.TypeOfWKTGeometriesNodeFactory"
+      id="ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.type.TypeOfWKTGeometriesNodeFactory">
+</node>
    <node category-path="/community/spatialAsWKT/writeSpatialAsWKT" deprecated="false" factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.write.write_to_shapefile.WriteWKTAsShapefileNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToShapefile.WriteWKTAsShapefileNodeFactory"/>
 <node category-path="/community/spatialAsWKT/writeSpatialAsWKT" deprecated="false" factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.write.write_to_kml.WriteWKTToKMLNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToKML.WriteWKTToKMLNodeFactory"/>
 <node
@@ -81,13 +116,6 @@
       deprecated="false"
       factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.write.write_to_db.WriteWKTIntoDBNodeFactory"
       id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToDB.WriteWKTIntoDBNodeFactory">
-</node>
-<node category-path="/community/spatialAsWKT/transformSpatialAsWKT" factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.centroid.ComputeCentroidForWKTGeometriesNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.properties.centroid.ComputeCentroidForWKTGeometriesNodeFactory"/>
-<node
-      category-path="/community/spatialAsWKT/propertiesSpatialAsWKT"
-      deprecated="false"
-      factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.type.TypeOfWKTGeometriesNodeFactory"
-      id="ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.type.TypeOfWKTGeometriesNodeFactory">
 </node>
 </extension>
    
