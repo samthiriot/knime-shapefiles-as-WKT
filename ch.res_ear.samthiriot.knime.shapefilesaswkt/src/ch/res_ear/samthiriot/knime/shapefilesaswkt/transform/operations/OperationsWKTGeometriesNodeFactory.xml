@@ -37,13 +37,12 @@
         </intro>
         
         <option name="operation">The operation to use</option>
-        <option name="colname">The name of the column to create</option>
         
     </fullDescription>
     
     <ports>
         <inPort index="0" name="datatable with WKT geometries">Table with WKT geometries</inPort>
         <inPort index="1" name="datatable with WKT geometries">Table with WKT geometries</inPort>
-        <outPort index="0" name="datatable with WKT geometries">Top table with the relationship</outPort>
+        <outPort index="0" name="datatable with WKT geometries">Top table with updated geometries</outPort>
     </ports>    
 </knimeNode>
