@@ -157,7 +157,7 @@ public class UnionOfWKTGeometriesNodeModel extends NodeModel {
 		BufferedDataContainer container = exec.createDataContainer(outputSpec);
     	
 		container.addRowToTable(new DefaultRow(
-				new RowKey("global_envelope"), 
+				new RowKey("union"), 
 				StringCellFactory.create(merged.toString()),
 				IntCellFactory.create(0)
 				));

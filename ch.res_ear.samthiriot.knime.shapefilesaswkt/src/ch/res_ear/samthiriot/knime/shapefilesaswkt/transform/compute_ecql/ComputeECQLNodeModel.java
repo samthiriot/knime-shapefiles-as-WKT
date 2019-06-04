@@ -94,38 +94,6 @@ public class ComputeECQLNodeModel extends NodeModel implements FlowVariableProvi
         super(1, 1);
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
-            throws InvalidSettingsException {
-        
-    	DataTableSpec spec = inSpecs[0];
-    	
-    	if (!SpatialUtils.hasGeometry(spec)) {
-    		throw new InvalidSettingsException("the input table does not contains WKT spatial data");
-    	}
-    	
-    	// ensure the query can be decoded
-    	getExpression();
-
-    	
-    	String colname = m_colname.getStringValue();
-    	if (spec.getColumnSpec(colname) != null) 
-    		throw new InvalidSettingsException("There is already a column named "+colname+" in the input table");
-    	
-    	
-    	DataColumnSpec addedColumn = createColumnSpec();
-    	
-    	DataTableSpecCreator specCreateor = new DataTableSpecCreator(spec);
-    	
-    	if (addedColumn != null)
-    		specCreateor.addColumns(addedColumn);
-    	
-        return new DataTableSpec[]{ specCreateor.createSpec() };
-    }
     
     /**
      * Returns a column spec for the novel column,
@@ -163,6 +131,38 @@ public class ComputeECQLNodeModel extends NodeModel implements FlowVariableProvi
     	return new DataColumnSpecCreator(colname, type).createSpec();
     	
     	
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
+            throws InvalidSettingsException {
+        
+    	DataTableSpec spec = inSpecs[0];
+    	
+    	if (!SpatialUtils.hasGeometry(spec)) {
+    		throw new InvalidSettingsException("the input table does not contains WKT spatial data");
+    	}
+    	
+    	// ensure the query can be decoded
+    	getExpression();
+
+    	
+    	String colname = m_colname.getStringValue();
+    	if (spec.getColumnSpec(colname) != null) 
+    		throw new InvalidSettingsException("There is already a column named "+colname+" in the input table");
+    	
+    	
+    	DataColumnSpec addedColumn = createColumnSpec();
+    	
+    	DataTableSpecCreator specCreateor = new DataTableSpecCreator(spec);
+    	
+    	if (addedColumn != null)
+    		specCreateor.addColumns(addedColumn);
+    	
+        return new DataTableSpec[]{ specCreateor.createSpec() };
     }
 
     protected Expression getExpression() throws InvalidSettingsException {
@@ -248,7 +248,6 @@ public class ComputeECQLNodeModel extends NodeModel implements FlowVariableProvi
 	        		exec.checkCanceled();
 	        		execFilter.setProgress(done/total);
 	        	}
-	        	
 
 	        	String rowid = (String) feature.getAttribute("rowid");
 	        	

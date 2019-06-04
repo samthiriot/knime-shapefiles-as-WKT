@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shapefilesAsWKT.png"  
+		type="Other" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+    
+    <name>Relate WKT Geometries</name>
+    
+    <shortDescription>
+        Relates WKT geometries
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        Takes two tables containing geometries in WKT format.
+        These two tables should have the same count of entities. 
+        Line by line the operator will be applied and the result 
+        appended as a novel Boolean column of the first table.
+        
+        <ul>
+	        <li>
+	        Equals: the geometries have the same type and points
+	        </li>
+	        <li>
+	        Disjoint: the geometries have no points in common
+	        </li>
+	        <li>
+			Intersects: 
+			the geometries have at least one point in common.:
+	        </li>
+			<li>
+			Touches:
+			the geometries only touch edges and do not overlap in any way:
+			</li>
+			<li>
+			Crosses
+			the geometries do more than touch, they actually overlap edges:
+			</li>
+			<li>
+			Within:
+			one geometry is completely within another (no touching edges):
+			</li>
+			<li>
+			Contains:
+			one geometry contains another:
+			</li>
+			<li>
+			Overlaps:
+			the geometries have some points in common; but not all points in common (so if one geometry is inside the other overlaps would be false). The overlapping section must be the same kind of shape as the two geometries; so two polygons that touch on a point are not considered to be overlapping.:
+			The definition of the overlaps relationship is a little bit different than that used in common English (normally you would assume that a geometry contained inside another geometry is "overlapping"; to test for that situation use Intersects)
+			</li>
+        </ul>
+        <p>
+		The actual computation is done by the <a href="https://geotools.org/">Geotools library</a>.
+		</p>
+        </intro>
+        
+        <option name="relationship">The relationship to use</option>
+        <option name="colname">The name of the column to create</option>
+        
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="datatable with WKT geometries">Table with WKT geometries</inPort>
+        <inPort index="1" name="datatable with WKT geometries">Table with WKT geometries</inPort>
+        <outPort index="0" name="datatable with WKT geometries">Top table with the relationship</outPort>
+    </ports>    
+</knimeNode>
