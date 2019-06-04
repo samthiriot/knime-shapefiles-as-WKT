@@ -15,12 +15,8 @@ import java.io.IOException;
 
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.knime.core.data.DataCell;
-import org.knime.core.data.DataColumnSpec;
-import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.DataTableSpecCreator;
-import org.knime.core.data.def.BooleanCell;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.StringCell.StringCellFactory;
 import org.knime.core.node.BufferedDataContainer;
@@ -70,26 +66,6 @@ public class OperationsWKTGeometriesNodeModel extends NodeModel {
 		super(2, 1);
 	}
 
-
-    /**
-     * Returns a column spec for the novel column,
-     * or null if the column to be created is the geometry
-     * @return
-     * @throws InvalidSettingsException
-     */
-    protected DataColumnSpec createColumnSpec() throws InvalidSettingsException {
-    	
-    	final String colname = m_colname.getStringValue();
-    	
-    	return new DataColumnSpecCreator(colname, BooleanCell.TYPE).createSpec();
-    	
-    }
-    
-    protected DataTableSpec createDataSpec(DataTableSpec spec) throws InvalidSettingsException {
-    	DataTableSpecCreator creator = new DataTableSpecCreator(spec);
-    	creator.addColumns(createColumnSpec());
-    	return creator.createSpec();
-    }
     
 	/**
 	 * {@inheritDoc}
@@ -116,7 +92,7 @@ public class OperationsWKTGeometriesNodeModel extends NodeModel {
 		if (!crs1.equals(crs2))
 			throw new InvalidSettingsException("the two tables are not spatialized on the same Coordinate Reference Sytems; please reproject them first");
 		
-		return new DataTableSpec[] { createDataSpec(spec1) };
+		return new DataTableSpec[] { spec1 };
 	}
 
 	long done = 0;
@@ -161,7 +137,7 @@ public class OperationsWKTGeometriesNodeModel extends NodeModel {
 			throw new InvalidSettingsException("the two tables should have the same number of rows");
 		}
 
-		DataTableSpec outputSpec = createDataSpec(inputTable1.getDataTableSpec());
+		DataTableSpec outputSpec = inputTable1.getDataTableSpec();
 		BufferedDataContainer container = exec.createDataContainer(outputSpec);
 
 		final double total = inputTable1.size();
@@ -172,7 +148,7 @@ public class OperationsWKTGeometriesNodeModel extends NodeModel {
 
 		final String operation = m_relationship.getStringValue();
 		IOperationComputer computer = null;
-		if (operation.equals("disjoint"))
+		if (operation.equals("difference"))
 			computer = new UnionComputer();
 		else if (operation.equals("intersects"))
 			computer = new DifferenceComputer();
@@ -218,7 +194,7 @@ public class OperationsWKTGeometriesNodeModel extends NodeModel {
 					container.addRowToTable(row);
 					  
 					exec.checkCanceled();
-					exec.setProgress(done++/total, "computing rows "+done);
+					exec.setProgress(done++/total, "computing "+operation+" of rows "+done);
 			
 				}
 				);
