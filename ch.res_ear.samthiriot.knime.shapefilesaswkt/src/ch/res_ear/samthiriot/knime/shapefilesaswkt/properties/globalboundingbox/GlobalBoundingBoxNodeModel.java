@@ -24,6 +24,8 @@ import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
+import org.knime.core.data.def.DoubleCell;
+import org.knime.core.data.def.DoubleCell.DoubleCellFactory;
 import org.knime.core.data.def.IntCell;
 import org.knime.core.data.def.IntCell.IntCellFactory;
 import org.knime.core.data.def.StringCell;
@@ -110,7 +112,23 @@ public class GlobalBoundingBoxNodeModel extends NodeModel {
     			"id", 
     			IntCell.TYPE).createSpec()
     			);
-				
+		newColumnSpecs.add( new DataColumnSpecCreator(
+    			"x1", 
+    			DoubleCell.TYPE).createSpec()
+    			);
+		newColumnSpecs.add( new DataColumnSpecCreator(
+    			"y1", 
+    			DoubleCell.TYPE).createSpec()
+				);
+		newColumnSpecs.add( new DataColumnSpecCreator(
+    			"x2", 
+    			DoubleCell.TYPE).createSpec()
+    			);
+		newColumnSpecs.add( new DataColumnSpecCreator(
+    			"y2", 
+    			DoubleCell.TYPE).createSpec()
+				);
+		
 		return new DataTableSpec(
 					newColumnSpecs.toArray(
 						new DataColumnSpec[newColumnSpecs.size()]));
@@ -146,7 +164,11 @@ public class GlobalBoundingBoxNodeModel extends NodeModel {
 		container.addRowToTable(new DefaultRow(
 				new RowKey("global_envelope"), 
 				StringCellFactory.create(globalEnvelope.toString()),
-				IntCellFactory.create(0)
+				IntCellFactory.create(0),
+				DoubleCellFactory.create(globalEnvelope.getMinX()),
+				DoubleCellFactory.create(globalEnvelope.getMinY()),
+				DoubleCellFactory.create(globalEnvelope.getMaxX()),
+				DoubleCellFactory.create(globalEnvelope.getMaxY())
 				));
 
 		container.close();

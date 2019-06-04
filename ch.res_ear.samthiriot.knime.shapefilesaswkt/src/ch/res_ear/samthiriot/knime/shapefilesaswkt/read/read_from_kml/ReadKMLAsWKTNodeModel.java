@@ -137,6 +137,7 @@ public class ReadKMLAsWKTNodeModel extends NodeModel {
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
 
+        exec.setMessage("loading the KML structure");
        
     	SimpleFeature f = decodeFileFromKML();
     
@@ -146,6 +147,7 @@ public class ReadKMLAsWKTNodeModel extends NodeModel {
 
         final DataCell missing = new MissingCell("was null in KML");
         
+        exec.setMessage("reading entries from KML");
         // read the file
         Collection<?> placemarks = (Collection) f.getAttribute("Feature");
         int line = 0;
