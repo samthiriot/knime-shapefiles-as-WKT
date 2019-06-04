@@ -85,6 +85,12 @@
       factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.relate.RelateWKTGeometriesNodeFactory"
       id="ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.relate.RelateWKTGeometriesNodeFactory">
 </node>
+<node
+      category-path="/community/spatialAsWKT/transformSpatialAsWKT"
+      deprecated="false"
+      factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.operations.OperationsWKTGeometriesNodeFactory"
+      id="ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.operations.OperationsWKTGeometriesNodeFactory">
+</node>
 <node category-path="/community/spatialAsWKT/transformSpatialAsWKT" factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.surface.SpatialPropertySurfaceNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.properties.surface.SpatialPropertySurfaceNodeFactory"/>
 <node
       category-path="/community/spatialAsWKT/propertiesSpatialAsWKT"

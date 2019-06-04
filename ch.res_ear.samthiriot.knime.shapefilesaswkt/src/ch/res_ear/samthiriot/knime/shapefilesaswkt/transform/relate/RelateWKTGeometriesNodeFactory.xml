@@ -35,7 +35,7 @@
 			the geometries only touch edges and do not overlap in any way:
 			</li>
 			<li>
-			Crosses
+			Crosses:
 			the geometries do more than touch, they actually overlap edges:
 			</li>
 			<li>

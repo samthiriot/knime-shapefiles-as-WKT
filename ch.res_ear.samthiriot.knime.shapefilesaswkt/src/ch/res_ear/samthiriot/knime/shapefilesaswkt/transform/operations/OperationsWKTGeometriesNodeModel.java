@@ -8,12 +8,10 @@
  * Contributors:
  *     Samuel Thiriot - original version and contributions
  *******************************************************************************/
-package ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.relate;
+package ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.operations;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.knime.core.data.DataCell;
@@ -22,14 +20,8 @@ import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataTableSpecCreator;
-import org.knime.core.data.DataType;
 import org.knime.core.data.def.BooleanCell;
 import org.knime.core.data.def.DefaultRow;
-import org.knime.core.data.def.DoubleCell;
-import org.knime.core.data.def.IntCell;
-import org.knime.core.data.def.LongCell;
-import org.knime.core.data.def.StringCell;
-import org.knime.core.data.def.BooleanCell.BooleanCellFactory;
 import org.knime.core.data.def.StringCell.StringCellFactory;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
@@ -43,7 +35,6 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.WKTWriter;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
@@ -59,12 +50,12 @@ import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
  *
  * @author Samuel Thiriot
  */
-public class RelateWKTGeometriesNodeModel extends NodeModel {
+public class OperationsWKTGeometriesNodeModel extends NodeModel {
     
 
 	private SettingsModelString m_relationship = new SettingsModelString(
-			"relationship",
-			"intersects"
+			"operation",
+			"union"
 			);
 	
 	private SettingsModelString m_colname = new SettingsModelString(
@@ -75,7 +66,7 @@ public class RelateWKTGeometriesNodeModel extends NodeModel {
 	/**
 	 * Constructor for the node model.
 	 */
-	protected RelateWKTGeometriesNodeModel() {
+	protected OperationsWKTGeometriesNodeModel() {
 		super(2, 1);
 	}
 
@@ -130,56 +121,26 @@ public class RelateWKTGeometriesNodeModel extends NodeModel {
 
 	long done = 0;
 
-	private static interface IRelationComputer {
-		public Boolean compute(Geometry geom1, Geometry geom2);
+	private static interface IOperationComputer {
+		public Geometry compute(Geometry geom1, Geometry geom2);
 	}
 	
-	private static class DisjointComputer implements IRelationComputer {
+	private static class UnionComputer implements IOperationComputer {
 		@Override
-		public Boolean compute(Geometry geom1, Geometry geom2) {
-			return geom1.disjoint(geom2);
+		public Geometry compute(Geometry geom1, Geometry geom2) {
+			return geom1.union(geom2);
 		}
 	}
-	private static class IntersectsComputer implements IRelationComputer {
+	private static class DifferenceComputer implements IOperationComputer {
 		@Override
-		public Boolean compute(Geometry geom1, Geometry geom2) {
-			return geom1.intersects(geom2);
+		public Geometry compute(Geometry geom1, Geometry geom2) {
+			return geom1.difference(geom2);
 		}
 	}
-	private static class TouchesComputer implements IRelationComputer {
+	private static class IntersectionComputer implements IOperationComputer {
 		@Override
-		public Boolean compute(Geometry geom1, Geometry geom2) {
-			return geom1.touches(geom2);
-		}
-	}
-	private static class CrossesComputer implements IRelationComputer {
-		@Override
-		public Boolean compute(Geometry geom1, Geometry geom2) {
-			return geom1.crosses(geom2);
-		}
-	}
-	private static class WithinComputer implements IRelationComputer {
-		@Override
-		public Boolean compute(Geometry geom1, Geometry geom2) {
-			return geom1.within(geom2);
-		}
-	}
-	private static class ContainsComputer implements IRelationComputer {
-		@Override
-		public Boolean compute(Geometry geom1, Geometry geom2) {
-			return geom1.contains(geom2);
-		}
-	}
-	private static class OverlapsComputer implements IRelationComputer {
-		@Override
-		public Boolean compute(Geometry geom1, Geometry geom2) {
-			return geom1.overlaps(geom2);
-		}
-	}
-	private static class EqualsComputer implements IRelationComputer {
-		@Override
-		public Boolean compute(Geometry geom1, Geometry geom2) {
-			return geom1.equals(geom2);
+		public Geometry compute(Geometry geom1, Geometry geom2) {
+			return geom1.difference(geom2);
 		}
 	}
 	
@@ -207,31 +168,22 @@ public class RelateWKTGeometriesNodeModel extends NodeModel {
 				
 		final int numberOfCells = inputTable1.getDataTableSpec().getNumColumns();
 
-		
-		final String relationship = m_relationship.getStringValue();
-		IRelationComputer computer = null;
-		if (relationship.equals("disjoint"))
-			computer = new DisjointComputer();
-		else if (relationship.equals("intersects"))
-			computer = new IntersectsComputer();
-		else if (relationship.equals("touches"))
-			computer = new TouchesComputer();
-		else if (relationship.equals("crosses"))
-			computer = new CrossesComputer();
-		else if (relationship.equals("within"))
-			computer = new WithinComputer();
-		else if (relationship.equals("contains"))
-			computer = new ContainsComputer();
-		else if (relationship.equals("overlaps"))
-			computer = new OverlapsComputer();
-		else if (relationship.equals("equals"))
-			computer = new EqualsComputer();
+		final int idxGeom = inputTable1.getSpec().findColumnIndex(SpatialUtils.GEOMETRY_COLUMN_NAME);
+
+		final String operation = m_relationship.getStringValue();
+		IOperationComputer computer = null;
+		if (operation.equals("disjoint"))
+			computer = new UnionComputer();
+		else if (operation.equals("intersects"))
+			computer = new DifferenceComputer();
+		else if (operation.equals("touches"))
+			computer = new IntersectionComputer();
 		else
-			throw new RuntimeException("Unknown operation: "+relationship);
+			throw new RuntimeException("Unknown operation: "+operation);
 
+		final IOperationComputer operationFinal = computer;
 
-		final IRelationComputer computerFinal = computer;
-
+		WKTWriter writer = new WKTWriter();
 		
 		// iterate each geometry of each row
 		done = 0;
@@ -241,16 +193,23 @@ public class RelateWKTGeometriesNodeModel extends NodeModel {
 				geomsAndRows -> {
 		     																	
 				    // create the row
-					DataCell[] cells = new DataCell[numberOfCells+1];
-					for (int i=0; i<numberOfCells; i++) {
+					DataCell[] cells = new DataCell[numberOfCells];
+					for (int i=0; i<idxGeom; i++) {
 						cells[i] = geomsAndRows.row1.getCell(i);
 					}
 					
-					cells[numberOfCells] = BooleanCellFactory.create(
-							computerFinal.compute(
-									geomsAndRows.geometry1, 
-									geomsAndRows.geometry2)
+					cells[idxGeom] = StringCellFactory.create(
+							writer.write(
+									operationFinal.compute(
+											geomsAndRows.geometry1, 
+											geomsAndRows.geometry2
+											))
 							);
+					
+					for (int i=idxGeom+1; i<numberOfCells; i++) {
+						cells[i] = geomsAndRows.row1.getCell(i);
+					}
+					
 												
 					DataRow row = new DefaultRow(
 							geomsAndRows.row1.getKey(), 
@@ -259,7 +218,7 @@ public class RelateWKTGeometriesNodeModel extends NodeModel {
 					container.addRowToTable(row);
 					  
 					exec.checkCanceled();
-					exec.setProgress(done++/total, "computing "+done+"th rows");
+					exec.setProgress(done++/total, "computing rows "+done);
 			
 				}
 				);
