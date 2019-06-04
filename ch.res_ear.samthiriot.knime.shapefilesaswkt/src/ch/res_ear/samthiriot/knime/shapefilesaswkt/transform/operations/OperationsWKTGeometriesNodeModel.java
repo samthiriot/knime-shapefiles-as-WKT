@@ -149,11 +149,11 @@ public class OperationsWKTGeometriesNodeModel extends NodeModel {
 		final String operation = m_relationship.getStringValue();
 		IOperationComputer computer = null;
 		if (operation.equals("difference"))
-			computer = new UnionComputer();
-		else if (operation.equals("intersects"))
 			computer = new DifferenceComputer();
-		else if (operation.equals("touches"))
+		else if (operation.equals("intersection"))
 			computer = new IntersectionComputer();
+		else if (operation.equals("union"))
+			computer = new UnionComputer();
 		else
 			throw new RuntimeException("Unknown operation: "+operation);
 
