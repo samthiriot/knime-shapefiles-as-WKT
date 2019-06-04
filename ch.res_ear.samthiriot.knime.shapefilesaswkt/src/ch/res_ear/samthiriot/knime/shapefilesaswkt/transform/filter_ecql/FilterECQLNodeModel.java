@@ -18,6 +18,8 @@ import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.filter.text.ecql.ECQL;
+import org.knime.base.util.flowvariable.FlowVariableProvider;
+import org.knime.base.util.flowvariable.FlowVariableResolver;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.container.CloseableRowIterator;
@@ -45,7 +47,7 @@ import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
  *
  * @author Samuel Thiriot
  */
-public class FilterECQLNodeModel extends NodeModel {
+public class FilterECQLNodeModel extends NodeModel implements FlowVariableProvider {
     
 
 	private SettingsModelString m_query = new SettingsModelString(
@@ -85,9 +87,11 @@ public class FilterECQLNodeModel extends NodeModel {
 
     	final String query = m_query.getStringValue();
 
+        String queryWithVariableValues = FlowVariableResolver.parse(query, this);
+
     	Filter filter = null;
     	try {
-    		filter = ECQL.toFilter(query);
+    		filter = ECQL.toFilter(queryWithVariableValues);
     	} catch (CQLException e) {
     		throw new InvalidSettingsException("invalid CQL query: "+e.getMessage(), e);
     	}
@@ -124,8 +128,6 @@ public class FilterECQLNodeModel extends NodeModel {
     			crs
     			);
     	
-    	Expression exp = ECQL.toExpression("area(the_geom)*2");
-
     	exec.setMessage("filtering");
         SimpleFeatureCollection features = datastore.getFeatureSource(datastore.getNames().get(0)).getFeatures(
         		filter
@@ -156,8 +158,6 @@ public class FilterECQLNodeModel extends NodeModel {
 		        	final SimpleFeature feature = itFeatures.next();
 		        	rowid = (String) feature.getAttribute("rowid");
 		        	
-		        	Object res = exp.evaluate(feature);
-		        	System.out.println(res);
 	        	}
 	        	
 	        	

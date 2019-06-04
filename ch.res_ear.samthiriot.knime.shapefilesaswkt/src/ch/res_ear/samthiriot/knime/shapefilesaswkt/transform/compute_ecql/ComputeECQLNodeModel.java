@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.geotools.data.DataStore;
@@ -21,6 +22,8 @@ import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.filter.text.ecql.ECQL;
+import org.knime.base.util.flowvariable.FlowVariableProvider;
+import org.knime.base.util.flowvariable.FlowVariableResolver;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -51,6 +54,7 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.workflow.FlowVariable;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.Expression;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -64,7 +68,7 @@ import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
  *
  * @author Samuel Thiriot
  */
-public class ComputeECQLNodeModel extends NodeModel {
+public class ComputeECQLNodeModel extends NodeModel implements FlowVariableProvider {
     
 
 	private SettingsModelString m_query = new SettingsModelString(
@@ -163,11 +167,15 @@ public class ComputeECQLNodeModel extends NodeModel {
 
     protected Expression getExpression() throws InvalidSettingsException {
 
+
     	final String query = m_query.getStringValue();
 
+        String queryWithVariableValues = FlowVariableResolver.parse(query, this);
+        
+        
     	Expression exp = null;
     	try {
-    		exp = ECQL.toExpression(query);
+    		exp = ECQL.toExpression(queryWithVariableValues);
     	} catch (CQLException e) {
     		throw new InvalidSettingsException("invalid CQL expression: "+e.getMessage(), e);
     	}
