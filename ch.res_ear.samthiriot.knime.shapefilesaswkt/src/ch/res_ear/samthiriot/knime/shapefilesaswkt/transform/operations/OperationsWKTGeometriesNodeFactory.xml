@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shapefilesAsWKT.png"  
+		type="Other" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+    
+    <name>Operations between WKT Geometries</name>
+    
+    <shortDescription>
+        Operations between WKT geometries
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        Takes two tables containing geometries in WKT format.
+        These two tables should have the same count of entities. 
+        Line by line the operation will be applied and the result 
+        will replace the geometry of the first table.
+        
+        <ul>
+	        <li>
+	        difference: the parts of the first geometry minus the second one 
+	        </li>
+	        <li>
+	        intersection: the parts common to the first and second geometries 
+	        </li>
+	        <li>
+	        union: the union of both geometries
+	        </li>
+	        
+        </ul>
+        <p>
+		The actual computation is done by the <a href="https://geotools.org/">Geotools library</a>.
+		</p>
+        </intro>
+        
+        <option name="operation">The operation to use</option>
+        <option name="colname">The name of the column to create</option>
+        
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="datatable with WKT geometries">Table with WKT geometries</inPort>
+        <inPort index="1" name="datatable with WKT geometries">Table with WKT geometries</inPort>
+        <outPort index="0" name="datatable with WKT geometries">Top table with the relationship</outPort>
+    </ports>    
+</knimeNode>

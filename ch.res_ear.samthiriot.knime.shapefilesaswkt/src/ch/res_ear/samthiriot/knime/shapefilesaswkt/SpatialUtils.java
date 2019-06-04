@@ -356,7 +356,7 @@ public class SpatialUtils {
 		final int idxColGeom2 = sample2.getDataTableSpec().findColumnIndex(GEOMETRY_COLUMN_NAME);
 
 		CloseableRowIterator itRow1 = sample1.iterator();
-		CloseableRowIterator itRow2 = sample1.iterator();
+		CloseableRowIterator itRow2 = sample2.iterator();
 
 		try {
 	    	while (itRow1.hasNext()) {
@@ -393,7 +393,7 @@ public class SpatialUtils {
         				e.printStackTrace();
         				throw new IllegalArgumentException(
         						"Invalid WKT geometry on row "+
-        						row1.getKey()+":"+
+        						row2.getKey()+":"+
         						e.getMessage(), 
         						e
         					);
@@ -403,7 +403,6 @@ public class SpatialUtils {
             	}
             	
 
-            	
 	    	}
 		} finally {
 			itRow1.close();
