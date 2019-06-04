@@ -149,9 +149,10 @@ public class ComputeECQLNodeModel extends NodeModel implements FlowVariableProvi
     	// ensure the query can be decoded
     	getExpression();
 
-    	
-    	String colname = m_colname.getStringValue();
-    	if (spec.getColumnSpec(colname) != null) 
+    	final String typeName = m_type.getStringValue().toLowerCase();
+
+    	final String colname = m_colname.getStringValue();
+    	if (spec.getColumnSpec(colname) != null && !typeName.equalsIgnoreCase("geometry"))
     		throw new InvalidSettingsException("There is already a column named "+colname+" in the input table");
     	
     	
