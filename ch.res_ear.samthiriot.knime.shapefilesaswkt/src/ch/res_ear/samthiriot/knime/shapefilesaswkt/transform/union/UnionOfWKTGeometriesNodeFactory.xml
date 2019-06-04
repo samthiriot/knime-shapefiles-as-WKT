@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shapefilesAsWKT.png"  
+		type="Other" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+    
+    <name>Union of WKT Geometries</name>
+    
+    <shortDescription>
+        Union of WKT geometries
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        Merges all the spatial features into only one geometry. 
+        This geometry will be returned as one unique line containing only the geometry and 
+        a novel id.
+         
+        <p>
+		The actual computation is done by the powerful <a href="https://geotools.org/">Geotools library</a>.
+		</p>
+        </intro>
+        
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="datatable with WKT geometries">the spatial features to merge</inPort>
+        <outPort index="0" name="datatable with WKT geometries">union of the spatial features</outPort>
+    </ports>    
+</knimeNode>
