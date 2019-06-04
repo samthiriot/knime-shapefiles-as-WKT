@@ -309,6 +309,110 @@ public class SpatialUtils {
 		
 	}
 
+	public static class RowsAndGeometrys {
+		
+		public final Geometry geometry1;
+		public final DataRow row1;
+		public final Geometry geometry2;
+		public final DataRow row2;
+		
+		public RowsAndGeometrys(Geometry geometry1, DataRow row1, Geometry geometry2, DataRow row2) {
+			super();
+			this.geometry1 = geometry1;
+			this.row1 = row1;
+			this.geometry2 = geometry2;
+			this.row2 = row2;
+		}
+		
+	}
+	
+	public interface IRowsAndGeometrysConsumer {
+	    void accept(RowsAndGeometrys rowsAndGeoms) 
+	    		throws CanceledExecutionException, InvalidSettingsException;
+	}
+	
+
+	/**
+	 * Decodes every cell of the geometry column of the two samples, 
+	 * and passes them to the consumer.
+	 * 
+	 * @param sample
+	 * @param rowConsumer
+	 * @throws CanceledExecutionException 
+	 */
+	public static void applyToEachGeometry(
+						BufferedDataTable sample1, 
+						BufferedDataTable sample2, 
+						IRowsAndGeometrysConsumer geometriesConsumer
+						) throws CanceledExecutionException, InvalidSettingsException {
+
+		if (sample1.size() != sample2.size())
+			throw new InvalidSettingsException("the two input tables should have the same size");
+		
+		GeometryFactory geomFactory = JTSFactoryFinder.getGeometryFactory( null );
+		WKTReader reader = new WKTReader(geomFactory);
+		
+		final int idxColGeom1 = sample1.getDataTableSpec().findColumnIndex(GEOMETRY_COLUMN_NAME);
+		final int idxColGeom2 = sample2.getDataTableSpec().findColumnIndex(GEOMETRY_COLUMN_NAME);
+
+		CloseableRowIterator itRow1 = sample1.iterator();
+		CloseableRowIterator itRow2 = sample1.iterator();
+
+		try {
+	    	while (itRow1.hasNext()) {
+	    		
+	    		if (!itRow2.hasNext())
+	    			throw new RuntimeException("there are no more as many entities in the two tables o_O");
+	    		
+	    		final DataRow row1 = itRow1.next();
+	    		final DataCell cellGeom1 = row1.getCell(idxColGeom1);
+
+	    		final DataRow row2 = itRow2.next();
+	    		final DataCell cellGeom2 = row2.getCell(idxColGeom2);
+
+	    		if (!(cellGeom1.isMissing() || cellGeom2.isMissing())) {
+            		
+                	// add geometry
+            		Geometry geom1 = null;
+                	try {
+        				geom1 = reader.read(cellGeom1.toString());
+        			} catch (ParseException e) {
+        				e.printStackTrace();
+        				throw new IllegalArgumentException(
+        						"Invalid WKT geometry on row "+
+        						row1.getKey()+":"+
+        						e.getMessage(), 
+        						e
+        						);    			
+        			}
+                	
+    				Geometry geom2 = null;
+    				try {
+        				geom2 = reader.read(cellGeom2.toString());
+        			} catch (ParseException e) {
+        				e.printStackTrace();
+        				throw new IllegalArgumentException(
+        						"Invalid WKT geometry on row "+
+        						row1.getKey()+":"+
+        						e.getMessage(), 
+        						e
+        					);
+        			}
+    				geometriesConsumer.accept(new RowsAndGeometrys(geom1, row1, geom2, row2));
+
+            	}
+            	
+
+            	
+	    	}
+		} finally {
+			itRow1.close();
+			itRow2.close();
+		}
+		
+	}
+	
+	
 	private static class AddRowsRunnable implements Runnable {
 
 		private final BufferedDataTable sample; 
