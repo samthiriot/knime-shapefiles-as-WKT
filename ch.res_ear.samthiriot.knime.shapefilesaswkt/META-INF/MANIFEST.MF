@@ -149,7 +149,8 @@ Require-Bundle: org.knime.workbench.core,
  org.knime.base,
  org.eclipse.xsd;bundle-version="2.13.0",
  org.knime.product;bundle-version="3.7.2",
- org.knime.workbench;bundle-version="3.7.0"
+ org.knime.workbench;bundle-version="3.7.0",
+ org.knime.testing
 Bundle-ActivationPolicy: lazy
 Export-Package: .,
  au.com.objectix.jgridshift,
