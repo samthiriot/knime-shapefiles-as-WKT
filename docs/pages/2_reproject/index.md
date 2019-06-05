@@ -24,4 +24,5 @@ This workflow demonstrates how to reproject the geometries.
 
 # Next
 
-Come back to [the documentation](../../).
+See the demo on how to [write spatial data into a shapefile](../../pages/3_write_as_shapefile/index.md).
+Or come back to [the documentation](../../).
