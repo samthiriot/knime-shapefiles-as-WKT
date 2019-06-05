@@ -14,4 +14,4 @@ The node "Read shapefile as WKT" decodes the geometries and produces one row per
 # Next
 
 See the demo on how to [merge geometries from various sources in KNIME](../../pages/1_merge_shapefiles/index.md).
-Or come back to [the documentation](../../main.md).
+Or come back to [the documentation](../../).
