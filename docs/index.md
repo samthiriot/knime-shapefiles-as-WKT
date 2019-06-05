@@ -128,8 +128,8 @@ which accompanies this distribution, and is available at https://www.gnu.org/lic
 
 # Source code
 
-The source code is shared in github: https://github.com/samthiriot/knime-shapefiles-as-WKT/
-Contributions are warmly welcomed. 
+The source code is [shared in github](https://github.com/samthiriot/knime-shapefiles-as-WKT/).
+Contributions are warmly welcomed.
 Please report bugs, or feature requests, in the [GitHub bugtracker](https://github.com/samthiriot/knime-shapefiles-as-WKT/issues/)
 
 
