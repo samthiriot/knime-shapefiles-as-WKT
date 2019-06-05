@@ -16,5 +16,5 @@ and store the result in Excel format.
 
 # Next
 
-See the next demo on the [computation of the accessibility of buildings to services](pages/9_demo_accessibility_zones/index.md)
+See the next demo on the [computation of the accessibility of buildings to services](../../pages/9_demo_accessibility_zones/index.md)
 Or come back to [the documentation](../../).

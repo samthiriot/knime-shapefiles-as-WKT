@@ -17,5 +17,5 @@ Note that this node, independantly of the Coordinate Reference System, will comp
 
 # Next
 
-See the next demo on [how to extract shapefile data to Excel](pages/7_extract_attributes_excel/index.md)
+See the next demo on [how to extract shapefile data to Excel](../../pages/7_extract_attributes_excel/index.md)
 Or come back to [the documentation](../../).
