@@ -16,9 +16,13 @@ We currently integrated the library in its snapshot version 22, because we had t
 
 ## License
 
-These nodes where developed for the [European Institute for Energy Research (EIFER)](https://www.eifer.kit.edu/).
+These nodes were developed for the [European Institute for Energy Research (EIFER)](https://www.eifer.kit.edu/).
 They are notably used for Generation of Synthetic Populations (GoSP), in order to read spatial populations. 
 These nodes are released as GPL v3; see the [Free Software Foundation presentation](https://www.gnu.org/licenses/quick-guide-gplv3.en.html) if you're not familiar with open-source licenses.
+
+## Documentation
+
+See [the documentation and examples](https://samthiriot.github.io/knime-shapefiles-as-WKT/).
 
 ## Install it
 
