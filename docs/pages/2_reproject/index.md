@@ -24,4 +24,4 @@ This workflow demonstrates how to reproject the geometries.
 
 # Next
 
-Come back to [the documentation](../../main.md).
+Come back to [the documentation](../../).

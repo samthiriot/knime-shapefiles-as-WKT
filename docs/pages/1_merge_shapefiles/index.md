@@ -28,4 +28,4 @@ However most of the Spatial nodes might refuse input data which mixes geometry t
 # Next
 
 See the [demo to reproject geometries](../../pages/2_reproject/index.md). 
-Or come back to [the documentation](../../main.md).
+Or come back to [the documentation](../../).
