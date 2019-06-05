@@ -1,4 +1,4 @@
-# Demo: convert KML data into shapefile format
+# Demo: compute the surface of geometries
 
 [Download the workflow here](6_demo_compute_surface_of_buildings.knwf), then import it into KNIME using File/Import KNIME Workflow. 
 
