@@ -4,6 +4,7 @@
 The "Spatial data as WKT" collection of nodes 
 propose to read and write spatial data from various formats, and provide basic transformation, filtering and visualization features. 
 
+![Screenshot of the spatial nodes](capture_main.png)
 
 ## Alternatives and originality
 
@@ -24,11 +25,13 @@ We decided to create another collection of nodes which overcomes these limitatio
 * we also provide numerous nodes to manipulate geometries by extracting their spatial properties (type, coordinates) and by computing spatial properties (area, distances)
 * the computations are delegated to the [geotools library](https://en.wikipedia.org/wiki/GeoTools), which stands as a reference for spatial processing in Java, and is used in well-known products such as [Geoserver](http://geoserver.org/). 
 
+
 # Limitations
 
 This collection does not intend to turn KNIME into a Geographic Information Systems. 
 Tools dedicated to this usage will always be better for this "pure" usage.  
 However if you have to merge data with spatial data, or extract data from spatial data, this might be of use.
+
  
 # Features:  
 
