@@ -40,6 +40,7 @@ Read information from:
 * KML
 * GML v3
 
+
 ## Write spatial data into several format
 
 Write spatial data into:
@@ -47,6 +48,7 @@ Write spatial data into:
 * ESRI shapefileformat, with the limitations inherent to this old file format (short column names, limited count of columns, etc.)
 * KML,
 * GML v3
+
 
 ## Projection and reprojection
 
@@ -59,12 +61,14 @@ Our collection deals with CRS in every step:
 * the user can reproject geometries using the "Reproject" node compliant with standard coordinate systems,
 * the CRS is written along with the data according to the standard specifications
 
+
 ## Properties 
 
 Features enable to get the properties of geometries:
 * extract 2d coordinates into double columns,
 * get the geometry type into a string column,
 * extract the coordinates of geometries
+
 
 ## Transformation
 
@@ -74,6 +78,7 @@ We provide basic features such as:
 * versalile nodes to filter rows according to spatial properties, or to compute additional columns, based on the "Extented Contextual Query Language". Those enable users to write queries based on surface, distance, proximity and other spatial operations.
 * nodes to compute relations between two sets of spatial entities (such as detection of overlapping),
 * nodes to compute operations between two sets of spatial entities (such as the computation of the union or substraction between entities)
+
 
 ## Visualization
 
@@ -91,6 +96,12 @@ You can install these nodes in KNIME 3.7.2 or above following these steps:
 * Select the collection of nodes named "Spatial as WKT"
 * Follow the next steps to install 
 
+# Demo, examples
+
+* [read buildings from shapefiles](pages/read_buildings/read_buildings.md)
+
+
+## Read buildings 
 
 # Copyright and License
 
