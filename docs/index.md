@@ -88,6 +88,7 @@ We provide basic features such as:
 Visualisation of spatial data was developed in order to facilitate the verification of the transformations.
 It is compatible with the standard KNIME coloring of rows done by the [Color Manager](https://nodepit.com/node/org.knime.base.node.viz.property.color.ColorManager2NodeFactory).
 
+
 # Installation
 
 You can install these nodes in KNIME 3.7.2 or above following these steps:
@@ -99,9 +100,11 @@ You can install these nodes in KNIME 3.7.2 or above following these steps:
 * Select the collection of nodes named "Spatial as WKT"
 * Follow the next steps to install 
 
+
 # Demo, examples
 
 * [read geometries from ESRI shapefiles](pages/0_read_shapefiles/index.md)
+* [merge geometries from various sources in KNIME](pages/1_merge_shapefiles/index.md)
 
 
 
