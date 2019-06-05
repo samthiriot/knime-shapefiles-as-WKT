@@ -1,4 +1,4 @@
-# Demo: read spatial data from Shapefiles
+# Demo: merge shapefiles in KNIME
 
 [Download the workflow here](1_merge_shapefiles_in_WKT.knwf), then import it into KNIME using File/Import KNIME Workflow. 
 
@@ -23,4 +23,9 @@ However most of the Spatial nodes might refuse input data which mixes geometry t
 
 # Go beyond
 
-* Add a node "Write WKT as a Shapefile" and write the result of the concatenation into a shapefile. 
+* Add a node "Write WKT as a Shapefile" and write the result of the concatenation into a shapefile. Open it with a [GIS sofware](https://en.wikipedia.org/wiki/Geographic_information_system) like [qgis](https://www.qgis.org), and check the data is still there.
+
+# Next
+
+See the [demo to reproject geometries](../../pages/2_reproject/index.md). 
+Or come back to [the documentation](../../main.md).
