@@ -106,7 +106,7 @@ You can install these nodes in KNIME 3.7.2 or above following these steps:
 * [read geometries from ESRI shapefiles](pages/0_read_shapefiles/index.md)
 * [merge shapefiles in KNIME](pages/1_merge_shapefiles/index.md)
 * [reproject geometries](pages/2_reproject/index.md)
-
+* [write spatial data into a shapefile](pages/3_write_as_shapefile/index.md)
 
 
 # Copyright and License
