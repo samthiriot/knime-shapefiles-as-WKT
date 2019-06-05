@@ -12,7 +12,7 @@ The collection offers nodes to read shapefiles as KNIME data tables and store KN
 
 All the smart work is done by the wonderful [geotools](https://en.wikipedia.org/wiki/GeoTools) [JTS library](https://en.wikipedia.org/wiki/JTS_Topology_Suite).
 We only do provide the integration of these features inside KNIME. 
-We currently integrated the library in its stable version 20.1 .
+We currently integrated the library in its snapshot version 22, because we had to submit small changes to the library to integrate it smoothly.
 
 ## License
 
@@ -41,3 +41,7 @@ The plugin includes a Maven pom file in order to package the dependancies of geo
 This only has to be done by hand from time to time (to upgrade the geotools version, or to add novel geotools dependancies).
 Else the build is pure Java/RCP. 
 
+## Testing 
+
+These nodes are tested automatically by [Jenkins in the KNIME servers](https://community.knime.org/jenkins/job/ch.res_ear.samthiriot.knime.shapefilesaswkt.update-trunk/). 
+These tests run test workflows and ensure the nodes under test work as expected.
