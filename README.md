@@ -8,6 +8,8 @@ Geometries are decoded and manipulated as their [Well-Known Text representation]
 
 The collection offers nodes to read shapefiles as KNIME data tables and store KNIME data tables as shapefiles.
 
+![Screenshot of the spatial nodes](docs/capture_main.png)
+
 ### how does it work?
 
 All the smart work is done by the wonderful [geotools](https://en.wikipedia.org/wiki/GeoTools) [JTS library](https://en.wikipedia.org/wiki/JTS_Topology_Suite).
