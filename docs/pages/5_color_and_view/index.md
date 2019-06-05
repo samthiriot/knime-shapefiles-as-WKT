@@ -17,4 +17,5 @@ This workflow demonstrates how to use the [KNIME Color Manager node](https://nod
 
 # Next
 
-Come back to [the documentation](../../).
+Check the next demo on [how to compute the surface of geometries](../../pages/6_compute_surface/index.md). 
+Or come back to [the documentation](../../).
