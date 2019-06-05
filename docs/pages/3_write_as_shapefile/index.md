@@ -16,5 +16,5 @@ This workflow demonstrates how to reproject the geometries.
 
 # Next
 
-See the next demo on how to [convert KML into shapefile format](pages/4_transform_KML_into_shapefile/index.md). 
+See the next demo on how to [convert KML into shapefile format](../../pages/4_transform_KML_into_shapefile/index.md). 
 Or come back to [the documentation](../../).
