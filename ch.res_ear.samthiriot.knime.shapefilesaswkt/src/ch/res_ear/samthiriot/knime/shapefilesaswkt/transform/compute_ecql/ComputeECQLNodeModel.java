@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.geotools.data.DataStore;
@@ -54,7 +53,6 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-import org.knime.core.node.workflow.FlowVariable;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.Expression;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -339,7 +337,7 @@ public class ComputeECQLNodeModel extends NodeModel implements FlowVariableProvi
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         
     	m_query.saveSettingsTo(settings);
-    	m_query.saveSettingsTo(settings);
+    	m_type.saveSettingsTo(settings);
     	m_colname.saveSettingsTo(settings);
     }
 

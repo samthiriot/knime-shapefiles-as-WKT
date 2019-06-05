@@ -110,6 +110,8 @@ You can install these nodes in KNIME 3.7.2 or above following these steps:
 * [convert KML into shapefile format](pages/4_transform_KML_into_shapefile/index.md)
 * [use the color manager to edit symboloty](pages/5_color_and_view/index.md)
 * [compute the surface of geometries](pages/6_compute_surface/index.md)
+* [extract shapefile data to Excel](pages/7_extract_attributes_excel/index.md)
+* [compute the accessibility of buildings to services](pages/9_demo_accessibility_zones/index.md)
 
 
 # Copyright and License
