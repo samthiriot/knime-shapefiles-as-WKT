@@ -25,6 +25,7 @@ We decided to create another collection of nodes which overcomes these limitatio
 * we also provide numerous nodes to manipulate geometries by extracting their spatial properties (type, coordinates) and by computing spatial properties (area, distances)
 * the computations are delegated to the [geotools library](https://en.wikipedia.org/wiki/GeoTools), which stands as a reference for spatial processing in Java, and is used in well-known products such as [Geoserver](http://geoserver.org/). 
 
+ 
 
 # Limitations
 
@@ -51,6 +52,9 @@ Write spatial data into:
 * ESRI shapefileformat, with the limitations inherent to this old file format (short column names, limited count of columns, etc.)
 * KML,
 * GML v3
+
+ 
+
 
 
 ## Projection and reprojection
@@ -113,6 +117,7 @@ You can install these nodes in KNIME 3.7.2 or above following these steps:
 * [extract shapefile data to Excel](pages/7_extract_attributes_excel/index.md)
 * [compute the accessibility of buildings to services](pages/9_demo_accessibility_zones/index.md)
 
+ 
 
 # Copyright and License
 
