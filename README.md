@@ -41,7 +41,7 @@ The plugin includes a Maven pom file in order to package the dependancies of geo
 This only has to be done by hand from time to time (to upgrade the geotools version, or to add novel geotools dependancies).
 Else the build is pure Java/RCP. 
 
-## Testing 
+### Testing 
 
 These nodes are tested automatically by [Jenkins in the KNIME servers](https://community.knime.org/jenkins/job/ch.res_ear.samthiriot.knime.shapefilesaswkt.update-trunk/). 
 These tests run test workflows and ensure the nodes under test work as expected.
