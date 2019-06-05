@@ -19,4 +19,5 @@ here we convert [KML data](https://en.wikipedia.org/wiki/Keyhole_Markup_Language
 
 # Next
 
-Come back to [the documentation](../../).
+Check the next demo on [how to use the color manager to edit symbology](../../pages/5_color_and_view/index.md). 
+Or come back to [the documentation](../../).
