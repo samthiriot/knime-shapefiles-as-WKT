@@ -53,6 +53,10 @@
         Opacity of the geometries of the first table. Keeping a bit of transparency is good (defaults to 0.5), as it helps to 
         detect overlapping geometries, and enables to views the geometries of the first table below.
         </option>
+        
+        <option name="WMS server for overlay">
+        The server to load the background overlay from. Change in case the overlay is not displayed.
+		</option>        
 
         
     </fullDescription>

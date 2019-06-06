@@ -13,8 +13,11 @@ package ch.res_ear.samthiriot.knime.shapefilesaswkt.view;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -28,9 +31,15 @@ import javax.swing.JRadioButtonMenuItem;
 
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.FeatureLayer;
 import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
+import org.geotools.ows.ServiceException;
+import org.geotools.ows.wms.WMSCapabilities;
+import org.geotools.ows.wms.WMSUtils;
+import org.geotools.ows.wms.WebMapServer;
+import org.geotools.ows.wms.map.WMSLayer;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.styling.FeatureTypeStyle;
@@ -79,7 +88,11 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
 	private MapContent content = null;
 	private JMapPane mapPane = null;
 
-
+	private ReferencedEnvelope envelope = null;
+	//private WMSLayer overlay = null;
+	
+	private List<WMSLayer> overlays = null;
+	
     /**
      * Creates a new view.
      * 
@@ -112,7 +125,19 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
 	        
 	        {
 	        	JMenuItem resetMenu = new JMenuItem("Zoom to fit");
-	        	MapAction a = new ResetAction(mapPane);
+	        	MapAction a = //new ResetAction(mapPane);
+	        			new MapAction() {
+							/**
+							 * 
+							 */
+							private static final long serialVersionUID = 1L;
+
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								if (envelope != null)
+									mapPane.setDisplayArea(envelope);					
+							}
+						};
 	        	resetMenu.setIcon((Icon) a.getValue(ResetAction.SMALL_ICON));
 	        	resetMenu.addActionListener(a);
 	        	menu.add(resetMenu);
@@ -171,7 +196,64 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
 	        	zoomOutMenu.addActionListener(a);
 	        	menu.add(zoomOutMenu);
 	        }
+	        menu.addSeparator();
 	       
+	        // add buttons for all the overlay layers
+            try {
+       	
+                String url = nodeModel.m_urlWMS.getStringValue();
+               
+                WebMapServer wms = new WebMapServer(new URL(url));
+
+            	WMSCapabilities capabilities = wms.getCapabilities();
+
+            	// gets all the layers in a flat list, in the order they appear in
+            	// the capabilities document (so the rootLayer is at index 0)
+            	//List<org.geotools.ows.wms.Layer> layers = capabilities.getLayerList();
+            	org.geotools.ows.wms.Layer[] layers = WMSUtils.getNamedLayers(capabilities);
+  
+            	overlays = new LinkedList<>();
+    		    ButtonGroup groupLayers = new ButtonGroup();
+    		    
+        		JRadioButtonMenuItem overlayNone = new JRadioButtonMenuItem("no overlay");
+        		overlayNone.setSelected(false);
+        		overlayNone.addActionListener(new MapAction() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						for (WMSLayer l: overlays)
+							l.setVisible(false);
+					}
+				});
+	        	groupLayers.add(overlayNone);
+	        	menu.add(overlayNone);
+	        	
+    		    int i=0;
+    		    for (org.geotools.ows.wms.Layer layer: layers) {
+            		WMSLayer l = new WMSLayer(wms, layer);
+            		l.setVisible(i == 0);
+            		content.addLayer(l);
+            		overlays.add(l);
+            		
+            		JRadioButtonMenuItem overlayMenu = new JRadioButtonMenuItem("layer "+layer.getName());
+            		overlayMenu.setSelected(i==0);
+            		final int index = i++;
+    	        	overlayMenu.addActionListener(new MapAction() {
+    					@Override
+    					public void actionPerformed(ActionEvent e) {
+    						for (WMSLayer l: overlays)
+    							l.setVisible(false);
+    						overlays.get(index).setVisible(true);
+    					}
+    				});
+    	        	groupLayers.add(overlayMenu);
+    	        	menu.add(overlayMenu);
+            	}
+            
+            } catch (ServiceException | IOException e) {
+                e.printStackTrace();
+                logger.warn("unable to load overlay: "+e.getMessage());
+            }
+            
 		    menuBar.add(menu);
 		    
 	    } catch (NoClassDefFoundError e) {
@@ -325,23 +407,31 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
         	logger.warn("nothing to display");
         	return;
         }
-        
+
         try {
+        	
         	        	
         	// add layer 1
     		SimpleFeatureSource shapefileSource = nodeModel.datastore1.getFeatureSource(
     				nodeModel.datastore1.getNames().get(0));
     		
+    		envelope = shapefileSource.getBounds();
+
+            
     		Style shpStyle = createStyleForStore(shapefileSource, nodeModel.m_color1.getColorValue(), opacity1);
             
     	    Layer shpLayer = new FeatureLayer(shapefileSource, shpStyle);       
             content.addLayer(shpLayer);
             mapPane.setDisplayArea(content.getMaxBounds());
         	
+            
             // add layer 2
             if (nodeModel.datastore2 != null) {
             	SimpleFeatureSource shapefileSource2 = nodeModel.datastore2.getFeatureSource(
         				nodeModel.datastore2.getNames().get(0));
+            	
+            	envelope.expandToInclude(shapefileSource2.getBounds());
+            	
         		Style shpStyle2 = createStyleForStore(shapefileSource2, nodeModel.m_color2.getColorValue(), opacity2);
 
         	    Layer shpLayer2 = new FeatureLayer(shapefileSource2, shpStyle2);       
@@ -349,6 +439,7 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
 
             }
           
+			mapPane.setDisplayArea(envelope);					
 
         } catch (IOException e) {
 			e.printStackTrace();
