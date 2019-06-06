@@ -307,7 +307,7 @@ public class ReadGMLAsWKTNodeModel extends NodeModel {
 	        		getLogger().warn("ignoring a feature which has no geometry: "+feature);
 	        		continue;
 	        	}
-	        	    		    
+	        	   
     		    // for each of the expected columns, try to find the corresponding cell
     		    for (int col = 0; col < tableSpec.getNumColumns(); col++) {
     		    	DataColumnSpec colSpec = tableSpec.getColumnSpec(col);

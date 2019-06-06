@@ -35,6 +35,7 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.port.PortObject;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.core.util.FileUtil;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -67,7 +68,7 @@ public class ReadShapefileAsWKTNodeModel extends AbstractReadWKTFromDatastoreNod
     }
     
     @Override
-    protected DataStore openDataStore(ExecutionContext exec) throws InvalidSettingsException {
+    protected DataStore openDataStore(final PortObject[] inObjects, ExecutionContext exec) throws InvalidSettingsException {
 
     	
     	// retrieve parameters
@@ -158,7 +159,7 @@ public class ReadShapefileAsWKTNodeModel extends AbstractReadWKTFromDatastoreNod
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
         
-		final DataStore datastore = openDataStore(null);
+		final DataStore datastore = openDataStore(null, null);
 
 		String schemaName;
 		try {
