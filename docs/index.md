@@ -123,7 +123,7 @@ You can install these nodes in KNIME 3.7.2 or above following these steps:
 
 Copyright (c) 2019 [EIFER](https://www.eifer.kit.edu/) (European Institute for Energy Research).
 This program and the accompanying materials are made available under the terms of the GNU GENERAL PUBLIC LICENSE
-which accompanies this distribution, and is available at https://www.gnu.org/licenses/gpl-3.0.html
+which accompanies this distribution, and is available at [https://www.gnu.org/licenses/gpl-3.0.html](https://www.gnu.org/licenses/gpl-3.0.html)
 
 
 # Source code

@@ -98,6 +98,7 @@ public class ReadKMLAsWKTNodeModel extends NodeModel {
     	// retrieve parameters
         CheckUtils.checkSourceFile(m_file.getStringValue());
         
+        // identify the file containing the KML (possibly with knime:// protocol)
         URL filename;
 		try {
 			filename = FileUtil.toURL(m_file.getStringValue());
@@ -109,6 +110,8 @@ public class ReadKMLAsWKTNodeModel extends NodeModel {
         if (filename == null)
         	throw new InvalidSettingsException("no file defined");
        
+        
+        // open the file content
         InputStream inputStream;
 		try {
 			inputStream = FileUtil.openStreamWithTimeout(filename);
@@ -117,6 +120,8 @@ public class ReadKMLAsWKTNodeModel extends NodeModel {
 			throw new IllegalArgumentException("unable to open the URL "+filename+": "+e2.getMessage());
 		}
         
+		// parse the content using KML
+		//org.geotools.kml.v22.KMLConfiguration configuration = new org.geotools.kml.v22.KMLConfiguration();
         Parser parser = new Parser(new org.geotools.kml.v22.KMLConfiguration());
         SimpleFeature f;
 		try {
@@ -140,8 +145,18 @@ public class ReadKMLAsWKTNodeModel extends NodeModel {
         exec.setMessage("loading the KML structure");
        
     	SimpleFeature f = decodeFileFromKML();
-    
-        DataTableSpec tableSpec = createDataTableSpec(f);
+    	
+    	System.out.println(f.getUserData());
+    	
+    	// CRS is always WGS84 for KML
+		CoordinateReferenceSystem crs;
+		try {
+			crs = CRS.decode("EPSG:4326"); // WGS84 
+		} catch (FactoryException e) {
+			throw new RuntimeException("unable to find the Coordinate Reference System EPSG:4326. This error should not happen. Please report this bug for solving.");
+		}        
+		
+		DataTableSpec tableSpec = FeaturesDecodingUtils.createDataTableSpec(f, getLogger(), crs);
         
         final BufferedDataContainer container = exec.createDataContainer(tableSpec);
 
@@ -217,70 +232,7 @@ public class ReadKMLAsWKTNodeModel extends NodeModel {
     }
 
     
-    protected DataTableSpec createDataTableSpec(SimpleFeature f) {
-    	
-    	List<DataColumnSpec> specs = new ArrayList<DataColumnSpec>(f.getProperties().size()+2);
-    	
-    	// add column with id
-    	specs.add(new DataColumnSpecCreator(
-    			"id", 
-    			StringCell.TYPE
-    			).createSpec());
-    	
-    	// create a column with the geometry
-    	{
-	    	
-			DataColumnSpecCreator creatorGeom = new DataColumnSpecCreator(
-	    			SpatialUtils.GEOMETRY_COLUMN_NAME, 
-	    			StringCell.TYPE
-	    			);
-			Map<String,String> properties = new HashMap<String, String>();
-			CoordinateReferenceSystem crs;
-			try {
-				crs = CRS.decode("EPSG:4326"); // WGS84 
-			} catch (FactoryException e) {
-				throw new RuntimeException("unable to find the Coordinate Reference System EPSG:4326. This error should not happen. Please report this bug for solving.");
-			}
-			properties.put(SpatialUtils.PROPERTY_CRS_CODE, SpatialUtils.getStringForCRS(crs));
-			properties.put(SpatialUtils.PROPERTY_CRS_WKT, crs.toWKT());
-			DataColumnProperties propertiesKWT = new DataColumnProperties(properties);
-			creatorGeom.setProperties(propertiesKWT);
-			specs.add(creatorGeom.createSpec());
-    	}
-		
-    	// create one column per property
-    	
-    	
-    	//System.out.println(f.getAttributes());
-    	
-    	Set<String> foundNames = new HashSet<String>();
-    	for (Property property: f.getProperties()) {
-    		String name = property.getName().toString();
-    		if ("Feature".equals(name) ||  // TODO a set
-    			"LookAt".equals(name) ||
-    			"Style".equals(name) || 
-    			"Region".equals(name)
-    			)
-    			continue;
-    		if (!foundNames.add(name)) {
-    			
-    			int i = 1;
-    			do {
-    				i++;
-    			} while (foundNames.contains(name+"("+i+")"));
-    			
-    			logger.warn("there was already a property named \""+name+"; we will rename this one "+name+"("+i+")");
-    			name = name + "(" + i + ")";
-    		}
-    		
-    		specs.add(FeaturesDecodingUtils.getColumnSpecForFeatureProperty(property, name, getLogger()));
-    	}
-		
-        return new DataTableSpec(
-        		"KML entities",
-        		specs.toArray(new DataColumnSpec[specs.size()])
-        		);
-    }
+    
     
 	/**
      * {@inheritDoc}
@@ -293,7 +245,7 @@ public class ReadKMLAsWKTNodeModel extends NodeModel {
     	// will fail if the file is not defined, 
     	// or not valid
     	
-        return new DataTableSpec[]{ createDataTableSpec(decodeFileFromKML()) };
+        return new DataTableSpec[]{ null }; // createDataTableSpec(decodeFileFromKML())
     }
 
 

@@ -30,6 +30,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelPassword;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.knime.core.node.port.PortObject;
 import org.knime.core.node.util.CheckUtils;
 
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.AbstractReadWKTFromDatastoreNodeModel;
@@ -97,7 +98,7 @@ public class ReadWKTFromDatabaseNodeModel extends AbstractReadWKTFromDatastoreNo
 	}
 
 	@Override
-	protected DataStore openDataStore(ExecutionContext exec) throws InvalidSettingsException {
+	protected DataStore openDataStore(final PortObject[] inObjects, ExecutionContext exec) throws InvalidSettingsException {
 
 		// @see http://docs.geotools.org/stable/userguide/library/jdbc/postgis.html
         Map<String, Object> params = new HashMap<>();

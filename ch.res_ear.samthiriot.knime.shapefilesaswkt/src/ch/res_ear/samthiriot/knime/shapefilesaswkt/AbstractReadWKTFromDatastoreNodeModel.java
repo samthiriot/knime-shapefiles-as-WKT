@@ -31,6 +31,9 @@ import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
+import org.knime.core.node.port.PortObject;
+import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.node.port.PortType;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -60,12 +63,20 @@ public abstract class AbstractReadWKTFromDatastoreNodeModel extends NodeModel {
 		super(0, 1);
 	}
 
+	protected AbstractReadWKTFromDatastoreNodeModel(int inputs) {
+		
+		super(inputs, 1);
+	}
+
+	public AbstractReadWKTFromDatastoreNodeModel(PortType[] portTypesInput) {
+		super(portTypesInput, new PortType[] { BufferedDataTable.TYPE } );
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+	protected DataTableSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
 		return new DataTableSpec[] { null };
 	}
 
@@ -74,7 +85,7 @@ public abstract class AbstractReadWKTFromDatastoreNodeModel extends NodeModel {
 	 * @return
 	 * @throws InvalidSettingsException
 	 */
-	protected abstract DataStore openDataStore(ExecutionContext exec) throws InvalidSettingsException;
+	protected abstract DataStore openDataStore(final PortObject[] inObjects, ExecutionContext exec) throws InvalidSettingsException;
 	
 	/**
 	 * Define which schema should be open in this datastore, either according to 
@@ -89,10 +100,10 @@ public abstract class AbstractReadWKTFromDatastoreNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
+    protected BufferedDataTable[] execute(final PortObject[] inObjects,
             final ExecutionContext exec) throws Exception {
 
-		final DataStore datastore = openDataStore(exec);
+		final DataStore datastore = openDataStore(inObjects, exec);
 
 		if (datastore.getTypeNames().length == 0)
 			throw new InvalidSettingsException("this database does not contain any schema");
