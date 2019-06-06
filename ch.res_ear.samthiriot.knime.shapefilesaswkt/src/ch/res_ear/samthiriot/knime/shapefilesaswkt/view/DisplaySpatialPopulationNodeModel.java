@@ -31,6 +31,7 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelColor;
 import org.knime.core.node.defaultnodesettings.SettingsModelDoubleBounded;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortType;
 import org.knime.core.util.FileUtil;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -59,6 +60,7 @@ public class DisplaySpatialPopulationNodeModel extends NodeModel {
     protected SettingsModelDoubleBounded m_opacity1 = new SettingsModelDoubleBounded("opacity1", 0.5, 0.0, 1.0);
     protected SettingsModelDoubleBounded m_opacity2 = new SettingsModelDoubleBounded("opacity2", 0.7, 0.0, 1.0);
     
+    protected SettingsModelString m_urlWMS = new SettingsModelString("url wms", "https://ows.terrestris.de/osm-gray/service");
     /**
      * Constructor for the node model.
      */
@@ -207,6 +209,7 @@ public class DisplaySpatialPopulationNodeModel extends NodeModel {
     	m_color2.saveSettingsTo(settings);
     	m_opacity1.saveSettingsTo(settings);
     	m_opacity2.saveSettingsTo(settings);
+    	m_urlWMS.saveSettingsTo(settings);
     }
 
     /**
@@ -220,6 +223,7 @@ public class DisplaySpatialPopulationNodeModel extends NodeModel {
     	m_color2.loadSettingsFrom(settings);
     	m_opacity1.loadSettingsFrom(settings);
     	m_opacity2.loadSettingsFrom(settings);
+    	m_urlWMS.loadSettingsFrom(settings);
     }
 
     /**
@@ -233,6 +237,7 @@ public class DisplaySpatialPopulationNodeModel extends NodeModel {
     	m_color2.validateSettings(settings);
     	m_opacity1.validateSettings(settings);
     	m_opacity2.validateSettings(settings);
+    	m_urlWMS.validateSettings(settings);
 
     }
     

@@ -15,8 +15,10 @@ import java.awt.Color;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentColorChooser;
 import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
+import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelColor;
 import org.knime.core.node.defaultnodesettings.SettingsModelDoubleBounded;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
 /**
  * <code>NodeDialog</code> for the "DisplaySpatialPopulation" Node.
@@ -58,6 +60,17 @@ public class DisplaySpatialPopulationNodeDialog extends DefaultNodeSettingsPane 
         		new SettingsModelDoubleBounded("opacity2", 0.5, 0.0, 1.0),
         		"opacity",
         		0.1));
+        
+        createNewGroup("Overlay");
+        addDialogComponent(new DialogComponentStringSelection(
+        	    new SettingsModelString("url wms", "https://ows.terrestris.de/osm-gray/service"),
+        	    "WMS server for overlay", 
+        	    "https://ows.terrestris.de/osm/service",
+        	    //"http://ows.terrestris.de/osm/service",
+        	    "https://ows.terrestris.de/osm-gray/service",
+        	    "http://ows.mundialis.de/services/service", 
+        	    "http://maps.heigit.org/osm-wms/service"
+        	    ));
 
     }
 }
