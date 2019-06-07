@@ -1,4 +1,4 @@
-# Demo: convert KML data into shapefile format
+# Demo: Color Geometries using Color Manager
 
 [Download the workflow here](5_demo_read_color_and_view_buildings.knwf), then import it into KNIME using File/Import KNIME Workflow. 
 
