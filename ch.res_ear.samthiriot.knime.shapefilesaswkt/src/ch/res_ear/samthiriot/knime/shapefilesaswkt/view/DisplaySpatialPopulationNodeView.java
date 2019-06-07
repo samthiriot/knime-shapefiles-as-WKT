@@ -196,7 +196,6 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
 	        	zoomOutMenu.addActionListener(a);
 	        	menu.add(zoomOutMenu);
 	        }
-	        menu.addSeparator();
 	       
 	        // add buttons for all the overlay layers
             try {
@@ -211,7 +210,9 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
             	// the capabilities document (so the rootLayer is at index 0)
             	//List<org.geotools.ows.wms.Layer> layers = capabilities.getLayerList();
             	org.geotools.ows.wms.Layer[] layers = WMSUtils.getNamedLayers(capabilities);
-  
+    	        
+            	menu.addSeparator();
+
             	overlays = new LinkedList<>();
     		    ButtonGroup groupLayers = new ButtonGroup();
     		    
