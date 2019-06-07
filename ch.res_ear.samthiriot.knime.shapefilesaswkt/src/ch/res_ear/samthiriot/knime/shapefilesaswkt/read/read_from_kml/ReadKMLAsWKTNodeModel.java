@@ -18,11 +18,6 @@ import java.net.URL;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -30,14 +25,10 @@ import org.geotools.feature.simple.SimpleFeatureImpl;
 import org.geotools.referencing.CRS;
 import org.geotools.xsd.Parser;
 import org.knime.core.data.DataCell;
-import org.knime.core.data.DataColumnProperties;
-import org.knime.core.data.DataColumnSpec;
-import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.MissingCell;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
-import org.knime.core.data.def.StringCell;
 import org.knime.core.data.def.StringCell.StringCellFactory;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
@@ -59,7 +50,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.SAXException;
 
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.FeaturesDecodingUtils;
-import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
 
 
 /**
