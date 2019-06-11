@@ -3,8 +3,7 @@
       id="ch.res_ear.samthiriot.knime.shapefilesaswkt.update"
       label="KNIME Spatial Processing Nodes"
       version="1.2.2.qualifier"
-      provider-name="EIFER (European Institute for Energy Research)"
-      plugin="ch.res_ear.samthiriot.knime.shapefilesaswkt">
+      provider-name="EIFER (European Institute for Energy Research)">
 
    <description>
       KNIME collection of nodes to read, write, visualize, filter, reproject and manipulate spatial data. 
