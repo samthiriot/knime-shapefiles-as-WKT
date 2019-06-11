@@ -98,19 +98,19 @@ public class GeotoolsToDataTableMapper {
     	} else if (gtDesc instanceof AttributeDescriptor) {
     		AttributeDescriptor gtDescAtt = (AttributeDescriptor)gtDesc;
     		
-    		if (gtDescAtt.getType().getBinding().equals(String.class)) {
+    		if (String.class.isAssignableFrom(gtDescAtt.getType().getBinding())) {
     			knimeType = StringCell.TYPE;
     			gtDetectedType = GeotoolDetectedType.ATTRIBUTE_STRING;
-    		} else if (gtDescAtt.getType().getBinding().equals(Integer.class)) {
+    		} else if (Integer.class.isAssignableFrom(gtDescAtt.getType().getBinding())) {
     			knimeType = IntCell.TYPE;
     			gtDetectedType = GeotoolDetectedType.ATTRIBUTE_INTEGER;
-    		} else if (gtDescAtt.getType().getBinding().equals(Double.class)) {
+    		} else if (Double.class.isAssignableFrom(gtDescAtt.getType().getBinding())) {
     			knimeType = DoubleCell.TYPE;
     			gtDetectedType = GeotoolDetectedType.ATTRIBUTE_DOUBLE;
-    		} else if (gtDescAtt.getType().getBinding().equals(Boolean.class)) {
+    		} else if (Boolean.class.isAssignableFrom(gtDescAtt.getType().getBinding())) {
     			knimeType = BooleanCell.TYPE;
     			gtDetectedType = GeotoolDetectedType.ATTRIBUTE_BOOLEAN;
-    		} else if (gtDescAtt.getType().getBinding().equals(Long.class)) {
+    		} else if (Long.class.isAssignableFrom(gtDescAtt.getType().getBinding())) {
     			knimeType = LongCell.TYPE;
     			gtDetectedType = GeotoolDetectedType.ATTRIBUTE_LONG;
     		} else if (gtDescAtt.getType().getBinding().equals(BigDecimal.class)) {
