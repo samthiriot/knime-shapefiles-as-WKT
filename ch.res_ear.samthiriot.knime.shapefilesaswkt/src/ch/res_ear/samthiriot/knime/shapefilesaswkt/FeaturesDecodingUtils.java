@@ -72,7 +72,6 @@ public class FeaturesDecodingUtils {
     			StringCell.TYPE
     			).createSpec());
     	*/
-    	
     	// create a column with the geometry
     	specs.add(createDataColumnSpecForGeom(crs));
     	
@@ -89,6 +88,7 @@ public class FeaturesDecodingUtils {
     			"LookAt".equals(name) ||
     			"Style".equals(name) || 
     			"Region".equals(name)
+    			//"id".equals(name)
     			)
     			continue;
     		if (!foundNames.add(name)) {
