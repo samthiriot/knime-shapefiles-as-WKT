@@ -221,7 +221,6 @@ public class RelateWKTGeometriesNodeModel extends NodeModel {
 
 
 		final IRelationComputer computerFinal = computer;
-
 		
 		// iterate each geometry of each row
 		done = 0;
