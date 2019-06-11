@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="ch.res_ear.samthiriot.knime.shapefilesaswkt.update"
-      label="Spatial Nodes"
+      label="Spatial Processing Nodes"
       version="1.2.2.qualifier"
       provider-name="EIFER (European Institute for Energy Research)"
       plugin="ch.res_ear.samthiriot.knime.shapefilesaswkt">
 
    <description>
-      KNIME collection of nodes to read, write, visualize, filter, project or filter
-spatial entities. Spatial features are manipulated as String columns containing WKT format.
-Computations are delegated to the geotools library.
+      KNIME collection of nodes to read, write, visualize, filter, reproject and manipulate spatial data. 
+Spatial features are manipulated as String columns containing
+human-readable WKT format.
+Integrates the well known GeoTools Library.
    </description>
 
    <copyright>
