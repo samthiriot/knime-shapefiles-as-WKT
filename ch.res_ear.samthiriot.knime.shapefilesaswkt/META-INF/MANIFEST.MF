@@ -147,7 +147,6 @@ Bundle-Activator: ch.res_ear.samthiriot.knime.shapefilesaswkt.ShapefileAsWKTNode
 Bundle-Vendor: EIFER (European Institute for Energy Research)
 Require-Bundle: org.knime.workbench.core;bundle-version="[3.7.0,5.0.0)",
  org.knime.base;bundle-version="[3.7.0,5.0.0)",
- org.eclipse.xsd;bundle-version="2.13.0",
  org.knime.product;bundle-version="[3.7.0,5.0.0)",
  org.knime.workbench;bundle-version="[3.7.0,5.0.0)",
  org.knime.testing;bundle-version="[3.7.0,5.0.0)"

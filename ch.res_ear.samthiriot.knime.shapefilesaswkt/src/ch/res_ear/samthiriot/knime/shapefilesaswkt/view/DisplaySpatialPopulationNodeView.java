@@ -11,14 +11,17 @@
 package ch.res_ear.samthiriot.knime.shapefilesaswkt.view;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
@@ -61,9 +64,16 @@ import org.geotools.swing.action.PanAction;
 import org.geotools.swing.action.ResetAction;
 import org.geotools.swing.action.ZoomInAction;
 import org.geotools.swing.action.ZoomOutAction;
+import org.geotools.swing.event.MapMouseEvent;
+import org.geotools.swing.event.MapMouseListener;
+import org.geotools.swing.event.MapPaneEvent;
+import org.geotools.swing.event.MapPaneListener;
+import org.geotools.swing.tool.FeatureLayerHelper;
 import org.geotools.swing.tool.InfoTool;
+import org.geotools.swing.tool.InfoToolResult;
 import org.geotools.swing.tool.PanTool;
 import org.geotools.swing.tool.ScrollWheelTool;
+import org.knime.core.data.RowKey;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeView;
 import org.locationtech.jts.geom.MultiPoint;
@@ -127,9 +137,7 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
 	        	JMenuItem resetMenu = new JMenuItem("Zoom to fit");
 	        	MapAction a = //new ResetAction(mapPane);
 	        			new MapAction() {
-							/**
-							 * 
-							 */
+						
 							private static final long serialVersionUID = 1L;
 
 							@Override
@@ -175,7 +183,18 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
 					logger.error("unable to load image resource "+InfoTool.ICON_IMAGE, e);
 					e.printStackTrace();
 				}
+
 	        	infoMenu.addActionListener(new InfoAction(mapPane));
+	        	/*
+	        	infoMenu.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						mapPane.get
+						getNodeModel().getInHiLiteHandler(0).fireHiLiteEvent(ids);				        
+					}
+				});
+				*/
 	        	menu.add(infoMenu);
 	        }
 	        {
@@ -196,7 +215,7 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
 	        	zoomOutMenu.addActionListener(a);
 	        	menu.add(zoomOutMenu);
 	        }
-	       
+	        
 	        // add buttons for all the overlay layers
             try {
        	
@@ -219,6 +238,9 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
         		JRadioButtonMenuItem overlayNone = new JRadioButtonMenuItem("no overlay");
         		overlayNone.setSelected(false);
         		overlayNone.addActionListener(new MapAction() {
+
+					private static final long serialVersionUID = 1L;
+
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						for (WMSLayer l: overlays)
@@ -239,7 +261,10 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
             		overlayMenu.setSelected(i==0);
             		final int index = i++;
     	        	overlayMenu.addActionListener(new MapAction() {
-    					@Override
+
+						private static final long serialVersionUID = 1L;
+
+						@Override
     					public void actionPerformed(ActionEvent e) {
     						for (WMSLayer l: overlays)
     							l.setVisible(false);
@@ -262,6 +287,124 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
 	    	logger.warn("unable to display toolbars");
 	    }
 	    
+
+        
+        // display a "wait" cursor during rendering
+        mapPane.addMapPaneListener(new MapPaneListener() {
+			
+        	Cursor previous = null;
+        	
+			@Override
+			public void onRenderingStopped(MapPaneEvent arg0) {
+
+				if (previous == null)
+					mapPane.setCursor(Cursor.getDefaultCursor());
+				else
+					mapPane.setCursor(previous);
+				
+			}
+			
+			@Override
+			public void onRenderingStarted(MapPaneEvent arg0) {
+				
+				previous = mapPane.getCursor();
+				mapPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			}
+			
+			@Override
+			public void onNewMapContent(MapPaneEvent arg0) { }
+			
+			@Override
+			public void onDisplayAreaChanged(MapPaneEvent arg0) { }
+		});
+       
+
+        mapPane.addMouseListener(new MapMouseListener() {
+			
+			@Override
+			public void onMouseWheelMoved(MapMouseEvent arg0) {
+				
+			}
+			
+			@Override
+			public void onMouseReleased(MapMouseEvent ev) {
+				
+				getNodeModel().getInHiLiteHandler(0).fireClearHiLiteEvent();
+				
+				Set<RowKey> keys = new HashSet<>();
+
+				for (Layer l: content.layers()) {
+					try {
+						FeatureLayerHelper searcher = new FeatureLayerHelper();
+						searcher.setMapContent(content);
+						searcher.setLayer(l);
+
+						InfoToolResult res = null;
+						try {
+							res = searcher.getInfo(ev.getWorldPos());
+						} catch (Exception e) {
+							e.printStackTrace();
+							continue;
+						}
+						if (res.getNumFeatures() == 0)
+							continue;
+
+						System.out.println(res);
+						
+
+						for (int i=0; i<res.getNumFeatures(); i++) {
+							System.out.println(res.getFeatureData(i));
+							Object rowId = res.getFeatureData(i).get("rowid");
+							keys.add(new RowKey(rowId.toString()));
+						}
+						
+
+						
+					} catch (IllegalArgumentException e) {
+						// skip silently
+					}
+				}
+
+				System.out.println("hilite: "+keys);
+				try {
+					getNodeModel().getInHiLiteHandler(0).fireHiLiteEvent(keys);
+				} catch (RuntimeException e) {
+					e.printStackTrace();
+				}
+
+				
+			}
+			
+			@Override
+			public void onMousePressed(MapMouseEvent arg0) {
+				
+			}
+			
+			@Override
+			public void onMouseMoved(MapMouseEvent arg0) {
+				
+			}
+			
+			@Override
+			public void onMouseExited(MapMouseEvent arg0) {
+				
+			}
+			
+			@Override
+			public void onMouseEntered(MapMouseEvent arg0) {
+				
+			}
+			
+			@Override
+			public void onMouseDragged(MapMouseEvent arg0) {
+				
+			}
+			
+			@Override
+			public void onMouseClicked(MapMouseEvent arg0) {
+				
+			}
+		});
     }
     
     protected void uncheckAll() {
@@ -410,7 +553,6 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
         }
 
         try {
-        	
         	        	
         	// add layer 1
     		SimpleFeatureSource shapefileSource = nodeModel.datastore1.getFeatureSource(
@@ -425,6 +567,7 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
             content.addLayer(shpLayer);
             mapPane.setDisplayArea(content.getMaxBounds());
         	
+            //searcher.setLayer(shpLayer);
             
             // add layer 2
             if (nodeModel.datastore2 != null) {
@@ -437,15 +580,16 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
 
         	    Layer shpLayer2 = new FeatureLayer(shapefileSource2, shpStyle2);       
                 content.addLayer(shpLayer2);
-
             }
           
 			mapPane.setDisplayArea(envelope);					
-
+			
         } catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("error when displaying the map: "+e.getMessage(), e);
 		}    
+        
+
     }
 
 }
