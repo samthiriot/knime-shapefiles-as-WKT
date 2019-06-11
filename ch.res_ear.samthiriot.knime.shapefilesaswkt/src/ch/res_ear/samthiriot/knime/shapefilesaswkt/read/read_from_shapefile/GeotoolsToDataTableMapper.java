@@ -30,6 +30,7 @@ import org.knime.core.data.def.LongCell;
 import org.knime.core.data.def.LongCell.LongCellFactory;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.data.def.StringCell.StringCellFactory;
+import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
@@ -113,7 +114,7 @@ public class GeotoolsToDataTableMapper {
     		} else if (Long.class.isAssignableFrom(gtDescAtt.getType().getBinding())) {
     			knimeType = LongCell.TYPE;
     			gtDetectedType = GeotoolDetectedType.ATTRIBUTE_LONG;
-    		} else if (gtDescAtt.getType().getBinding().equals(BigDecimal.class)) {
+    		} else if (BigDecimal.class.isAssignableFrom(gtDescAtt.getType().getBinding())) {
     			knimeType = DoubleCell.TYPE;
     			gtDetectedType = GeotoolDetectedType.ATTRIBUTE_BIGDECIMAL;
     			logger.warn("the column "+gtDesc.getName()
@@ -128,7 +129,9 @@ public class GeotoolsToDataTableMapper {
 
     		}
     		
-    	} 
+    	} else {
+    		throw new RuntimeException("unknown attribute type "+gtDesc);
+    	}
 
     	DataColumnSpecCreator creator = null;
     	if (gtDetectedType == GeotoolDetectedType.SPATIAL) {

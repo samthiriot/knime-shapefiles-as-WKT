@@ -129,15 +129,15 @@ public class FeaturesDecodingUtils {
 		final Class<?> type = property.getType().getBinding();
 		
 		DataType knimeType = null;
-		if (type.equals(Integer.class)) {
+		if (Integer.class.isAssignableFrom(type)) {
 			knimeType = IntCell.TYPE;
-		} else if (type.equals(String.class)) {
+		} else if (String.class.isAssignableFrom(type)) {
 			knimeType = StringCell.TYPE;
-		} else if (type.equals(Long.class)) {
+		} else if (Long.class.isAssignableFrom(type)) {
 			knimeType = LongCell.TYPE;
-		} else if (type.equals(Double.class) || type.equals(Float.class)) {
+		} else if (Double.class.isAssignableFrom(type) || Float.class.isAssignableFrom(type)) {
 			knimeType = DoubleCell.TYPE;
-		} else if (type.equals(Boolean.class)) {
+		} else if (Boolean.class.isAssignableFrom(type)) {
 			knimeType = BooleanCell.TYPE;
 		} else {
 			logger.warn("The type of KML property "+name+" is not supported ("+property.getType()+"); we will convert it to String");
@@ -169,15 +169,15 @@ public class FeaturesDecodingUtils {
 		DataCell resultCell = null;
 		if (value == null) {
 			resultCell = null;
-		} else if (type.equals(Integer.class)) {
+		} else if (Integer.class.isAssignableFrom(type)) {
 			resultCell = IntCellFactory.create(value.toString());
-		} else if (type.equals(String.class)) {
+		} else if (String.class.isAssignableFrom(type)) {
 			resultCell = StringCellFactory.create(value.toString());
-		} else if (type.equals(Long.class)) {
+		} else if (Long.class.isAssignableFrom(type)) {
 			resultCell = LongCellFactory.create(value.toString());
-		} else if (type.equals(Double.class) || type.equals(Float.class)) {
+		} else if (Double.class.isAssignableFrom(type) || Float.class.isAssignableFrom(type)) {
 			resultCell = DoubleCellFactory.create(value.toString());
-		} else if (type.equals(Boolean.class)) {
+		} else if (Boolean.class.isAssignableFrom(type)) {
 			resultCell = BooleanCellFactory.create(value.toString());
 		} else {
 			resultCell = StringCellFactory.create(value.toString());
