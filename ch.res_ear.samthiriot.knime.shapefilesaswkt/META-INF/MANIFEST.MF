@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: KNIME Shapefile WKT manipulation
+Bundle-Name: KNIME Spatial Processing Nodes
 Bundle-SymbolicName: ch.res_ear.samthiriot.knime.shapefilesaswkt;singleton:=true
 Bundle-Version: 1.2.2.qualifier
 Bundle-ClassPath: readshapefileaskml.jar,
@@ -156,14 +156,22 @@ Export-Package: .,
  au.com.objectix.jgridshift,
  ch.res_ear.samthiriot.knime.dialogs,
  ch.res_ear.samthiriot.knime.shapefilesaswkt,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.coordinates,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.coordinates2d,
  ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.globalboundingbox,
  ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.surface,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.type,
  ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_db,
  ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_gml,
  ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_kml,
  ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_shapefile,
  ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.centroid,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.compute_ecql,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.filter_ecql,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.operations,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.relate,
  ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.reproject,
+ ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.union,
  ch.res_ear.samthiriot.knime.shapefilesaswkt.view,
  ch.res_ear.samthiriot.knime.shapefilesaswkt.write.write_to_db,
  ch.res_ear.samthiriot.knime.shapefilesaswkt.write.write_to_gml,
