@@ -708,6 +708,7 @@ Public License instead of this License.  But first, please read
       <import plugin="org.knime.product" version="3.7.0"/>
       <import plugin="org.knime.workbench" version="3.7.0"/>
       <import plugin="org.knime.testing" version="3.7.0"/>
+      <import plugin="org.eclipse.core.resources"/>
    </requires>
 
    <plugin
