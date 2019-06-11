@@ -23,7 +23,7 @@ Germany
    </copyright>
 
    <license url="http://www.gnu.org/licenses/gpl-3.0.html">
-GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
+      GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
 
  Copyright (C) 2007 Free Software Foundation, Inc. &lt;https://fsf.org/&gt;
  Everyone is permitted to copy and distribute verbatim copies
@@ -703,9 +703,11 @@ Public License instead of this License.  But first, please read
    </url>
 
    <requires>
-      <import plugin="org.knime.workbench.core"/>
-      <import plugin="org.knime.base"/>
-      <import plugin="org.eclipse.xsd" version="2.13.0" match="greaterOrEqual"/>
+      <import plugin="org.knime.workbench.core" version="3.7.0"/>
+      <import plugin="org.knime.base" version="3.7.0"/>
+      <import plugin="org.knime.product" version="3.7.0"/>
+      <import plugin="org.knime.workbench" version="3.7.0"/>
+      <import plugin="org.knime.testing" version="3.7.0"/>
    </requires>
 
    <plugin
