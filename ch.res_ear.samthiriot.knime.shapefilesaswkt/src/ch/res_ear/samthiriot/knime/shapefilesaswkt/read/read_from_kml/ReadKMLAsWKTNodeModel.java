@@ -135,9 +135,7 @@ public class ReadKMLAsWKTNodeModel extends NodeModel {
         exec.setMessage("loading the KML structure");
        
     	SimpleFeature f = decodeFileFromKML();
-    	
-    	System.out.println(f.getUserData());
-    	
+    	    	
     	// CRS is always WGS84 for KML
 		CoordinateReferenceSystem crs;
 		try {
@@ -165,7 +163,7 @@ public class ReadKMLAsWKTNodeModel extends NodeModel {
 	        	ArrayList<DataCell> cells = new ArrayList<DataCell>(2+f.getProperties().size());
 	        	
 	        	// add id
-	        	cells.add(StringCellFactory.create(feature.getID()));
+	        	//cells.add(StringCellFactory.create(feature.getID()));
 	        	
 	        	// add geometry
 	        	if (feature.getDefaultGeometry() == null) {
