@@ -6,10 +6,10 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
     
-    <name>Union of WKT Geometries</name>
+    <name>Union of Geometries</name>
     
     <shortDescription>
-        Union of WKT geometries
+        Union of Geometries
     </shortDescription>
     
     <fullDescription>

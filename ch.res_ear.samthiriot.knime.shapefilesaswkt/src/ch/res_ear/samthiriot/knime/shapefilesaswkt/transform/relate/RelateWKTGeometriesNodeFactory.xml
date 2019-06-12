@@ -6,10 +6,10 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
     
-    <name>Relate WKT Geometries</name>
+    <name>Relate Geometries</name>
     
     <shortDescription>
-        Relates WKT geometries
+        Relates Geometries
     </shortDescription>
     
     <fullDescription>

@@ -5,7 +5,7 @@
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 			xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
 			
-    <name>Filter WKT data using ECQL</name>
+    <name>Filter WKT data using ECQL queries</name>
     
     <shortDescription>
         Filters WKT geometries using ECQL queries.

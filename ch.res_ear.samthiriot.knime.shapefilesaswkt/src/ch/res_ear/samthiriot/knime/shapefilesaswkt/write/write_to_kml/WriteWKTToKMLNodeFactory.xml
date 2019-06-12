@@ -6,10 +6,10 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
 		
-    <name>Write WKT to KML</name>
+    <name>Write Geometries to KML</name>
     
     <shortDescription>
-        Writes WKT spatial data as KML
+        Writes Geometries to KML format
     </shortDescription>
     
     <fullDescription>

@@ -6,10 +6,10 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
     
-    <name>Read Shapefile as WKT</name>
+    <name>Read Spatial from Shapefile</name>
     
     <shortDescription>
-        Reads spatial features (geometries) from a shapefile. 
+        Reads spatial features (geometries) from a Shapefile. 
         Accepts any geometry type: points, lines, or polygons.
         Decodes the geometry as a String column in WKT (Well-known Text Representation).
         Decodes every attribute of the spatial features as a column of a corresponding KNIME type. 

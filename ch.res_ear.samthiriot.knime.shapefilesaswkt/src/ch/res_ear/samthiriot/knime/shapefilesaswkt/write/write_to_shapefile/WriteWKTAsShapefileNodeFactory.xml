@@ -6,10 +6,10 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
 		
-    <name>Write WKT as a Shapefile</name>
+    <name>Write Geometries into Shapefile</name>
     
     <shortDescription>
-        Stores the WKT data as a shapefile.
+        Stores Spatial Data into a shapefile.
     </shortDescription>
     
     <fullDescription>

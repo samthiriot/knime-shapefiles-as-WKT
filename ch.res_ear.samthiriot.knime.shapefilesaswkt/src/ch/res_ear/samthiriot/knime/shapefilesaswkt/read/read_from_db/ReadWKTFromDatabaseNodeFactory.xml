@@ -7,10 +7,10 @@
 		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
 		
 		
-    <name>Read WKT From Database</name>
+    <name>Read Geometries From Database</name>
     
     <shortDescription>
-        Read WKT geometries from a database such as a PostGIS database.
+        Read Geometries from a Database such as a PostGIS database.
     </shortDescription>
     
     <fullDescription>
