@@ -7,7 +7,7 @@
   <groupId>ch.res_ear.samthiriot.knime</groupId>
   <artifactId>ch.res_ear.samthiriot.knime.shapefilesKML</artifactId>
   <version>1.2.2-SNAPSHOT</version>
-  <name>KNIME nodes to manipulate Shapefiles as KML</name>
+  <name>KNIME Spatial Processing Nodes</name>
   
   <description>
   KNIME nodes to read, write, visualize, filter, project or filter 
@@ -195,6 +195,9 @@
         <excludes>
           <exclude>**/*.java</exclude>
         </excludes>
+        <includes>
+          <include>**/*.xml</include>
+        </includes>
       </resource>
     </resources>
     <plugins>
