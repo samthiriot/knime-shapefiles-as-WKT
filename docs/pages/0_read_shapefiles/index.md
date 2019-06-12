@@ -5,7 +5,7 @@
 ![Capture](capture.png)
 
 This workflow demonstrates how to read data from the [ESRI shapefile format](https://en.wikipedia.org/wiki/Shapefile).
-The node "Read shapefile as WKT" decodes the geometries and produces one row per geometry.
+The node "Read from Shapefile" decodes the geometries and produces one row per geometry.
 
 * open the output table of one of these nodes, and observe how the geometries are encoded in a column "the_geom"; this format is the Well-Known Text format.
 * compare the outputs of the various nodes; observe how the geometries can be lines of polygons

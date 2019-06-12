@@ -14,12 +14,12 @@ This workflow demonstrates how to reproject the geometries.
 
 * Run the workflow
 * Open the outputs of each node, and compare the coordinates; watch how the geometries are the same in a different referential. 
-* Add a "View WKT Spatial Data", and observe how the projection does not change what is displayed; only the referential changes
+* Add a "View Geometries as Map", and observe how the projection does not change what is displayed; only the referential changes
 * Try to reproject to another coordinate system by tuning the configuration of the "Reproject" node; try WGS84 which covers the globe and is thus compliant with any location
 
 # Go beyond
 
-* Add a node "Write WKT as a Shapefile" and write the result of the concatenation into a shapefile. Open it with a [GIS sofware](https://en.wikipedia.org/wiki/Geographic_information_system) like [qgis](https://www.qgis.org), and check the data is still there.
+* Add a node "Write Geometries into Shapefile" and write the result of the concatenation into a shapefile. Open it with a [GIS sofware](https://en.wikipedia.org/wiki/Geographic_information_system) like [qgis](https://www.qgis.org), and check the data is still there.
 
 
 # Next

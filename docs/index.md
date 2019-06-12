@@ -1,7 +1,7 @@
 
-# Spatial data as WKT nodes for KNIME
+# Spatial Processing Nodes for KNIME
 
-The "Spatial data as WKT" collection of nodes 
+The "Spatial Processing Nodes" collection of nodes 
 propose to read and write spatial data from various formats, and provide basic transformation, filtering and visualization features. 
 
 ![Screenshot of the spatial nodes](capture_main.png)
@@ -101,7 +101,7 @@ You can install these nodes in KNIME 3.7.2 or above following these steps:
 	* name: "Recent unstable contributions"
 	* Location: http://update.knime.com/community-contributions/trunk
 * After clicking ok, select this "Recent unstable contributions" entry in the combo box,
-* Select the collection of nodes named "Spatial as WKT"
+* Select the collection of nodes named "Spatial Processing Nodes"
 * Follow the next steps to install 
 
 
@@ -128,7 +128,7 @@ which accompanies this distribution, and is available at [https://www.gnu.org/li
 
 # Source code
 
-The source code is [shared in github](https://github.com/samthiriot/knime-shapefiles-as-WKT/).
+The source code is [shared in GitHub](https://github.com/samthiriot/knime-shapefiles-as-WKT/).
 Contributions are warmly welcomed.
 Please report bugs, or feature requests, in the [GitHub bugtracker](https://github.com/samthiriot/knime-shapefiles-as-WKT/issues/)
 
