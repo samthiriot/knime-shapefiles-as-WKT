@@ -152,7 +152,7 @@ public class ReadKMLAsWKTNodeModel extends NodeModel {
         
         exec.setMessage("reading entries from KML");
         // read the file
-        Collection<?> placemarks = (Collection) f.getAttribute("Feature");
+        Collection<?> placemarks = (Collection<?>) f.getAttribute("Feature");
         int line = 0;
         
         if (placemarks != null) {
