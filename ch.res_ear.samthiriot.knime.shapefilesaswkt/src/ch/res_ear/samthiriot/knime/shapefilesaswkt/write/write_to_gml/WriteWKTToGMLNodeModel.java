@@ -41,7 +41,6 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -59,7 +58,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.DataTableToGeotoolsMapper;
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.NodeWarningWriter;
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
-import ch.res_ear.samthiriot.knime.shapefilesaswkt.write.write_to_shapefile.WriteWKTAsShapefileNodeModel;
 
 
 /**
@@ -74,10 +72,6 @@ import ch.res_ear.samthiriot.knime.shapefilesaswkt.write.write_to_shapefile.Writ
  */
 public class WriteWKTToGMLNodeModel extends NodeModel {
 
-    // the logger instance
-    private static final NodeLogger logger = NodeLogger
-            .getLogger(WriteWKTAsShapefileNodeModel.class);
-    
     private final SettingsModelString m_file = new SettingsModelString("filename", null);
     private final SettingsModelString m_version = new SettingsModelString("version", "GML v3");
     protected final SettingsModelBoolean m_writeSchema = new SettingsModelBoolean("write_schema", true);
