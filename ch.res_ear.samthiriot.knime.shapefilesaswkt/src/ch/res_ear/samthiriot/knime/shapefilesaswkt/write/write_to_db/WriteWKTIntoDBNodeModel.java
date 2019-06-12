@@ -41,7 +41,6 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -82,10 +81,6 @@ public class WriteWKTIntoDBNodeModel extends NodeModel {
 	protected SettingsModelString m_layer = new SettingsModelString("layer", "my_geometries");
     protected SettingsModelBoolean m_checkWritten = new SettingsModelBoolean("check_written", true);
 
-    // the logger instance
-    private static final NodeLogger logger = NodeLogger
-            .getLogger(WriteWKTIntoDBNodeModel.class);
-    
     /**
      * Count of entities to write at once
      */

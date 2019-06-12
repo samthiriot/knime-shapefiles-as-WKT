@@ -29,8 +29,6 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.locationtech.jts.io.WKTWriter;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
 
@@ -93,9 +91,9 @@ public class ComputeCentroidForWKTGeometriesNodeModel extends NodeModel {
 				
 		final int numberOfCells = inputTable.getDataTableSpec().getNumColumns();
 
-		CoordinateReferenceSystem crsOrig = SpatialUtils.decodeCRS(inputTable.getDataTableSpec());
+		//CoordinateReferenceSystem crsOrig = SpatialUtils.decodeCRS(inputTable.getDataTableSpec());
 
-		CRSAuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory("AUTO", null);
+		//CRSAuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory("AUTO", null);
 
 		final int idxGeomCol = inputTable.getDataTableSpec().findColumnIndex(SpatialUtils.GEOMETRY_COLUMN_NAME);
 		
