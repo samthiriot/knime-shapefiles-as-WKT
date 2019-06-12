@@ -37,7 +37,6 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -64,11 +63,6 @@ import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
  * @author Samuel Thiriot
  */
 public class WriteWKTAsShapefileNodeModel extends NodeModel {
-    
-
-    // the logger instance
-    private static final NodeLogger logger = NodeLogger
-            .getLogger(WriteWKTAsShapefileNodeModel.class);
     
     /**
      * Count of entities to write at once

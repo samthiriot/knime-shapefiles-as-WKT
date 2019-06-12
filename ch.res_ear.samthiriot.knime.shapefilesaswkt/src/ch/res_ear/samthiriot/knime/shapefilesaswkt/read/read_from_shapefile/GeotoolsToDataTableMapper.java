@@ -89,7 +89,7 @@ public class GeotoolsToDataTableMapper {
     protected void createKnimeSpecForGeoToolDescriptor() {
 
     	if (gtDesc instanceof GeometryDescriptor) {
-    		GeometryDescriptor gtDescGeom = (GeometryDescriptor)gtDesc;
+    		//GeometryDescriptor gtDescGeom = (GeometryDescriptor)gtDesc;
     		// TODO ((GeometryDescriptor) gtDesc).getCoordinateReferenceSystem();
     		
     		knimeType = StringCell.TYPE;
