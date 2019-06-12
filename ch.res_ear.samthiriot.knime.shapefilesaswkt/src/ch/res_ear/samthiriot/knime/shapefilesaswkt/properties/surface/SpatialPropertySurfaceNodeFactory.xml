@@ -6,10 +6,10 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
 		
-    <name>Compute Surface of WKT geometries</name>
+    <name>Compute Surface of Geometries</name>
     
     <shortDescription>
-        Compute the surface of the geometry (m2)
+        Compute the Surface of the Geometry (m2)
     </shortDescription>
     
     <fullDescription>

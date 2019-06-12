@@ -6,15 +6,15 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
     
-    <name>Type of WKT Geometries</name>
+    <name>Type of Geometries</name>
     
     <shortDescription>
-        Type of WKT geometries
+        Type of Geometries
     </shortDescription>
     
     <fullDescription>
         <intro>
-        For each geometry, extract the type of geometry and stores it into an additional column. 
+        For each geometry, extract the type of geometry and stores it into an additional String column. 
         The type might be for instance "Point", "Polygon", "Multipolygon", etc.
         
         <p>

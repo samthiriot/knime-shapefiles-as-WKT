@@ -5,10 +5,10 @@
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 			xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
     
-    <name>View WKT Spatial Data</name>
+    <name>View Spatial Data as Map</name>
     
     <shortDescription>
-        View spatial data encoded as WKT on a map.
+        View Spatial Data as a Map.
     </shortDescription>
     
     <fullDescription>

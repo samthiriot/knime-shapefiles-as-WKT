@@ -6,10 +6,10 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
 		
-    <name>Write WKT to GML</name>
+    <name>Write Geometries to GML</name>
     
     <shortDescription>
-        Writes WKT spatial data as GML
+        Writes Geometries as GML format
     </shortDescription>
     
     <fullDescription>

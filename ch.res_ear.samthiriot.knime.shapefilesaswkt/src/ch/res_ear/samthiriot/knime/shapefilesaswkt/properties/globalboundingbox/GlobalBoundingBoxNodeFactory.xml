@@ -6,10 +6,10 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
 		
-    <name>Global bounding box of WKT geometries</name>
+    <name>Global Bounding Box of Geometries</name>
     
     <shortDescription>
-        Compute the envelope of all the WKT geometries of the input table
+        Compute the envelope of all the geometries of the input table
     </shortDescription>
     
     <fullDescription>

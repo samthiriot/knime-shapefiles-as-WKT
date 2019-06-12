@@ -6,10 +6,10 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
 		
-    <name>Write WKT into Database</name>
+    <name>Write Geometries into Database</name>
     
     <shortDescription>
-        Stores the WKT data into a Database
+        Stores Geometries into a Database
     </shortDescription>
     
     <fullDescription>

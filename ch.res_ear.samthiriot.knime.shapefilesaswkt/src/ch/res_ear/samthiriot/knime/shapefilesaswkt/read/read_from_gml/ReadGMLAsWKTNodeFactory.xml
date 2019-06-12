@@ -6,10 +6,10 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
 		
-    <name>Read GML spatial data as WKT</name>
+    <name>Read Spatial Data from GML</name>
     
     <shortDescription>
-        Reads WKT spatial data from GML format
+        Reads Spatial Data from GML format
     </shortDescription>
     
     <fullDescription>

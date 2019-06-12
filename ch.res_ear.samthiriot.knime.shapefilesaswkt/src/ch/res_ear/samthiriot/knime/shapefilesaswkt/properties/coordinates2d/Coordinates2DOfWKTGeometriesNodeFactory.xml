@@ -6,10 +6,10 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
     
-    <name>2D Coordinates of WKT Geometries</name>
+    <name>2D Coordinates of Geometries</name>
     
     <shortDescription>
-        2D Coordinates of WKT geometries
+        2D Coordinates of Geometries
     </shortDescription>
     
     <fullDescription>
