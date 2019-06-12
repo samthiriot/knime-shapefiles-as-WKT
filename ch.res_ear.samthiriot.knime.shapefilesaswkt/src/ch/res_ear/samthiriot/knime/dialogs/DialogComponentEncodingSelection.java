@@ -50,7 +50,7 @@ public class DialogComponentEncodingSelection extends DialogComponent {
 	
 	public static final String CHOICE_AUTOMATIC = "<automatic>";
 
-    private final JComboBox m_combobox;
+    private final JComboBox<StringIconOption> m_combobox;
 
     private final JLabel m_label;
 
@@ -62,7 +62,7 @@ public class DialogComponentEncodingSelection extends DialogComponent {
 		
         m_label = new JLabel("encoding");
         getComponentPanel().add(m_label);
-        m_combobox = new JComboBox();
+        m_combobox = new JComboBox<>();
         m_combobox.setRenderer(new StringIconListCellRenderer());
 
         //StringIconOption[] options;
@@ -84,7 +84,7 @@ public class DialogComponentEncodingSelection extends DialogComponent {
 			currentIdx++;
 	    }
 	    
-	    // TODO define current charset
+	    // TODO define current charset?
 	    
 	    // create the component to display the options
 	    

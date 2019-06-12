@@ -1053,3 +1053,4 @@ Import-Package: org.geotools.swing,
  org.geotools.swing.tool,
  org.geotools.swing.wizard,
  org.geotools.swing.wms
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
