@@ -6,7 +6,7 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
 		
-    <name>Read Spatial Data from KML</name>
+    <name>Read from KML</name>
     
     <shortDescription>
         Reads Spatial Data from KML format

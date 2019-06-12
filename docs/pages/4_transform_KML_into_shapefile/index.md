@@ -11,7 +11,7 @@ here we convert [KML data](https://en.wikipedia.org/wiki/Keyhole_Markup_Language
 
 # Things to try
 
-* change the location of the output file by tuning the "Write WKT as a Shapefile" configuration
+* change the location of the output file by tuning the "Write Geometris into Shapefile" configuration
 * Run the workflow
 * Observe the warnings emitted by the node: the ESRI shapefile format is a bit dated, and suffers many limitations in the column titles size, the count of columns and others. When these limitations are met, the node will adapt your data so it can be written and warn you.
 * Open the resulting file with a [GIS sofware](https://en.wikipedia.org/wiki/Geographic_information_system) like [qgis](https://www.qgis.org), and check the data was written the right way.

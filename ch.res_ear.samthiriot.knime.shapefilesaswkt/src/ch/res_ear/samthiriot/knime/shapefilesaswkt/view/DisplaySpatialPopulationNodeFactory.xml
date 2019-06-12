@@ -5,7 +5,7 @@
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 			xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
     
-    <name>View Spatial Data as Map</name>
+    <name>View Geometries as Map</name>
     
     <shortDescription>
         View Spatial Data as a Map.
