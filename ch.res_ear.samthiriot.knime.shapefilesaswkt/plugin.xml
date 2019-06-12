@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?eclipse version="3.0"?><plugin>
                             <extension point="org.knime.product.splashExtension">
-                               <splashExtension icon="icons/wkt48.png" icon24="icons/wkt24.png" icon32="icons/wkt32.png" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.splashExtension" tooltip="WKT nodes for KNIME">
+                               <splashExtension icon="icons/logo_v2_48.png" icon24="icons/logo_v2_24.png" icon32="icons/logo_v2_32.png" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.splashExtension" tooltip="Spatial Processing Nodes">
                                </splashExtension>
                             </extension>
    <extension point="org.knime.workbench.repository.categories">
-      <category description="Manipulation of spatial data in WKT format" icon="icons/shapefilesAsWKT.png" level-id="spatialAsWKT" locked="false" name="Spatial Processing" path="/community/">
+      <category description="Manipulation of spatial data in WKT format" icon="icons/logo_v2_16.png" level-id="spatialAsWKT" locked="false" name="Spatial Processing" path="/community/">
       </category>
-      <category description="Read spatial data to WKT format" icon="icons/shp-wkt-reader-icon.png" level-id="readSpatialAsWKT" locked="false" name="Read" path="/community/spatialAsWKT">
+      <category description="Read spatial data to WKT format" icon="icons/logo_v2_small_read.png" level-id="readSpatialAsWKT" locked="false" name="Read" path="/community/spatialAsWKT">
       </category>
       <category
             after="readSpatialAsWKT"
             description="Extract the properties of geometries"
-            icon="icons/shapefilesAsWKT.png"
+            icon="icons/logo_v2_16.png"
             level-id="propertiesSpatialAsWKT"
             locked="false"
             name="Properties"
@@ -21,7 +21,7 @@
       <category
             after="propertiesSpatialAsWKT"
             description="Transform spatial data in WKT format"
-            icon="icons/shapefilesAsWKT.png"
+            icon="icons/logo_v2_16.png"
             level-id="transformSpatialAsWKT"
             locked="false"
             name="Transform"
@@ -30,7 +30,7 @@
       <category
             after="transformSpatialAsWKT"
             description="View spatial data in WKT format"
-            icon="icons/shapefilesAsWKT.png"
+            icon="icons/logo_v2_small_view.png"
             level-id="viewSpatialAsWKT"
             locked="false"
             name="View"
@@ -39,7 +39,7 @@
       <category
             after="viewSpatialAsWKT"
             description="Writes WKT spatial data"
-            icon="icons/shp-wkt-writer-icon.png"
+            icon="icons/logo_v2_small_write.png"
             level-id="writeSpatialAsWKT"
             locked="false"
             name="Write"
