@@ -11,6 +11,15 @@
       </category>
       <category
             after="readSpatialAsWKT"
+            description="Create Geometries"
+            icon="icons/logo_v2_small_read.png"
+            level-id="createSpatialAsWKT"
+            locked="false"
+            name="Create"
+            path="/community/spatialAsWKT">
+      </category>
+      <category
+            after="createSpatialAsWKT"
             description="Extract the properties of geometries"
             icon="icons/logo_v2_16.png"
             level-id="propertiesSpatialAsWKT"
@@ -20,7 +29,7 @@
       </category>
       <category
             after="propertiesSpatialAsWKT"
-            description="Transform spatial data in WKT format"
+            description="Transform geometries"
             icon="icons/logo_v2_16.png"
             level-id="transformSpatialAsWKT"
             locked="false"
@@ -128,6 +137,12 @@
       deprecated="false"
       factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.write.write_to_db.WriteWKTIntoDBNodeFactory"
       id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.writeToDB.WriteWKTIntoDBNodeFactory">
+</node>
+<node
+      category-path="/community/spatialAsWKT/createSpatialAsWKT"
+      deprecated="false"
+      factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.pointfrom2d.CreatePointFrom2DNodeFactory"
+      id="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.pointfrom2d.CreatePointFrom2DNodeFactory">
 </node>
 </extension>
    

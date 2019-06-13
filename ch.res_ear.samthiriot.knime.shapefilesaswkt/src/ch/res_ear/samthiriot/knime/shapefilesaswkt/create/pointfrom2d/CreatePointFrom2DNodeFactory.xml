@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shapefilesAsWKT.png"  
+		type="Other" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+		
+    <name>Create Point from 2D Coordinates</name>
+    
+    <shortDescription>
+        Create a Point column from 2D Coordinates
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        Takes two columns containing coordinates, and changes it into Point geometries 
+        having for coordinates the values X and Y in the Coordinate Reference System defined
+        in parameters. 
+        </intro>
+        
+        <option name="column name X">Name of the column containing the X coordinate</option>
+        <option name="column name Y">Name of the column containing the Y coordinate</option>
+        <option name="delete coordinate columns">If checked (default), the columns containing X and Y values 
+        will be deleted in the resulting table</option>
+        <option name="Coordinate Reference System">The projection in which the X and Y values should be understood</option>
+
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="table with coordinates">A table with spatial data</inPort>
+        <outPort index="0" name="entities with points">The table with an additional column containing geometries</outPort>
+    </ports>    
+
+</knimeNode>
