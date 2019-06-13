@@ -168,10 +168,6 @@ public class CreatePointFrom2DNodeModel extends NodeModel {
 		DataTableSpec outputSpec = createOutputSpec(inputTable.getDataTableSpec());
 		BufferedDataContainer container = exec.createDataContainer(outputSpec);
 
-		final double total = inputTable.size();
-				
-		final int numberOfCells = inputTable.getDataTableSpec().getNumColumns();
-
 		final boolean delete_xy = m_delete_xy.getBooleanValue();
 		final int idxColumnX = inputTable.getSpec().findColumnIndex(m_colname_x.getStringValue());
 		final int idxColumnY = inputTable.getSpec().findColumnIndex(m_colname_y.getStringValue());
