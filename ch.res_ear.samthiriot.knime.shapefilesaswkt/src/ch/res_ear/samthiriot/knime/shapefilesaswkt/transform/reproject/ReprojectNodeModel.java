@@ -12,17 +12,13 @@ package ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.reproject;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-import org.geotools.data.DataStore;
-import org.geotools.data.simple.SimpleFeatureCollection;
-import org.geotools.data.simple.SimpleFeatureIterator;
-import org.geotools.data.store.ReprojectingFeatureCollection;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.referencing.CRS;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnProperties;
 import org.knime.core.data.DataColumnSpec;
@@ -43,8 +39,11 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.locationtech.jts.geom.Geometry;
-import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.OperationNotFoundException;
+import org.opengis.referencing.operation.TransformException;
 
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
 
@@ -70,6 +69,8 @@ public class ReprojectNodeModel extends NodeModel {
         super(1, 1);
     }
 
+    long done = 0;
+    
     /**
      * {@inheritDoc}
      */
@@ -95,6 +96,81 @@ public class ReprojectNodeModel extends NodeModel {
     	
     	CoordinateReferenceSystem crsTarget = SpatialUtils.getCRSforString(m_crs.getStringValue());
     	
+
+    	// create specs
+    	exec.setMessage("creating specifications");
+    	DataColumnSpec[] novelsSpecs = new DataColumnSpec[inputPopulation.getDataTableSpec().getNumColumns()];
+    	for (int i=0; i<idxColumnGeom; i++) {
+    		novelsSpecs[i] = inputPopulation.getDataTableSpec().getColumnSpec(i);
+    	}
+    	// TODO inputPopulation.getDataTableSpec().getColumnSpec(idxColumnGeom).getProperties().
+		Map<String,String> properties = new HashMap<String, String>();
+		properties.put(SpatialUtils.PROPERTY_CRS_CODE, SpatialUtils.getStringForCRS(crsTarget));
+		properties.put(SpatialUtils.PROPERTY_CRS_WKT, crsTarget.toWKT());
+    	DataColumnSpecCreator creator = new DataColumnSpecCreator(
+    			inputPopulation.getDataTableSpec().getColumnSpec(idxColumnGeom).getName(), 
+    			StringCell.TYPE
+    			);
+    	creator.setProperties(new DataColumnProperties(properties));
+    	novelsSpecs[idxColumnGeom] = creator.createSpec();
+    	for (int i=idxColumnGeom+1; i<novelsSpecs.length; i++) {
+    		novelsSpecs[i] = inputPopulation.getDataTableSpec().getColumnSpec(i);
+    	}
+    	
+    	DataTableSpec novelSpec = new DataTableSpec("spatial entities", novelsSpecs);
+        BufferedDataContainer container = exec.createDataContainer(novelSpec);
+        
+        int colCount = novelSpec.getNumColumns();
+		done = 0;
+		final double total = inputPopulation.size();
+		MathTransform transform = null;
+		try {
+			transform = CRS.findMathTransform(crsOrig, crsTarget, false);
+		} catch (OperationNotFoundException e) {
+			e.printStackTrace();
+			setWarningMessage("unable to find a math transform without being lenient; the result will be a bit approximated ("+e.getLocalizedMessage()+")");
+			transform = CRS.findMathTransform(crsOrig, crsTarget, true);
+		}
+		final MathTransform transform2 = transform;
+		
+    	SpatialUtils.applyToEachGeometry(
+    			inputPopulation, 
+    			geomAndRow -> {
+						
+					List<DataCell> cells = new ArrayList<>();
+					
+					for (int i=0; i<colCount; i++) {
+						if (i == idxColumnGeom) {
+							// replace the cell by the reprojected geometry
+							Geometry projected;
+							try {
+								projected = JTS.transform(geomAndRow.geometry, transform2);
+							} catch (MismatchedDimensionException | TransformException  e) {
+								e.printStackTrace();
+								throw new InvalidSettingsException("unable to reproject: "+e.getMessage());
+							} 
+							cells.add(StringCellFactory.create(projected.toString()));
+							
+						} else {
+							cells.add(geomAndRow.row.getCell(i));
+						}
+					}
+					
+					DataRow row = new DefaultRow(
+			    		  geomAndRow.row.getKey(), 
+			    		  cells
+			    		  );
+					container.addRowToTable(row);
+					  
+					if (done++ % 10 == 0) {
+						exec.checkCanceled();
+						exec.setProgress(done/total, "computing surface of row "+done);
+					}
+			
+				}
+    			);
+    	
+    	/*
     	// copy the input population into a datastore
     	exec.setMessage("spatializing inputs");
         DataStore datastore = SpatialUtils.createDataStore();
@@ -120,27 +196,6 @@ public class ReprojectNodeModel extends NodeModel {
         
     	exec.setMessage("reprojecting");
         
-    	
-    	DataColumnSpec[] novelsSpecs = new DataColumnSpec[inputPopulation.getDataTableSpec().getNumColumns()];
-    	for (int i=0; i<idxColumnGeom; i++) {
-    		novelsSpecs[i] = inputPopulation.getDataTableSpec().getColumnSpec(i);
-    	}
-    	// TODO inputPopulation.getDataTableSpec().getColumnSpec(idxColumnGeom).getProperties().
-		Map<String,String> properties = new HashMap<String, String>();
-		properties.put(SpatialUtils.PROPERTY_CRS_CODE, SpatialUtils.getStringForCRS(crsTarget));
-		properties.put(SpatialUtils.PROPERTY_CRS_WKT, crsTarget.toWKT());
-    	DataColumnSpecCreator creator = new DataColumnSpecCreator(
-    			inputPopulation.getDataTableSpec().getColumnSpec(idxColumnGeom).getName(), 
-    			StringCell.TYPE
-    			);
-    	creator.setProperties(new DataColumnProperties(properties));
-    	novelsSpecs[idxColumnGeom] = creator.createSpec();
-    	for (int i=idxColumnGeom+1; i<novelsSpecs.length; i++) {
-    		novelsSpecs[i] = inputPopulation.getDataTableSpec().getColumnSpec(i);
-    	}
-    	
-    	DataTableSpec novelSpec = new DataTableSpec("spatial entities", novelsSpecs);
-        BufferedDataContainer container = exec.createDataContainer(novelSpec);
         Iterator<DataRow> itRow = inputPopulation.iterator();
         
         // TODO use http://docs.geotools.org/latest/tutorials/geometry/geometrycrs.html
@@ -179,9 +234,10 @@ public class ReprojectNodeModel extends NodeModel {
         	currentIdx++;
         }
         itEntities.close();
+    	datastore.dispose();
+    	 */
     	
-        datastore.dispose();
-        
+         
         // once we are done, we close the container and return its table
         container.close();
         BufferedDataTable out = container.getTable();
