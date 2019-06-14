@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnProperties;
@@ -44,7 +43,6 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.opengis.geometry.Envelope;
@@ -211,13 +209,7 @@ public class CreatePointFrom2DNodeModel extends NodeModel {
 		final boolean delete_xy = m_delete_xy.getBooleanValue();
 		final int idxColumnX = inputTable.getSpec().findColumnIndex(m_colname_x.getStringValue());
 		final int idxColumnY = inputTable.getSpec().findColumnIndex(m_colname_y.getStringValue());
-    	final CoordinateReferenceSystem crsTarget = SpatialUtils.getCRSforString(m_crs.getStringValue());
-    	
-    	final double minX = crsTarget.getCoordinateSystem().getAxis(0).getMinimumValue();
-    	final double maxX = crsTarget.getCoordinateSystem().getAxis(0).getMaximumValue();
-
-    	final double minY = crsTarget.getCoordinateSystem().getAxis(1).getMinimumValue();
-    	final double maxY = crsTarget.getCoordinateSystem().getAxis(1).getMaximumValue();
+    	//final CoordinateReferenceSystem crsTarget = SpatialUtils.getCRSforString(m_crs.getStringValue());
     	
 		GeometryFactory gf = new GeometryFactory();
 	        	        
