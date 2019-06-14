@@ -159,7 +159,7 @@ public class DisplaySpatialPopulationNodeModel extends NodeModel {
         } catch (InterruptedException e) {
         	throw new RuntimeException(e);
         }
-    	
+        
         return new BufferedDataTable[]{};
     }
     
