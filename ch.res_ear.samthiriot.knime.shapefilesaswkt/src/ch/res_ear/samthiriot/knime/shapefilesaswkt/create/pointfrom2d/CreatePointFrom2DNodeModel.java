@@ -14,11 +14,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.geotools.geometry.jts.JTS;
+import org.geotools.referencing.CRS;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnProperties;
 import org.knime.core.data.DataColumnSpec;
@@ -45,6 +47,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
@@ -103,7 +106,46 @@ public class CreatePointFrom2DNodeModel extends NodeModel {
 		if (!spec.containsName(m_colname_x.getStringValue()))
 			throw new InvalidSettingsException("unknown column "+m_colname_x.getStringValue()+" in the table");
 		if (!spec.containsName(m_colname_y.getStringValue()))
-			throw new InvalidSettingsException("unknown column "+m_colname_x.getStringValue()+" in the table");
+			throw new InvalidSettingsException("unknown column "+m_colname_y.getStringValue()+" in the table");
+		
+		// check the extend
+		final double minX = ((DoubleValue)spec.getColumnSpec(m_colname_x.getStringValue()).getDomain().getLowerBound()).getDoubleValue();
+		final double maxX = ((DoubleValue)spec.getColumnSpec(m_colname_x.getStringValue()).getDomain().getUpperBound()).getDoubleValue();
+		final double minY = ((DoubleValue)spec.getColumnSpec(m_colname_y.getStringValue()).getDomain().getLowerBound()).getDoubleValue();
+		final double maxY = ((DoubleValue)spec.getColumnSpec(m_colname_y.getStringValue()).getDomain().getUpperBound()).getDoubleValue();
+		
+    	final CoordinateReferenceSystem crsTarget = SpatialUtils.getCRSforString(m_crs.getStringValue());
+
+    	/*
+    	final double crsminX = crsTarget.getCoordinateSystem().getAxis(0).getMinimumValue();
+    	final double crsmaxX = crsTarget.getCoordinateSystem().getAxis(0).getMaximumValue();
+
+    	final double crsminY = crsTarget.getCoordinateSystem().getAxis(1).getMinimumValue();
+    	final double crsmaxY = crsTarget.getCoordinateSystem().getAxis(1).getMaximumValue();
+    	*/
+    	
+
+    	Envelope env = CRS.getEnvelope(crsTarget);
+    	
+    	final double crsminX = env.getMinimum(0);
+    	final double crsmaxX = env.getMaximum(0);
+
+    	final double crsminY = env.getMinimum(1);
+    	final double crsmaxY = env.getMaximum(1);
+
+    	
+    	List<String> pbs = new LinkedList<String>();
+    	if (minX < crsminX)
+    		pbs.add("lower bound of X values "+minX+" is smaller than the minimum X coordinate "+crsminX);
+    	if (maxX > crsmaxX)
+    		pbs.add("upper bound of X values "+maxX+" is greater than the maximum Y coordinate "+crsmaxX);
+    	if (minY < crsminY)
+    		pbs.add("lower bound of Y values "+minY+" is smaller than the minimum Y coordinate "+crsminY);
+    	if (maxY > crsmaxY)
+    		pbs.add("upper bound of Y values "+maxY+" is greater than the maximum Y coordinate "+crsmaxY);
+    	if (!pbs.isEmpty()) {
+    		throw new InvalidSettingsException("The X and Y values are not compatible with the Coordinate Reference System: "+String.join(", ", pbs));
+    	}
 		
 		return new DataTableSpec[] { createOutputSpec(spec) };
 	}
@@ -132,7 +174,7 @@ public class CreatePointFrom2DNodeModel extends NodeModel {
 			
 			String name = inputTableSpec.getColumnNames()[i];
 			// skip X and Y columns
-			if (delete_xy && (colname_x.equals(name)) || colname_y.equals(name)) {
+			if (delete_xy && (colname_x.equals(name) || colname_y.equals(name))) {
 				continue;
 			}
 			newColumnSpecs.add(inputTableSpec.getColumnSpec(i));
@@ -152,9 +194,7 @@ public class CreatePointFrom2DNodeModel extends NodeModel {
 					newColumnSpecs.toArray(
 						new DataColumnSpec[newColumnSpecs.size()]));
 	}
-	
-	long done = 0;
-	
+		
 	/**
 	 * 
 	 * {@inheritDoc}
@@ -172,7 +212,13 @@ public class CreatePointFrom2DNodeModel extends NodeModel {
 		final int idxColumnX = inputTable.getSpec().findColumnIndex(m_colname_x.getStringValue());
 		final int idxColumnY = inputTable.getSpec().findColumnIndex(m_colname_y.getStringValue());
     	final CoordinateReferenceSystem crsTarget = SpatialUtils.getCRSforString(m_crs.getStringValue());
+    	
+    	final double minX = crsTarget.getCoordinateSystem().getAxis(0).getMinimumValue();
+    	final double maxX = crsTarget.getCoordinateSystem().getAxis(0).getMaximumValue();
 
+    	final double minY = crsTarget.getCoordinateSystem().getAxis(1).getMinimumValue();
+    	final double maxY = crsTarget.getCoordinateSystem().getAxis(1).getMaximumValue();
+    	
 		GeometryFactory gf = new GeometryFactory();
 	        	        
 		CloseableRowIterator itRow = inputTable.iterator();
@@ -190,14 +236,16 @@ public class CreatePointFrom2DNodeModel extends NodeModel {
 			} else {
 				cells = row.stream().collect(Collectors.toList());
 			}
+						
+			final double x = ((DoubleValue)row.getCell(idxColumnX)).getDoubleValue();
+			final double y = ((DoubleValue)row.getCell(idxColumnY)).getDoubleValue();
+			
 			
 			// forge the geometry
-			Point point = gf.createPoint(new Coordinate(
-					((DoubleValue)row.getCell(idxColumnX)).getDoubleValue(),
-					((DoubleValue)row.getCell(idxColumnY)).getDoubleValue()
-					));
+			Point point = gf.createPoint(new Coordinate(x,y));
 
-	        Geometry worldPoint = JTS.toGeographic(point, crsTarget);
+			//System.out.println(point.toString());
+	        //Geometry worldPoint = JTS.toGeographic(point, crsTarget);
 
 	        /*
 			StringBuffer sb = new StringBuffer();
@@ -208,7 +256,7 @@ public class CreatePointFrom2DNodeModel extends NodeModel {
 			sb.append(")");
 			*/
 	        
-			cells.add(StringCellFactory.create(worldPoint.toString()));
+			cells.add(StringCellFactory.create(point.toString()));
 			
 			container.addRowToTable(new DefaultRow(
 					row.getKey(), 
