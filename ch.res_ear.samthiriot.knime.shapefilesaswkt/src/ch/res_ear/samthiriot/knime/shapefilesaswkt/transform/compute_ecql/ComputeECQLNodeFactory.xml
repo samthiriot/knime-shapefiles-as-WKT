@@ -46,6 +46,13 @@
         <option name="query">The query in Contextual Query Language</option>
         <option name="type">The type of the column to create. Ensure it is consistent with the result of the query</option>
         <option name="name">The name of the column to create</option>
+        <option name="create multi geometries">When a spatial operation is computed, it might 
+        sometimes create different geometry types depending to the initial geometry; for instance
+        a buffer might create either a Polygon or a MultiPolygon. Unfortunately if the result
+        contains a mixture of polygon and multipolygon, it will not be easy to process. 
+        If this option is checked (default), all the polygons will be changed into multipolygons,
+        and all the lines into multilines. Uncheck only if you want simple geometries such as polygons or lines.  
+        </option>
 
     </fullDescription>
     

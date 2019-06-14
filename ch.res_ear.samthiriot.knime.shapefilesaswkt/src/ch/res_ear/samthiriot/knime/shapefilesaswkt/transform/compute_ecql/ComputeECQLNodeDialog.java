@@ -14,9 +14,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentMultiLineString;
 import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
 
@@ -62,13 +64,7 @@ public class ComputeECQLNodeDialog extends DefaultNodeSettingsPane {
 				"area"
 				);
         
-        m_type.addChangeListener(new ChangeListener() {
-			
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				m_colname.setEnabled(!m_type.getStringValue().equals("Geometry"));
-			}
-		});
+
         
         addDialogComponent(
         		new DialogComponentStringSelection(
@@ -91,6 +87,25 @@ public class ComputeECQLNodeDialog extends DefaultNodeSettingsPane {
         		true,
         		30
         		));
+        
+        SettingsModelBoolean m_multi = new SettingsModelBoolean(
+				"multigeom", 
+				true
+				);
+        addDialogComponent(new DialogComponentBoolean(
+        		m_multi, 
+        		"create multi geometries"
+        		));
+        
+        m_type.addChangeListener(new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				m_colname.setEnabled(!m_type.getStringValue().equals("Geometry"));
+				m_multi.setEnabled(m_type.getStringValue().equals("Geometry"));
+			}
+		});
+        
     }
 }
 

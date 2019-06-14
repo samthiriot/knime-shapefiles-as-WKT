@@ -21,6 +21,7 @@ import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.filter.text.ecql.ECQL;
+import org.geotools.geometry.jts.GeometryBuilder;
 import org.knime.base.util.flowvariable.FlowVariableProvider;
 import org.knime.base.util.flowvariable.FlowVariableResolver;
 import org.knime.core.data.DataCell;
@@ -52,7 +53,11 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Polygon;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.Expression;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -82,6 +87,11 @@ public class ComputeECQLNodeModel extends NodeModel implements FlowVariableProvi
 	private SettingsModelString m_colname = new SettingsModelString(
 			"colname",
 			"surface"
+			);
+	
+	private SettingsModelBoolean m_createGeometriesMulti = new SettingsModelBoolean(
+			"multigeom", 
+			true
 			);
 
     /**
@@ -182,6 +192,22 @@ public class ComputeECQLNodeModel extends NodeModel implements FlowVariableProvi
     	return exp;
     }
     
+    protected GeometryBuilder geometryBuilder = null;
+    
+    protected Geometry createMultiGeometry(Object o) {
+    	
+    	if (Polygon.class.isAssignableFrom(o.getClass())) {
+    		return geometryBuilder.multiPolygon((Polygon)o);
+    	}
+    	
+    	if (LineString.class.isAssignableFrom(o.getClass())) {
+    		return geometryBuilder.multiLineString((LineString)o);
+    	}
+    	
+    	return (Geometry)o;
+    	
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -189,6 +215,10 @@ public class ComputeECQLNodeModel extends NodeModel implements FlowVariableProvi
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
 
+    	final boolean createMultiGeom = m_createGeometriesMulti.getBooleanValue();
+    	final String typename = m_type.getStringValue();
+    	final boolean typeIsGeom = typename.equals("Geometry");
+    	
     	final BufferedDataTable inputPopulation = inData[0];
 
     	DataColumnSpec addedColumn = createColumnSpec();
@@ -218,6 +248,7 @@ public class ComputeECQLNodeModel extends NodeModel implements FlowVariableProvi
     			crs
     			);
     	
+    	geometryBuilder = new GeometryBuilder();
 
     	exec.setMessage("computing "+m_colname.getStringValue());
     	
@@ -256,6 +287,10 @@ public class ComputeECQLNodeModel extends NodeModel implements FlowVariableProvi
 	        	
 	        	List<DataCell> cells = null;
 	        	Object res = exp.evaluate(feature);
+	        	
+	        	if (createMultiGeom && typeIsGeom) {
+	        		res = createMultiGeometry(res);
+	        	}
 
 	        	if (addedColumn == null) {
 	        		
@@ -339,6 +374,7 @@ public class ComputeECQLNodeModel extends NodeModel implements FlowVariableProvi
     	m_query.saveSettingsTo(settings);
     	m_type.saveSettingsTo(settings);
     	m_colname.saveSettingsTo(settings);
+    	m_createGeometriesMulti.saveSettingsTo(settings);
     }
 
     /**
@@ -352,6 +388,8 @@ public class ComputeECQLNodeModel extends NodeModel implements FlowVariableProvi
     	m_query.loadSettingsFrom(settings);
     	m_type.loadSettingsFrom(settings);
     	m_colname.loadSettingsFrom(settings);
+    	m_createGeometriesMulti.loadSettingsFrom(settings);
+    	
     }
 
     /**
@@ -364,7 +402,8 @@ public class ComputeECQLNodeModel extends NodeModel implements FlowVariableProvi
     	m_query.validateSettings(settings);
     	m_type.validateSettings(settings);
     	m_colname.validateSettings(settings);
-
+    	m_createGeometriesMulti.validateSettings(settings);
+    	
     }
     
     /**
