@@ -24,7 +24,7 @@ They are notably used for Generation of Synthetic Populations (GoSP), in order t
 These nodes are released as GPL v3; see the [Free Software Foundation presentation](https://www.gnu.org/licenses/quick-guide-gplv3.en.html) if you're not familiar with open-source licenses.
 
 
-## Documentation
+## Documentation
 
 See [the documentation and examples](https://samthiriot.github.io/knime-shapefiles-as-WKT/).
 
