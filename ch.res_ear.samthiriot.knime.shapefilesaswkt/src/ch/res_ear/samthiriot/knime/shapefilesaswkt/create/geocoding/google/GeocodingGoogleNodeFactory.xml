@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shapefilesAsWKT.png"  
+		type="Other" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+		
+    <name>Geocode Address (Google)</name>
+    
+    <shortDescription>
+        Create a Point Geometry from an Address (Google)
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        Geocoding is the process of converting addresses 
+        (like "1600 Amphitheatre Parkway, Mountain View, CA") 
+        into geographic coordinates (like latitude 37.423021 and longitude -122.083739).
+        These coordinates are produced as 2D Point Geometries. 
+        <p>
+        For a given column containing an address, this node will iterate every row of the input
+        table, and call the <a href="https://developers.google.com/maps/documentation/geocoding/intro">Google Geocoding API</a> for each address. 
+        The execution might be slow, as one network query is done for each line of the table; 
+        note you obviously need a network access to use this node.
+        Geocoding a large table might require a lot of time.
+        </p>
+        <p>
+        In order to use the Google Geocoding API, you have 
+        to <a href="https://developers.google.com/maps/documentation/geocoding/start#get-a-key">get a Google API key</a>
+        and paste in into the Configuration pane. You probably will have to activate billing on your Google account; 
+        to activate the Google Geocoding API in your developer dashboard; to increase the quota for this API to thousands;
+        to reduce the quota per minute and day from unlimited to thousands. 
+        Note that <b>numerous queries might lead to billing from Google</b>; 
+        check the <a href="https://developers.google.com/maps/documentation/geocoding/usage-and-billing">billing conditions</a>.
+        Remember that sharing a workflow in which you pasted your API key might lead other people to run queries in your name,
+        leading to your account being billed by Google. 
+        Also ensure you comply the <a href="https://developers.google.com/maps/documentation/geocoding/policies">Google Geocoding policies</a>.
+        </p>
+       
+        <p>
+        Several columns are created which contain the information returned by the API.
+        <ul>
+        <li><b>is partial</b>: if true, indicates that the geocoder did not return 
+        an exact match for the original request, though it was able to match part of the 
+        requested address. You may wish to examine the original request for misspellings and/or 
+        an incomplete address. Partial matches most often occur for street addresses that do 
+        not exist within the locality you pass in the request. Partial matches may also be 
+        returned when a request matches two or more locations in the same locality. 
+        For example, "21 Henr St, Bristol, UK" will return a partial match for both 
+        Henry Street and Henrietta Street. Note that if a request includes a misspelled address 
+        component, the geocoding service may suggest an alternative address. 
+        Suggestions triggered in this way will also be marked as a partial match.
+		</li>
+        <li><b>type</b>: 
+	        "ROOFTOP" indicates that the returned result is a precise geocode for which we have location information accurate down to street address precision.
+			"RANGE_INTERPOLATED" indicates that the returned result reflects an approximation (usually on a road) interpolated between two precise points (such as intersections). Interpolated results are generally returned when rooftop geocodes are unavailable for a street address.
+			"GEOMETRIC_CENTER" indicates that the returned result is the geometric center of a result such as a polyline (for example, a street) or polygon (region).
+			"APPROXIMATE" indicates that the returned result is approximate.</li>
+        <li><b>location type</b>: a list which indicates the type of the returned result. 
+	        This array contains a set of zero or more tags identifying the type of feature 
+	        returned in the result. 
+	        For example, a geocode of "Chicago" returns "locality" which indicates that "Chicago" is a 
+	        city, and also returns "political" which indicates it is a political entity.
+        </li>
+        <li><b>place_id</b> is a unique identifier that can be used with other Google APIs. 
+        For example, you can use the place_id in a <a href="https://developers.google.com/places/web-service/intro">Places API</a> request to 
+        get details of a local business, such as phone number, opening hours, user reviews, and more.
+        </li>
+        </ul>
+        You can get more information about the results returned by 
+        Google Geocoding API by checking <a href="https://developers.google.com/maps/documentation/geocoding/start">their documentation</a>.
+        </p>
+        <p>
+        In order to save time and quota (and money), the results from the calls are cached in your hard drive. 
+        As a consequence, asking several times for the very same address in the same computer will not lead to more calls. 
+        </p>
+        <p>
+        In case several possibilities are returned by the Google Geocoding API, 
+        one line will be created for each possibility. A warning will be displayed in this case.
+        </p>
+                
+        </intro>
+        
+        <option name="Column name address">Name of the column containing the address</option>
+        <option name="API Key">Key for Google API to use for geocoding</option>
+
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="table with addresses">A table to geocode</inPort>
+        <outPort index="0" name="table with geocoded addresses">The table with geocoding information</outPort>
+    </ports>    
+
+</knimeNode>

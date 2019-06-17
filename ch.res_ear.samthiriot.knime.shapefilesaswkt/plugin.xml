@@ -144,6 +144,18 @@
       factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.pointfrom2d.CreatePointFrom2DNodeFactory"
       id="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.pointfrom2d.CreatePointFrom2DNodeFactory">
 </node>
+<node
+      category-path="/community/spatialAsWKT/createSpatialAsWKT"
+      deprecated="false"
+      factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.google.GeocodingGoogleNodeFactory"
+      id="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.google.GeocodingGoogleNodeFactory">
+</node>
+<node
+      category-path="/community/spatialAsWKT/createSpatialAsWKT"
+      deprecated="false"
+      factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.osm.GeocodingOSMNodeFactory"
+      id="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.osm.GeocodingOSMNodeFactory">
+</node>
 </extension>
    
 </plugin>
