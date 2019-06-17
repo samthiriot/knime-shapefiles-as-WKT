@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shapefilesAsWKT.png"  
+		type="Other" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+		
+    <name>Geocode Address (OpenStreetMap)</name>
+    
+    <shortDescription>
+        Create a Point Geometry from an Address (OpenStreetMap)
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        Geocoding is the process of converting addresses 
+        (like "1600 Amphitheatre Parkway, Mountain View, CA") 
+        into geographic coordinates (like latitude 37.423021 and longitude -122.083739).
+        <p>
+        For a given column containing an address, this node will iterate every row of the input
+        table, and call the OpenStreetMap Geocoding API (aka <a href="https://nominatim.openstreetmap.org/">Nominatim</a>) for each address. 
+        The execution might be slow, as one network query is done for each line of the table; 
+        note you obviously need a network access to use this API. 
+        </p>
+        <p>
+        Please read the <a href="https://operations.osmfoundation.org/policies/nominatim/">Usage Policy</a> of Nominatim 
+        which publishes the Open Street Map API, and ensure your usage complies with it. 
+        This service runs on donated servers which are not supposed to be used to geocode large
+        sets of data. According to these terms of service:
+        <ul>
+        <li>Maximum one request per second can be done; we enforce this limit; this means
+        60 rows require a minute; 600 rows take 10 minutes; 3600 rows require one hour.</li>
+        <li>The queries are cached on your hard drive; so running 2 times the same query
+        will always return the same result (the second time will be way quicker).</li>
+		<li>You should not execute several instances of this node in parallel in order
+		to avoid overloading the Nominatim servers.</li>
+        </ul>
+        </p>
+        <p>
+        In case several possibilities are returned by the OSM Geocoding API, 
+        one line will be created for each possibility. A warning will be displayed in this case.
+        You can easily use a row filter to keep only the type of result you are interested in
+         (such as residential), or use a "group by" node in order to keep only one result by geometry.
+        </p>
+        <p>
+        The resulting table contains the original columns plus:
+        <ul>
+        <li><b>the_geom</b>: the geometry encoded in WKT (by default, a Point). The Coordinate Reference System is stored as a property of this column.</li>
+        <li><b>type:</b> the type of place identified by OpenStreetMap, such as "residential", "living street", "service" or many other values</li>
+        <li><b>osm id</b>: the id of this location for OpenStreetMap. Might be used to query more information from OpenStreetMap</li>
+        <li><b>osm type:</b> an OpenStreetMap geometry is either a Node (point in space), Way (linear features and area boundaries) or a Relation (sometimes used to explain how other elements work together).
+        See the <a href="https://wiki.openstreetmap.org/wiki/Elements">related doc</a> for more details.</li>
+        <li><b>license:</b> the license under which the data was provided to</li>
+        <li><b>rank:</b>the internal OpenStreetMap rank for this feature. It somehow corresponds spatial granularity</li>
+        <li><b>rank interpretation:</b>a string interpretation of the rank of this feature according to the <a href="https://wiki.openstreetmap.org/wiki/Nominatim/Development_overview">OpenStreetMap documentation</a>:
+        which states for instance that a country is ranked 16 whilst a House or building is 28. This interpretation is temptative, as OpenStreetMap states it might change from one country to another.
+        Yet this facilitates the interpretation of the quality of the result: if you try to geocode houses locations, but only find street level rank, you better check manually if your houses are located 
+        to the street only or at the actual house level.
+        </li>
+        </ul>
+        </p>
+        
+        </intro>
+        
+        <option name="Column name address">Name of the column containing the address</option>
+        <option name="Your email">Your email. Required by the term of service of Nominatim. 
+        In case their servers would be overloaded by your requests, they would contact you there to discuss.
+        Please always provide one.</option>
+        <option name="service URL">The server which will be contacted for geocoding. 
+        Change it if you want to use another Nominatim server (maybe your own instance you
+        run one your own computer)</option>
+        <option name="Fetch full geometries">If checked, will produce the full geometries from OpenStreetMap (such as polygon, linestring, etc.) 
+        instead of a Point with x and y coordinates. Unfortunately, this produces heterogeneous geometry types which can not be easily viewed 
+        nor stored into shapefiles. For instance a House which is precisely known might return the 
+        polygon of the building's footprint, whilst a house number mapped to a street will 
+        return the segment of the street of interest.
+        </option>
+        
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="table with addresses">A table to geocode</inPort>
+        <outPort index="0" name="table with geocoded addresses">The table with geocoding information</outPort>
+    </ports>    
+
+</knimeNode>
