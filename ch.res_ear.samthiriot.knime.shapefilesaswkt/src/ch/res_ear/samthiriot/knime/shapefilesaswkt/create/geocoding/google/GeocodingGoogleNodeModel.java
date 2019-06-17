@@ -26,6 +26,7 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.MissingCell;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.collection.CollectionCellFactory;
@@ -178,9 +179,10 @@ public class GeocodingGoogleNodeModel extends NodeModel {
 				.apiKey(apiKey)
 				.connectTimeout(timeoutSeconds, TimeUnit.SECONDS)
 			    .build();
-;
+
 		// TODO proxy
 				
+		final MissingCell missing = new MissingCell("no location found");
 
 		DataTableSpec outputSpec = createOutputSpec(inputTable.getDataTableSpec());
 		BufferedDataContainer container = exec.createDataContainer(outputSpec);
@@ -218,6 +220,22 @@ public class GeocodingGoogleNodeModel extends NodeModel {
 					throw new RuntimeException("error while geocoding: "+e.getLocalizedMessage());
 				}
 				GoogleGeocodingCache.getInstance().storeInCache(address, results);
+			}
+			if (results == null || results.isEmpty()) {
+				getLogger().warn("unable to find a location for address "+address);
+				// add a row with empty location
+				List<DataCell> cells = new ArrayList<>(outputSpec.getNumColumns());
+				// copy the original cells
+				for (int i=0; i<row.getNumCells(); i++)
+					cells.add(row.getCell(i));
+				// add all the cells
+				for (int i=0; i<5; i++)
+					cells.add(missing);
+				container.addRowToTable(
+						new DefaultRow(
+								row.getKey(), 
+								cells));
+				continue;
 			}
 			if (results.size() > 1) {
 				countMultipleResults++;

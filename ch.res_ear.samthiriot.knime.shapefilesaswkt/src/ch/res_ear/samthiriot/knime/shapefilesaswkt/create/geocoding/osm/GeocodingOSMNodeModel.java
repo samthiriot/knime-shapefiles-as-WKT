@@ -309,17 +309,16 @@ public class GeocodingOSMNodeModel extends NodeModel {
 				exec.checkCanceled();
 	        }
 	        
-			if (addresses == null) {
+			if (addresses == null || addresses.isEmpty()) {
 				getLogger().warn("unable to find a location for address "+address);
 				// add a row with empty location
 				List<DataCell> cells = new ArrayList<>(outputSpec.getNumColumns());
 				// copy the original cells
 				for (int i=0; i<row.getNumCells(); i++)
 					cells.add(row.getCell(i));
-				// add the geometry (point) cell
-				cells.add(missing);
-				// add the geometry type cell
-				cells.add(missing);
+				// add all the cells
+				for (int i=0; i<7; i++)
+					cells.add(missing);
 				container.addRowToTable(
 						new DefaultRow(
 								row.getKey(), 

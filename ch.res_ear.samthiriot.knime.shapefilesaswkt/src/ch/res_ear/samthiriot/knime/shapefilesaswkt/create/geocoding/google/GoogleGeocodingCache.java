@@ -19,8 +19,6 @@ public class GoogleGeocodingCache extends GeocodingCache<List<GeocodingResult>> 
 		return singleton;
 	}
 	
-	private final NodeLogger logger = NodeLogger.getLogger(GoogleGeocodingCache.class);
-
 	public static final String TABLE_NAME_GOOLE_GEOCODING = "GOOGLE_GEOCODING";
 
 	private GoogleGeocodingCache() {

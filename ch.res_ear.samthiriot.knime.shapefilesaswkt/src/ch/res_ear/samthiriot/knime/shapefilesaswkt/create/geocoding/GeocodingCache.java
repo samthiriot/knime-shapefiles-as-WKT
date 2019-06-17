@@ -131,6 +131,9 @@ public abstract class GeocodingCache<T> { // TODO extends Serializable
 		if (conn == null || preparedStatementWriteOSMGeocoding == null)
 			return;
 		
+		if (result == null)
+			return;
+		
 		if (address.length() > 255) {
 			logger.warn("will not cache this address which is too long (more than 255 char): "+address);
 			return;
