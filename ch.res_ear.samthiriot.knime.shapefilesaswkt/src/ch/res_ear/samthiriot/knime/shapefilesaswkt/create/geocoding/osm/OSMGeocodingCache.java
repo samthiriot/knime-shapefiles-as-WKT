@@ -17,8 +17,6 @@ public class OSMGeocodingCache extends GeocodingCache<List<Address>> {
 		return singleton;
 	}
 	
-	private final NodeLogger logger = NodeLogger.getLogger(OSMGeocodingCache.class);
-
 	public static final String TABLE_NAME_OSM_GEOCODING = "OSM_GEOCODING";
 
 	private OSMGeocodingCache() {
