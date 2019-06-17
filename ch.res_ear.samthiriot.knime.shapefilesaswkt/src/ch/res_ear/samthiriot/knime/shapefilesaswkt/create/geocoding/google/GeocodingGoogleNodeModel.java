@@ -199,6 +199,23 @@ public class GeocodingGoogleNodeModel extends NodeModel {
 		while (itRow.hasNext()) {
 			final DataRow row = itRow.next();
 			
+			if (row.getCell(idxColAddress).isMissing()) {
+				// cannot geocode a missing address !
+				getLogger().warn("missing address in row "+row.getKey());
+				// add a row with empty location
+				List<DataCell> cells = new ArrayList<>(outputSpec.getNumColumns());
+				// copy the original cells
+				for (int i=0; i<row.getNumCells(); i++)
+					cells.add(row.getCell(i));
+				// add all the cells
+				for (int i=0; i<5; i++)
+					cells.add(missing);
+				container.addRowToTable(
+						new DefaultRow(
+								row.getKey(), 
+								cells));
+				continue;
+			}
 			// geocode this address
 			final String address = ((StringValue)row.getCell(idxColAddress)).getStringValue();
 		
@@ -215,7 +232,6 @@ public class GeocodingGoogleNodeModel extends NodeModel {
 							).await();
 					results = Arrays.asList(resultsRaw);
 				} catch (ApiException | InterruptedException | IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					throw new RuntimeException("error while geocoding: "+e.getLocalizedMessage());
 				}
