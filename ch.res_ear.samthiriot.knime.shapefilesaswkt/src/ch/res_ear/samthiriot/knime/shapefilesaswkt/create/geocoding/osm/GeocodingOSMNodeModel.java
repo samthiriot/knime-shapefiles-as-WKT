@@ -346,7 +346,7 @@ public class GeocodingOSMNodeModel extends NodeModel {
 				double latitude = addr.getLatitude();
 				double longitude = addr.getLongitude();
 				Point point = gf.createPoint(new Coordinate(longitude,latitude));
-				if (fullGeom)
+				if (fullGeom && addr.getGeojson() != null)
 					cells.add(StringCellFactory.create(addr.getGeojson().toString()));
 				else 
 					cells.add(StringCellFactory.create(point.toString()));

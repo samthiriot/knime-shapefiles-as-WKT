@@ -222,7 +222,7 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
                 String url = nodeModel.m_urlWMS.getStringValue();
                
                 WebMapServer wms = new WebMapServer(new URL(url));
-
+                
             	WMSCapabilities capabilities = wms.getCapabilities();
 
             	// gets all the layers in a flat list, in the order they appear in
@@ -254,6 +254,7 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
     		    for (org.geotools.ows.wms.Layer layer: layers) {
             		WMSLayer l = new WMSLayer(wms, layer);
             		l.setVisible(i == 0);
+
             		content.addLayer(l);
             		overlays.add(l);
             		
