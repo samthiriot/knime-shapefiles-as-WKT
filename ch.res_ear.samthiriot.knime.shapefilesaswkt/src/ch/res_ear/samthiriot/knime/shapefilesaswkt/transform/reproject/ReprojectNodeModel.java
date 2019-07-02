@@ -79,8 +79,8 @@ public class ReprojectNodeModel extends NodeModel {
             final ExecutionContext exec) throws Exception {
 
     	// define the length of the several steps
-    	ExecutionMonitor execProgressSpatialiseInputs = exec.createSubProgress(0.20);  
-    	ExecutionMonitor execProgressReproject = exec.createSubProgress(0.80);  
+    	//ExecutionMonitor execProgressSpatialiseInputs = exec.createSubProgress(0.20);  
+    	//ExecutionMonitor execProgressReproject = exec.createSubProgress(0.80);  
 
     	final BufferedDataTable inputPopulation = inData[0];
     	
