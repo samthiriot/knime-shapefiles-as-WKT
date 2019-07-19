@@ -2,8 +2,6 @@ package ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.osm;
 
 import java.util.List;
 
-import org.knime.core.node.NodeLogger;
-
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.GeocodingCache;
 import fr.dudie.nominatim.model.Address;
 
