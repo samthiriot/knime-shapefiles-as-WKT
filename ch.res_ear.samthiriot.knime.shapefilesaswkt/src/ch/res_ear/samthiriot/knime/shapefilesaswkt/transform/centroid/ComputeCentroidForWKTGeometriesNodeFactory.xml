@@ -24,7 +24,7 @@
     </fullDescription>
     
     <ports>
-        <inPort index="0" name="datatable with WKT geometries">Description of first input port...</inPort>
+        <inPort index="0" name="datatable with WKT geometries">Table with geometries</inPort>
         <outPort index="0" name="datatable with WKT geometries">Table with geometries changed into their centroid</outPort>
     </ports>    
 </knimeNode>

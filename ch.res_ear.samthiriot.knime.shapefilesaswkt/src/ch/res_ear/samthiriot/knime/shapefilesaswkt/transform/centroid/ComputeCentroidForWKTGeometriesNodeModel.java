@@ -124,7 +124,7 @@ public class ComputeCentroidForWKTGeometriesNodeModel extends NodeModel {
 					  
 					if (done++ % 100 == 0) {
 						exec.checkCanceled();
-						exec.setProgress(done/total, "computing surface of row "+done);
+						exec.setProgress(done/total, "computing centroid of row "+done);
 					}
 			
 				}
