@@ -156,6 +156,11 @@
       factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.osm.GeocodingOSMNodeFactory"
       id="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.osm.GeocodingOSMNodeFactory">
 </node>
+<node
+      category-path="/community/spatialAsWKT/transformSpatialAsWKT"
+      factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.randompoint.RandomPointInShapeNodeFactory"
+      id="ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.randompoint.RandomPointInShapeNodeFactory">
+</node>
 </extension>
    
 </plugin>

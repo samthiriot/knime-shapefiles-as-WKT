@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shapefilesAsWKT.png"  
+		type="Other" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+    
+    <name>Random Points in the Geometry</name>
+    
+    <shortDescription>
+        Random Points in the Geometry
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        Creates a random points in the geometry. 
+        For each line of the input table, decodes the geometry of the "the_geom" column in WKT format, 
+        and creates one of more random points within it.
+        If the geometry is a polygon, a point within this polygon will be returned. 
+        If the geometry is a line or polyline, a point on this line will be returned.
+        If the geometry is a point, the same point will be returned. 
+        
+        <p>
+		Geometry operations rely on the <a href="https://en.wikipedia.org/wiki/JTS_Topology_Suite">JTS library</a>.
+		Random numbers are generated using the <a href="https://en.wikipedia.org/wiki/Colt_(libraries)">colt library</a>
+		using a MersenneTwister pseudo-random number generator.
+		</p>
+        </intro>
+	
+		<option name="count">How many random points to draw per geometry. 
+		Defaults to 1. One row will be created for each point and each geometry. </option>
+		<option name="automatic seed">Generate random numbers using an automatic random seed.
+		Leads to randomness. Uncheck if you want to be able to reproduce your results 
+		(at the expense of randomness!).</option>
+		<option name="seed">The seed to use to intialize the random number generator.</option>
+		
+        
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="datatable with WKT geometries">Table with geometries in WKT format</inPort>
+        <outPort index="0" name="datatable with WKT geometries">Table with random points in the geometries</outPort>
+    </ports>    
+    
+</knimeNode>

@@ -210,7 +210,7 @@ public class DisplaySpatialPopulationNodeView extends NodeView<DisplaySpatialPop
 	        	JRadioButtonMenuItem zoomOutMenu = new JRadioButtonMenuItem("Zoom out");
 	        	group.add(zoomOutMenu);
 	        	zoomOutMenu.setMnemonic('-');
-	        	MapAction a = new ZoomInAction(mapPane);
+	        	MapAction a = new ZoomOutAction(mapPane);
 	        	zoomOutMenu.setIcon((Icon) a.getValue(ZoomOutAction.SMALL_ICON));
 	        	zoomOutMenu.addActionListener(a);
 	        	menu.add(zoomOutMenu);
