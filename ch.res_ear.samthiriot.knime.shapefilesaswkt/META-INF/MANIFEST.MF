@@ -177,4 +177,4 @@ Export-Package: ch.res_ear.samthiriot.knime.dialogs,
  ch.res_ear.samthiriot.knime.shapefilesaswkt.write.write_to_kml,
  ch.res_ear.samthiriot.knime.shapefilesaswkt.write.write_to_shapefile
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Import-Package: org.w3c.dom.events;version="3.0.0"
+Import-Package: org.w3c.dom.events
