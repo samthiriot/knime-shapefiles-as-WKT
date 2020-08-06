@@ -2,7 +2,7 @@
 <feature
       id="ch.res_ear.samthiriot.knime.shapefilesaswkt.feature"
       label="KNIME Spatial Processing Nodes"
-      version="1.2.2.qualifier"
+      version="1.2.6.qualifier"
       provider-name="EIFER (European Institute for Energy Research)">
 
    <description>
@@ -708,7 +708,6 @@ Public License instead of this License.  But first, please read
       <import plugin="org.knime.product" version="3.7.0"/>
       <import plugin="org.knime.workbench" version="3.7.0"/>
       <import plugin="org.knime.testing" version="3.7.0"/>
-      <import plugin="org.knime.datageneration" version="3.7.0"/>
       <import plugin="org.eclipse.core.resources"/>
    </requires>
 
