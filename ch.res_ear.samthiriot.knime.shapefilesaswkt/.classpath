@@ -1,6 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-jdbc-db2-22-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-affine-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-algebra-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-bandcombine-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-bandmerge-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-bandselect-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-binarize-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-border-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-buffer-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-classifier-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-colorconvert-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-colorindexer-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-crop-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-errordiffusion-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-format-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-imagefunction-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-iterators-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-lookup-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-mosaic-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-nullop-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-orderdither-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-piecewise-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-rescale-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-rlookup-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-scale-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-scale2-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-shadedrelief-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-stats-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-translate-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-utilities-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-vectorbin-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-warp-1.1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jt-zonal-1.1.11.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
@@ -123,6 +155,11 @@
 	<classpathentry including="**/*.java" kind="src" output="target/classes" path="src">
 		<attributes>
 			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
