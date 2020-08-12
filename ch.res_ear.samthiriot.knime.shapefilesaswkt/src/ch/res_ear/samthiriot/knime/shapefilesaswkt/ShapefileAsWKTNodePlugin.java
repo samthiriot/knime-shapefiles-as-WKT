@@ -16,6 +16,7 @@ package ch.res_ear.samthiriot.knime.shapefilesaswkt;
 
 import org.eclipse.core.runtime.Plugin;
 import org.geotools.util.factory.Hints;
+import org.knime.core.node.NodeLogger;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -49,8 +50,15 @@ public class ShapefileAsWKTNodePlugin extends Plugin {
     public void start(final BundleContext context) throws Exception {
         super.start(context);
 
-        Hints.putSystemDefault(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
-
+        try {
+        	Hints.putSystemDefault(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
+        } catch (RuntimeException e) {
+        	NodeLogger
+        		.getLogger(ShapefileAsWKTNodePlugin.class)
+        		.warn(
+        				"unable to define hints for the geotools library: "+e.getMessage(), 
+        				e);
+        }
     }
 
     /**
