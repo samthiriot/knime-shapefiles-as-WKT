@@ -31,10 +31,13 @@ See [the documentation and examples](https://samthiriot.github.io/knime-shapefil
 
 ## Install it
 
-Currently the only way to install this collection of nodes is to download it as a zip file and add it to your current KNIME installation.
-Later it would be available as part of the KNIME community nodes.
+## From update site 
+
+In KNIME, add as an external repository: https://knime.res-ear.ch .
 
 ### Zip installation
+
+Alternatively, you can install this collection of nodes is to download it as a zip file and add it to your current KNIME installation.
 
 Download the last release from this site, then follow the [KNIME instructions to install a plugin](https://www.knime.com/downloads/update).
 

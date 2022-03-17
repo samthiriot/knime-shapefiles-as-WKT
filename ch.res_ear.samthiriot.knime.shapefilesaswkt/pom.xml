@@ -18,7 +18,7 @@
   <properties>
      <!-- <geotools.version>21.0</geotools.version>  -->
      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>     
-     <geotools.version>22-SNAPSHOT</geotools.version>
+     <geotools.version>22.5</geotools.version>
 	 <maven.test.skip>true</maven.test.skip>
      <google.api.version>0.9.3</google.api.version>
 	 <httpclient.version>4.3.2</httpclient.version>
@@ -202,7 +202,7 @@
     <repository>
 	    <id>opengeo boundlessgeo</id>
 	    <name>OpenGeo boundlessgeo Repository</name>
-	    <url>https://repo.boundlessgeo.com/snapshot/</url>
+	    <url>https://repo.osgeo.org/repository/release/</url>
 	    <snapshots>
 	        <enabled>true</enabled>
 	    </snapshots>
