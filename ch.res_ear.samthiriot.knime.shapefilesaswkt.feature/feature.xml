@@ -6,13 +6,11 @@
       provider-name="EIFER (European Institute for Energy Research)">
 
    <description>
-      KNIME collection of nodes to read, write, visualize, filter, project or filter
-spatial entities. Spatial features are manipulated as String columns containing WKT format.
-Computations are delegated to the geotools library.
+      KNIME nodes to read tables from dBase databases.
    </description>
 
    <copyright>
-      (c) Copyright EIFER&apos;s team 2018, 2019.  All rights reserved.
+      (c) Copyright Samuel Thiriot for EIFER 2018-2022. All rights reserved.
 
 EIFER:
 Europäisches Institut für Energieforschung EDF-KIT EWIV
