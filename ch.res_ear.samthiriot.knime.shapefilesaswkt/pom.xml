@@ -18,7 +18,7 @@
   <properties>
      <!-- <geotools.version>21.0</geotools.version>  -->
      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>     
-     <geotools.version>22.5</geotools.version>
+     <geotools.version>26.3</geotools.version>
 	 <maven.test.skip>true</maven.test.skip>
      <google.api.version>0.9.3</google.api.version>
 	 <httpclient.version>4.3.2</httpclient.version>
