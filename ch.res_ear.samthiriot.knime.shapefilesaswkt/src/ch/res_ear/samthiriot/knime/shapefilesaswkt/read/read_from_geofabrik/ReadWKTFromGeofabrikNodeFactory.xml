@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shp-wkt-reader-icon.png" 
+		type="Source" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+		
+		
+    <name>Load Geometries From Geofabrik</name>
+    
+    <shortDescription>
+        Load Geometries from Geofabrik.
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+	        Load geometries from <a href="http://download.geofabrik.de">Geofabrik download</a>.
+	      	Geofabrik 
+	      	You can read their full documentation <a href="http://download.geofabrik.de/osm-data-in-gis-formats-free.pdf">here</a>.
+	    
+	    <p>  	
+		The OpenStreetMap (OSM) project (www.openstreetmap.org) has collected an enormous
+		amount of free spatial data and the database is growing every day. Many people want to use
+		this data for their own GIS projects but have been hindered by the use of a non-standard
+		data format in the OSM project. 
+		</p>
+		</intro>
+
+        <option name="Zone to load">Select one of the downloads prepared by Geofabrik.</option>
+        <option name="Layer to load">Select one of the types of entities prepared by Geofabrik.</option>
+        
+    </fullDescription>
+    
+    <ports>
+        <outPort index="0" name="spatial population">Spatial population</outPort>
+
+    </ports>
+</knimeNode>

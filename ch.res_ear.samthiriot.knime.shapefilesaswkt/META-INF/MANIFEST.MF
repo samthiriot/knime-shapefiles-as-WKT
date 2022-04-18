@@ -158,7 +158,14 @@ Bundle-ClassPath: target/classes/,
  lib/txw2-2.4.0-b180830.0438.jar,
  lib/unit-api-2.0.jar,
  lib/uom-lib-common-2.0.jar,
- lib/xml-commons-resolver-1.2.jar
+ lib/xml-commons-resolver-1.2.jar,
+ lib/gt-geojson-26.3.jar,
+ lib/hamcrest-core-1.1.jar,
+ lib/json-simple-1.1.1.jar,
+ lib/junit-4.10.jar,
+ lib/gt-geojsondatastore-26.3.jar,
+ lib/jackson-annotations-2.10.5.jar,
+ lib/jackson-databind-2.10.5.1.jar
 Bundle-Activator: ch.res_ear.samthiriot.knime.shapefilesaswkt.ShapefileAsWKTNodePlugin
 Bundle-Vendor: EIFER (European Institute for Energy Research)
 Require-Bundle: org.knime.workbench.core;bundle-version="[3.7.0,5.0.0)",
@@ -166,7 +173,9 @@ Require-Bundle: org.knime.workbench.core;bundle-version="[3.7.0,5.0.0)",
  org.knime.product;bundle-version="[3.7.0,5.0.0)",
  org.knime.workbench;bundle-version="[3.7.0,5.0.0)",
  org.knime.testing;bundle-version="[3.7.0,5.0.0)",
- org.eclipse.core.resources
+ org.eclipse.core.resources,
+ org.junit,
+ org.junit.jupiter.api
 Bundle-ActivationPolicy: lazy
 Export-Package: .,
  au.com.objectix.jgridshift,

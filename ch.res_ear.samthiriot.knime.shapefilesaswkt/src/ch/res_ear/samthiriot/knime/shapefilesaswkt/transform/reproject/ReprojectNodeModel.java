@@ -164,78 +164,11 @@ public class ReprojectNodeModel extends NodeModel {
 					  
 					if (done++ % 10 == 0) {
 						exec.checkCanceled();
-						exec.setProgress(done/total, "computing surface of row "+done);
+						exec.setProgress(done/total, "reprojecting row "+done);
 					}
 			
 				}
     			);
-    	
-    	/*
-    	// copy the input population into a datastore
-    	exec.setMessage("spatializing inputs");
-        DataStore datastore = SpatialUtils.createDataStore();
-        Runnable runnableSpatialize = SpatialUtils.decodeAsFeaturesRunnable(
-        		inputPopulation, 
-        		SpatialUtils.GEOMETRY_COLUMN_NAME, 
-        		execProgressSpatialiseInputs, 
-        		datastore, 
-        		"entities", 
-        		crsOrig,
-        		false,
-        		null
-        		);
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(runnableSpatialize);
-        executor.shutdown();
-        try {
-        	// wait forever
-        	executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        } catch (InterruptedException e) {
-        	throw new RuntimeException(e);
-        }
-        
-    	exec.setMessage("reprojecting");
-        
-        Iterator<DataRow> itRow = inputPopulation.iterator();
-        
-        // TODO use http://docs.geotools.org/latest/tutorials/geometry/geometrycrs.html
-        
-        SimpleFeatureCollection features = datastore.getFeatureSource(datastore.getNames().get(0)).getFeatures();
-
-        ReprojectingFeatureCollection rfc = new ReprojectingFeatureCollection(
-        		features, crsTarget);
-        SimpleFeatureIterator itEntities = rfc.features();
-        long currentIdx = 0;
-        long total = inputPopulation.size();
-        while (itEntities.hasNext()) {
-        	if (!itRow.hasNext()) throw new RuntimeException("program error: wrong size");
-        	
-        	DataRow row = itRow.next();
-        	
-        	SimpleFeature parentFeature = itEntities.next();
-        	Geometry geom = (Geometry)parentFeature.getDefaultGeometry();
-        	
-        	
-        	DataCell[] novelCells = new DataCell[row.getNumCells()];
-        	for (int i=0; i<idxColumnGeom; i++) {
-        		novelCells[i] = row.getCell(i);
-        	}
-        	novelCells[idxColumnGeom] = StringCellFactory.create(geom.toString());
-        	for (int i=idxColumnGeom+1; i<row.getNumCells(); i++) {
-        		novelCells[i] = row.getCell(i);
-        	}
-            container.addRowToTable(new DefaultRow(row.getKey(), novelCells));
-
-        	if (currentIdx % 10 == 0) {
-        		execProgressReproject.setProgress((double)currentIdx/total, ""+currentIdx+"/"+total);
-        		execProgressReproject.checkCanceled();
-        	}
-        	
-        	currentIdx++;
-        }
-        itEntities.close();
-    	datastore.dispose();
-    	 */
     	
          
         // once we are done, we close the container and return its table

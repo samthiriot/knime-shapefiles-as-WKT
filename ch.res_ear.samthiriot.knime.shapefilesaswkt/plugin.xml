@@ -65,6 +65,13 @@
       factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_gml.ReadGMLAsWKTNodeFactory"
       id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromGML.ReadGMLAsWKTNodeFactory">
 </node>
+<node
+      category-path="/community/spatialAsWKT/readSpatialAsWKT"
+      deprecated="false"
+      factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_geofabrik.ReadWKTFromGeofabrikNodeFactory"
+      hidden="false"
+      id="ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_geofabrik.ReadWKTFromGeofabrikNodeFactory">
+</node>
    <node category-path="/community/spatialAsWKT/viewSpatialAsWKT" deprecated="false" factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.view.DisplaySpatialPopulationNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.view.DisplaySpatialPopulationNodeFactory">
    </node>
    <node category-path="/community/spatialAsWKT/transformSpatialAsWKT" deprecated="false" factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.reproject.ReprojectNodeFactory" id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.reproject.ReprojectNodeFactory">
