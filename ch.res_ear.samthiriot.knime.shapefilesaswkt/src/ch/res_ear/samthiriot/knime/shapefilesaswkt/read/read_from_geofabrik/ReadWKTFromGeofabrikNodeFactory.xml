@@ -7,23 +7,37 @@
 		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
 		
 		
-    <name>Load Geometries From Geofabrik</name>
+    <name>Load OpenStreetMap from Geofabrik</name>
     
     <shortDescription>
-        Load Geometries from Geofabrik.
+        Load OpenStreetMap data from Geofabrik.
     </shortDescription>
     
     <fullDescription>
         <intro>
-	        Load geometries from <a href="http://download.geofabrik.de">Geofabrik download</a>.
-	      	Geofabrik 
-	      	You can read their full documentation <a href="http://download.geofabrik.de/osm-data-in-gis-formats-free.pdf">here</a>.
-	    
+        Load <a href="www.openstreetmap.org">OpenStreetMap</a> data from the data prepared 
+        and shared by <a href="http://download.geofabrik.de">Geofabrik</a>.
+      	
 	    <p>  	
-		The OpenStreetMap (OSM) project (www.openstreetmap.org) has collected an enormous
+		The OpenStreetMap (OSM) project has collected an enormous
 		amount of free spatial data and the database is growing every day. Many people want to use
 		this data for their own GIS projects but have been hindered by the use of a non-standard
 		data format in the OSM project. 
+		Geofabrik extracts OpenStreetMap data and shares it publicly in the form of shapefiles.
+		</p>
+		<p>
+		This node downloads OpenStreetMap data from the servers of Geofabrik.
+		To get more information about the content, 
+      	you can refer <a href="http://download.geofabrik.de/osm-data-in-gis-formats-free.pdf">their full documentation</a>.
+	    The internal data downloading and conversion is done with the  <a href="https://geotools.org/">geotools open-source library</a>. 
+	    </p>
+	    <p>
+	    Downloaded files are pretty large (hundreds of Mb). 
+	    They are cached in your computer. You can change this destination, or clear the cache, 
+	    by using the menu File/Preferences/Knime/Spatial data. 
+	    </p>
+		<p>
+		Note Geofabrik also provides paid shapefiles with additional fields or specific preparation. 
 		</p>
 		</intro>
 
@@ -33,7 +47,7 @@
     </fullDescription>
     
     <ports>
-        <outPort index="0" name="spatial population">Spatial population</outPort>
+        <outPort index="0" name="spatial population">OpenStreetMap data</outPort>
 
     </ports>
 </knimeNode>

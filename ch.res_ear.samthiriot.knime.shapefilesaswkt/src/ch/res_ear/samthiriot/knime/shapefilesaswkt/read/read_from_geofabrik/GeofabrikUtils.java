@@ -9,22 +9,20 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.io.IOUtils;
-import org.geotools.data.FeatureReader;
 import org.geotools.data.FileDataStore;
 import org.geotools.data.geojson.GeoJSONDataStoreFactory;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
-import org.geotools.data.simple.SimpleFeatureSource;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
 
 public class GeofabrikUtils {
 	
@@ -32,6 +30,8 @@ public class GeofabrikUtils {
 	// 
 	
 // https://download.geofabrik.de/index-v1-nogeom.json
+	
+	private static final Object lockDownloadGeofabrikIndex = new Object();
 	
 	public static File readGeofabrikIndexIntoFile() {
 		
@@ -42,24 +42,31 @@ public class GeofabrikUtils {
 		    URL url = new URL(URL_INDEX_GEOFABRIK);
 		    InputStream inputStream = url.openStream();
 		    
-		    File f = new File("/tmp/test.json");
-		    if (f.exists())
-		    	return f;
+		    File f = new File(GeofabrikUtils.getFileForCache(), "index-v1.json");
 		    
-		    FileWriter fileWriter = new FileWriter(f);
+		    synchronized (lockDownloadGeofabrikIndex) {
+		    	
+		    	if (f.exists())
+			    	return f;
+			    
+			    FileWriter fileWriter = new FileWriter(f);
+			    
+				IOUtils.copy(inputStream, fileWriter, StandardCharsets.UTF_8);
+				
+				return f;
+					
+			}
 		    
-			IOUtils.copy(inputStream, fileWriter, StandardCharsets.UTF_8);
-			
-			return f;
-			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new RuntimeException("unable to read the file");
 		}
 	    
 	}
 	
+	/**
+	 * Cached decoding of the index of geofabrik tools
+	 */
 	private static Map<String,String> cachedName2Url = null;
 	
 	public static Map<String,String> fetchListOfDataExtracts() {
@@ -88,7 +95,7 @@ public class GeofabrikUtils {
 		    Map<String,String> name2url = new HashMap<>();
 		    
 		    Map<String,String> id2parent = new HashMap<>();
-		    Map<String,String> id2name = new HashMap();
+		    Map<String,String> id2name = new HashMap<>();
 		    
 		    // decode features
 		    while (it.hasNext()) {
@@ -166,4 +173,28 @@ public class GeofabrikUtils {
 	    
 	    
 	}
+	
+	/**
+	 * Get the directory to use to store cache for GeoFabrik
+	 * @return
+	 */
+	public static File getFileForCache() {
+		File dir = new File(
+				SpatialUtils.getFileForCache(),
+				"geofabrik"
+				);
+		dir.mkdirs();
+		return dir;
+	}
+	
+	public final static Map<String,Object> filecode2lock = Collections.synchronizedMap(new HashMap<>());
+	
+	public static Object getLockForFile(String filecode) {
+		synchronized (filecode2lock) {
+			if (!filecode2lock.containsKey(filecode))
+				filecode2lock.put(filecode, new Object());
+			return filecode2lock.get(filecode);
+		}
+	}
+	
 }

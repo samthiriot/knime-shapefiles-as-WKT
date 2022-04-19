@@ -14,10 +14,17 @@
  */
 package ch.res_ear.samthiriot.knime.shapefilesaswkt;
 
+import java.io.File;
+
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.geotools.util.factory.Hints;
 import org.knime.core.node.NodeLogger;
 import org.osgi.framework.BundleContext;
+
+import ch.res_ear.samthiriot.knime.shapefilesaswkt.preferences.PreferenceConstants;
 
 /**
  * This is the eclipse bundle activator.
@@ -32,6 +39,8 @@ public class ShapefileAsWKTNodePlugin extends Plugin {
     // The shared instance.
     private static ShapefileAsWKTNodePlugin plugin;
 
+    public static final String KEY_PREFERENCE_STORE = "ch.res_ear.samthiriot.knime.shapefilesaswkt.preferences";
+    
     /**
      * The constructor.
      */
@@ -81,6 +90,23 @@ public class ShapefileAsWKTNodePlugin extends Plugin {
     public static ShapefileAsWKTNodePlugin getDefault() {
         return plugin;
     }
+
+	public IPreferenceStore getPreferenceStore() {
+		//Preferences preferences = InstanceScope.INSTANCE.getNode(ShapefileAsWKTNodePlugin.KEY_PREFERENCE_STORE);
+		
+		IPreferenceStore prefs = new ScopedPreferenceStore(
+				InstanceScope.INSTANCE, 
+				KEY_PREFERENCE_STORE
+				);
+		{
+			File f = new File(System.getProperty("java.io.tmpdir"));
+			File f2 = new File(f, "spatial data cache");
+			f2.mkdirs();
+			
+			prefs.setDefault(PreferenceConstants.P_DIRECTORY_CACHE, f2.getAbsolutePath());
+		}
+		return prefs;
+	}
 
 }
 

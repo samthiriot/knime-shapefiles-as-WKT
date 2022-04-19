@@ -60,7 +60,6 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
@@ -78,15 +77,16 @@ import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
  */
 public class ReadWKTFromGeofabrikNodeModel extends NodeModel {
     
-    SettingsModelString m_nameToLoad = new SettingsModelString(
+    private SettingsModelString m_nameToLoad = new SettingsModelString(
     		"name_to_load", 
     		"Europe/Germany/Baden-Württemberg/Regierungsbezirk Karlsruhe");
     
-    SettingsModelString m_layerToLoad = new SettingsModelString(
+    private SettingsModelString m_layerToLoad = new SettingsModelString(
     		"layer_to_load", 
     		"buildings (Building outlines)");
 
-    MissingCell missing = new MissingCell("not provided");
+    // used internally during data production
+    private MissingCell missing = new MissingCell("not provided");
 	
 	protected ReadWKTFromGeofabrikNodeModel() {
 		
@@ -95,7 +95,7 @@ public class ReadWKTFromGeofabrikNodeModel extends NodeModel {
 	}
 			
 
-	private DataColumnSpec[] createSpecs(CoordinateReferenceSystem coordinateReferenceSystem) {
+	private DataColumnSpec[] createSpecs() {
 
     	List<DataColumnSpec> specs = new LinkedList<DataColumnSpec>();
 
@@ -114,14 +114,13 @@ public class ReadWKTFromGeofabrikNodeModel extends NodeModel {
         			SpatialUtils.GEOMETRY_COLUMN_NAME, 
         			StringCell.TYPE
         			);
-    		if (coordinateReferenceSystem != null) {
-				Map<String,String> properties = new HashMap<String, String>();
-				coordinateReferenceSystem = SpatialUtils.getCRSforString("EPSG:4326");
-				properties.put(SpatialUtils.PROPERTY_CRS_CODE, SpatialUtils.getStringForCRS(coordinateReferenceSystem));
-				properties.put(SpatialUtils.PROPERTY_CRS_WKT, coordinateReferenceSystem.toWKT());
-				DataColumnProperties propertiesKWT = new DataColumnProperties(properties);
-				creator.setProperties(propertiesKWT);
-    		}
+
+			Map<String,String> properties = new HashMap<String, String>();
+			CoordinateReferenceSystem coordinateReferenceSystem = SpatialUtils.getCRSforString("EPSG:4326");
+			properties.put(SpatialUtils.PROPERTY_CRS_CODE, SpatialUtils.getStringForCRS(coordinateReferenceSystem));
+			properties.put(SpatialUtils.PROPERTY_CRS_WKT, coordinateReferenceSystem.toWKT());
+			DataColumnProperties propertiesKWT = new DataColumnProperties(properties);
+			creator.setProperties(propertiesKWT);
 			specs.add(creator.createSpec());
     	}
     	specs.add(new DataColumnSpecCreator(
@@ -200,6 +199,11 @@ public class ReadWKTFromGeofabrikNodeModel extends NodeModel {
 	}
 	
 	
+	/**
+	 * Used to monitor the progress of a file download
+	 * 
+	 * @author Samuel Thiriot
+	 */
 	public static class DownloadCountingOutputStream extends CountingOutputStream {
 
 		private final ExecutionContext exec;
@@ -232,6 +236,12 @@ public class ReadWKTFromGeofabrikNodeModel extends NodeModel {
 
 	}
 	
+	/**
+	 * Provided a value returned by a getAttribute call on a geotools feature,
+	 * returns a Knime DataCell Value: missing, or String Cell.
+	 * @param stringValue
+	 * @return
+	 */
 	protected DataCell getStringOrMissing(Object stringValue) {
 		if (stringValue == null)
 			return missing;
@@ -241,6 +251,12 @@ public class ReadWKTFromGeofabrikNodeModel extends NodeModel {
 		return StringCellFactory.create(str);
 	}
 	
+	/**
+	 * Provided a value returned by a getAttribute call on a geotools feature,
+	 * returns a Knime DataCell Value: missing, or String Cell.
+	 * @param intValue
+	 * @return
+	 */
 	protected DataCell getIntOrMissing(Object intValue) {
 		if (intValue == null)
 			return missing;
@@ -248,6 +264,13 @@ public class ReadWKTFromGeofabrikNodeModel extends NodeModel {
 		return IntCellFactory.create(intValue.toString());
 	}
 	
+	/**
+	 * Provided a value returned by a getAttribute call on a geotools feature,
+	 * returns a Knime DataCell Value: missing, or String Cell. 
+	 * If the value is 0, is assumed missing.
+	 * @param intValue
+	 * @return
+	 */
 	protected DataCell getIntOrMissingIfZero(Object intValue) {
 		if (intValue == null)
 			return missing;
@@ -260,6 +283,12 @@ public class ReadWKTFromGeofabrikNodeModel extends NodeModel {
 		return IntCellFactory.create(str);
 	}
 	
+	/**
+	 * Provided a value returned by a getAttribute call on a geotools feature,
+	 * returns a Knime Boolean or Missing Value: 
+	 * @param intValue
+	 * @return
+	 */
 	protected DataCell getBoolOrMissing(Object val) {
 		if (val == null)
 			return missing;
@@ -275,7 +304,6 @@ public class ReadWKTFromGeofabrikNodeModel extends NodeModel {
 	
 	@Override
 	protected BufferedDataTable[] execute(BufferedDataTable[] inData, ExecutionContext exec) throws Exception {
-
 		
 		// download the file
 		String nameToDownload = m_nameToLoad.getStringValue();
@@ -295,17 +323,22 @@ public class ReadWKTFromGeofabrikNodeModel extends NodeModel {
 		File destFile = null;
 		{
 			ExecutionContext execCopy = exec.createSubExecutionContext(0.6);
-			destFile = File.createTempFile("geofabrik_", ".shp.zip");
-			// TODO for debug
-			//destFile = new File("/tmp/toto.shp.zip");
-			//if (!destFile.exists()) {
-				FileOutputStream os = new FileOutputStream(destFile);
-				DownloadCountingOutputStream cos = new DownloadCountingOutputStream(os, execCopy, total);
-				URLConnection connection = urlToDownload2.openConnection();
-				connection.setUseCaches(true);
-				IOUtils.copy(connection.getInputStream(), cos);
-	            cos.close();
-			//}
+			File dirShapefiles = new File(GeofabrikUtils.getFileForCache(), "shapefiles");
+			dirShapefiles.mkdirs();
+			destFile = new File(
+					dirShapefiles, 
+					nameToDownload.replaceAll("/", "_")+".shp.zip");
+			synchronized (GeofabrikUtils.getLockForFile(destFile.getAbsolutePath())) {
+				if (!destFile.exists()) {
+					FileOutputStream os = new FileOutputStream(destFile);
+					DownloadCountingOutputStream cos = new DownloadCountingOutputStream(os, execCopy, total);
+					URLConnection connection = urlToDownload2.openConnection();
+					connection.setUseCaches(true);
+					IOUtils.copy(connection.getInputStream(), cos);
+		            cos.close();
+				}
+			}
+			
 		}
 		
 		exec.checkCanceled();
@@ -379,17 +412,9 @@ public class ReadWKTFromGeofabrikNodeModel extends NodeModel {
 			
 		}
 		final String schemaName = datastore.getTypeNames()[0];
-
-		SimpleFeatureType type;
-		try {
-			type = datastore.getSchema(schemaName);
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Unable to decode the schema "+schemaName+" from the file: "+e, e);
-		}
 		
 		// create result table
-		DataColumnSpec[] colSpecs = createSpecs(type.getCoordinateReferenceSystem());
+		DataColumnSpec[] colSpecs = createSpecs();
 
         DataTableSpec outputSpec = new DataTableSpec(colSpecs);
         final BufferedDataContainer container = exec.createDataContainer(outputSpec);
@@ -478,7 +503,7 @@ public class ReadWKTFromGeofabrikNodeModel extends NodeModel {
 	protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) 
 			throws InvalidSettingsException {
 		
-		return new DataTableSpec[]{ new DataTableSpec(createSpecs(null)) };
+		return new DataTableSpec[]{ new DataTableSpec(createSpecs()) };
 	}
 
 	/**
@@ -489,6 +514,7 @@ public class ReadWKTFromGeofabrikNodeModel extends NodeModel {
 	
 		m_nameToLoad.saveSettingsTo(settings);
 		m_layerToLoad.saveSettingsTo(settings);
+		
 	}
 
 	/**
@@ -510,6 +536,7 @@ public class ReadWKTFromGeofabrikNodeModel extends NodeModel {
 		
 		m_nameToLoad.validateSettings(settings);
 		m_layerToLoad.validateSettings(settings);
+		
 	}
 
 	@Override

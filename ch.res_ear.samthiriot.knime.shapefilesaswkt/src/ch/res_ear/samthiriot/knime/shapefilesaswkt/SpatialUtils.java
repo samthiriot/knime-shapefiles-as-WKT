@@ -60,6 +60,8 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import ch.res_ear.samthiriot.knime.shapefilesaswkt.preferences.PreferenceConstants;
+
 // see http://docs.geotools.org/latest/userguide/tutorial/feature/csv2shp.html
 
 /**
@@ -827,6 +829,13 @@ public class SpatialUtils {
 	public static boolean hasGeometry(DataTableSpec dataTableSpec) {
 		int idx = dataTableSpec.findColumnIndex(GEOMETRY_COLUMN_NAME);
 		return (idx >= 0);
+	}
+	
+	public static File getFileForCache() {
+		String filepath = ShapefileAsWKTNodePlugin.getDefault().getPreferenceStore().getString(PreferenceConstants.P_DIRECTORY_CACHE);
+		File f = new File(filepath);
+		f.mkdirs();
+		return f;
 	}
 	
 

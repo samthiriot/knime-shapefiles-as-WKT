@@ -7,10 +7,19 @@
    <extension point="org.knime.workbench.repository.categories">
       <category description="Manipulation of spatial data in WKT format" icon="icons/logo_v2_16.png" level-id="spatialAsWKT" locked="false" name="Spatial Processing" path="/community/">
       </category>
-      <category description="Read spatial data to WKT format" icon="icons/logo_v2_small_read.png" level-id="readSpatialAsWKT" locked="false" name="Read" path="/community/spatialAsWKT">
+      <category description="Read spatial data to WKT format" icon="icons/logo_v2_small_read.png" level-id="readSpatialAsWKT" locked="false" name="Read from file" path="/community/spatialAsWKT">
       </category>
       <category
             after="readSpatialAsWKT"
+            description="Read spatial data to WKT format"
+            icon="icons/logo_v2_small_read.png"
+            level-id="readWebSpatialAsWKT"
+            locked="false"
+            name="Read from web"
+            path="/community/spatialAsWKT">
+      </category>
+      <category
+            after="readWebSpatialAsWKT"
             description="Create Geometries"
             icon="icons/logo_v2_small_read.png"
             level-id="createSpatialAsWKT"
@@ -66,7 +75,7 @@
       id="ch.res_ear.samthiriot.knime.shapefilesAsWKT.readFromGML.ReadGMLAsWKTNodeFactory">
 </node>
 <node
-      category-path="/community/spatialAsWKT/readSpatialAsWKT"
+      category-path="/community/spatialAsWKT/readWebSpatialAsWKT"
       deprecated="false"
       factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_geofabrik.ReadWKTFromGeofabrikNodeFactory"
       hidden="false"
@@ -169,5 +178,23 @@
       id="ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.randompoint.RandomPointInShapeNodeFactory">
 </node>
 </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.knime.workbench.ui.preferences"
+            class="ch.res_ear.samthiriot.knime.shapefilesaswkt.preferences.SpatialPreferencePage"
+            id="ch.res_ear.samthiriot.knime.shapefilesaswkt.preferences.SpatialPreferencePage"
+            name="Spatial Data">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="ch.res_ear.samthiriot.knime.shapefilesaswkt.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.knime.workbench.core.URIImporter">
+   </extension>
    
 </plugin>

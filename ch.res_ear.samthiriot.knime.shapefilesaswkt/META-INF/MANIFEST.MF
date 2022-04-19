@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KNIME Spatial Processing Nodes
 Bundle-SymbolicName: ch.res_ear.samthiriot.knime.shapefilesaswkt;singleton:=true
-Bundle-Version: 1.2.8.qualifier
+Bundle-Version: 1.2.9.qualifier
 Bundle-ClassPath: target/classes/,
  lib/aircompressor-0.20.jar,
  lib/animal-sniffer-annotations-1.17.jar,
@@ -175,7 +175,9 @@ Require-Bundle: org.knime.workbench.core;bundle-version="[3.7.0,5.0.0)",
  org.knime.testing;bundle-version="[3.7.0,5.0.0)",
  org.eclipse.core.resources,
  org.junit,
- org.junit.jupiter.api
+ org.junit.jupiter.api,
+ org.eclipse.core.runtime,
+ org.eclipse.ui
 Bundle-ActivationPolicy: lazy
 Export-Package: .,
  au.com.objectix.jgridshift,
