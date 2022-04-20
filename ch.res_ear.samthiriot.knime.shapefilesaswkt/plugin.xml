@@ -177,6 +177,12 @@
       factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.randompoint.RandomPointInShapeNodeFactory"
       id="ch.res_ear.samthiriot.knime.shapefilesaswkt.transform.randompoint.RandomPointInShapeNodeFactory">
 </node>
+<node
+      category-path="/community/spatialAsWKT/createSpatialAsWKT"
+      deprecated="false"
+      factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geometrycol.CreatePointFromGeometryColNodeFactory"
+      id="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geometrycol.CreatePointFromGeometryColNodeFactory">
+</node>
 </extension>
    <extension
          point="org.eclipse.ui.preferencePages">

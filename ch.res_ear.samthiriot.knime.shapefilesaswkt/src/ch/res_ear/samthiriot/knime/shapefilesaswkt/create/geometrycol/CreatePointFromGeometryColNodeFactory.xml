@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shapefilesAsWKT.png"  
+		type="Other" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+		
+    <name>Create from Geometry Column</name>
+    
+    <shortDescription>
+        Create from a column containing a WKT column
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        Takes one column containing geometries in <a href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">WKT format</a>, 
+        and changes it into geometries attached to a <a href="https://en.wikipedia.org/wiki/Spatial_reference_system">Coordinate Reference System</a>. 
+		<p>
+		The typical use case is a CSV file which contains geometries, which you want to interpret as geometries. 
+		</p>
+        </intro>
+        
+        <option name="column name">Name of the column containing the geometry</option>
+        <option name="delete coordinate columns">If checked (default), the column containing the geometry value 
+        will be deleted in the resulting table</option>
+        <option name="Coordinate Reference System">The projection in which the geometry should be understood</option>
+
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="table">A table with a WKT column</inPort>
+        <outPort index="0" name="table with geometries">The table with an additional column containing geometries</outPort>
+    </ports>    
+
+</knimeNode>
