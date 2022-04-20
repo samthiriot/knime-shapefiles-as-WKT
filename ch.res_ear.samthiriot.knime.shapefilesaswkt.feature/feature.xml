@@ -2,16 +2,16 @@
 <feature
       id="ch.res_ear.samthiriot.knime.shapefilesaswkt.feature"
       label="KNIME Spatial Processing Nodes"
-      version="1.3.0.qualifier"
+      version="1.3.2.qualifier"
       provider-name="EIFER (European Institute for Energy Research)">
 
    <description>
-      KNIME nodes to read tables from dBase databases.
+      KNIME collection of nodes to manipulate spatial data: shapefiles, OpenStreetMap data, WKT geometries, etc.
    </description>
 
    <copyright>
-      (c) Copyright Samuel Thiriot for EIFER 2018-2022. All rights reserved.
-
+      (c) Copyright Samuel Thiriot for EIFER 2018-2023. All rights
+reserved.
 EIFER:
 Europäisches Institut für Energieforschung EDF-KIT EWIV
 (European Institute for Energy Research)

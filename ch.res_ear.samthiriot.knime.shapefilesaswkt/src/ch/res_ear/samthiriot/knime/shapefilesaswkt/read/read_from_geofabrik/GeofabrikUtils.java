@@ -1,36 +1,38 @@
 package ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_geofabrik;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 import org.apache.commons.io.IOUtils;
-import org.geotools.data.FileDataStore;
-import org.geotools.data.geojson.GeoJSONDataStoreFactory;
-import org.geotools.data.simple.SimpleFeatureCollection;
-import org.geotools.data.simple.SimpleFeatureIterator;
-import org.opengis.feature.simple.SimpleFeature;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+import org.knime.core.node.NodeLogger;
 
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
 
 public class GeofabrikUtils {
 	
-	public static final String URL_INDEX_GEOFABRIK = "https://download.geofabrik.de/index-v1.json";
-	// 
+	private static final NodeLogger logger = NodeLogger.getLogger(
+			ReadWKTFromGeofabrikNodeModel.class);
 	
-// https://download.geofabrik.de/index-v1-nogeom.json
-	
+	public static final String URL_INDEX_GEOFABRIK = "https://download.geofabrik.de/index-v1-nogeom.json"; // -nogeom
+	// https://download.geofabrik.de/index-v1.json
+		
 	private static final Object lockDownloadGeofabrikIndex = new Object();
 	
 	public static File readGeofabrikIndexIntoFile() {
@@ -40,9 +42,11 @@ public class GeofabrikUtils {
 	    	
 	    	// load the file first 
 		    URL url = new URL(URL_INDEX_GEOFABRIK);
-		    InputStream inputStream = url.openStream();
+		    URLConnection connection = url.openConnection();
+		    connection.setUseCaches(false);
+		    InputStream inputStream = connection.getInputStream();
 		    
-		    File f = new File(GeofabrikUtils.getFileForCache(), "index-v1.json");
+		    File f = new File(GeofabrikUtils.getFileForCache(), "index-v1-nogeom.json"); // -nogeom
 		    
 		    synchronized (lockDownloadGeofabrikIndex) {
 		    	
@@ -52,6 +56,8 @@ public class GeofabrikUtils {
 			    FileWriter fileWriter = new FileWriter(f);
 			    
 				IOUtils.copy(inputStream, fileWriter, StandardCharsets.UTF_8);
+				fileWriter.flush();
+				fileWriter.close();
 				
 				return f;
 					
@@ -67,12 +73,127 @@ public class GeofabrikUtils {
 	/**
 	 * Cached decoding of the index of geofabrik tools
 	 */
-	private static Map<String,String> cachedName2Url = null;
+	//private static Map<String,String> cachedName2Url = null;
+	
+	public static class ListOfZonesReader implements Callable<Map<String,String>> {
+	    @Override
+	    public Map<String,String> call() throws Exception {
+	    	return fetchListOfDataExtracts();
+	    }
+	}
+	
+	/**
+	 * returns a Future with the list of available zones.
+	 * @return
+	 */
+	public static CompletableFuture<Map<String,String>> obtainListOfDataExtracts() {
+		
+		return CompletableFuture.supplyAsync(
+				new Supplier<Map<String,String>>() {
+		    @Override
+		    public Map<String,String> get() {
+		        return fetchListOfDataExtracts();
+		    }
+		});
+	}
 	
 	public static Map<String,String> fetchListOfDataExtracts() {
+    	
+		File f = null;
 
-		if (cachedName2Url != null)
-			return cachedName2Url;
+	    try {
+	    	
+	    	f = readGeofabrikIndexIntoFile();
+
+	        JSONTokener tokener = new JSONTokener(new FileInputStream(f));
+	        JSONObject root = new JSONObject(tokener);
+	        
+	        JSONArray features = root.getJSONArray("features");
+	        		    
+		    Map<String,String> name2url = new HashMap<>();
+		    
+		    Map<String,String> id2parent = new HashMap<>();
+		    Map<String,String> id2name = new HashMap<>();
+		    
+		    // decode features
+		    for (int i=0; i<features.length(); i++) {
+	        	JSONObject feature = (JSONObject)features.get(i);
+	        	JSONObject properties = feature.getJSONObject("properties");
+
+	            String id = properties.getString("id");
+		        String name = properties.getString("name");
+		        
+		        //logger.warn("id = "+id+", name = "+name);
+		        
+		        id2name.put(id, name);
+		        
+		        // find parent (optional)
+		        String parent = null;
+		        if (properties.has("parent")) 
+		        	parent = properties.getString("parent");
+		        if (parent != null) {
+		        	id2parent.put(id, parent);
+		        	//logger.warn(id+" has for parent "+parent);
+		        } else {
+		        	//logger.warn(id+" has no parent");
+		        }
+
+		        // find url
+		        JSONObject urls = properties.getJSONObject("urls");
+		        //ObjectNode urls = (ObjectNode)ft.getAttribute("urls");
+		        // skip index without shp
+		        if (!urls.has("shp"))
+		        	continue;
+		        
+		        String shp = urls.getString("shp");
+				        
+		        name2url.put(id, shp);
+		        
+		    }
+		    
+		    // find parents
+		    Map<String,String> hierarchy2url = new TreeMap<>();
+		    for (String id: name2url.keySet()) {
+		    	
+		    	final String url = name2url.get(id);
+		    	
+		    	String newId = id2name.get(id);
+		    	
+		    	String parent = id2parent.get(id);
+		    			    	
+	    		while (parent != null) {
+			    	//logger.warn("for id "+newId+" we found parent "+parent);
+	    			newId = id2name.get(parent) +"/" + newId;
+	    			id = parent;
+	    			parent = id2parent.get(id);
+		    	} 
+		    	
+	    		hierarchy2url.put(newId, url);
+		    	//logger.warn(newId+" => "+url);
+		    }
+		    
+		    //cachedName2Url = Collections.unmodifiableMap(hierarchy2url);
+		    return hierarchy2url;
+			
+	    } catch (JSONException e1) {
+			e1.printStackTrace();
+			if (f != null)
+				f.delete();
+			throw new RuntimeException("error while parsing file "+URL_INDEX_GEOFABRIK, e1);
+	    } catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("unable to access the list of data from "+URL_INDEX_GEOFABRIK, e);
+		} finally {
+			
+		}
+	    
+	}
+	
+	/*
+	public static Map<String,String> fetchListOfDataExtracts() {
+
+		//if (cachedName2Url != null)
+		//	return cachedName2Url;
 		
 		GeoJSONDataStoreFactory factory = new GeoJSONDataStoreFactory();
 
@@ -80,9 +201,8 @@ public class GeofabrikUtils {
 		SimpleFeatureIterator it = null;
 	    try {
 	    	
-	    	/*Map<String,?> params = new HashMap<>();
-	    	params.put(GeoJSONDataStoreFactory.URL_PARAM.key, new URL(URL_INDEX_GEOFABRIK));
-*/
+	    	//Map<String,?> params = new HashMap<>();
+	    	//params.put(GeoJSONDataStoreFactory.URL_PARAM.key, new URL(URL_INDEX_GEOFABRIK));
 	    	
 	    	File f = readGeofabrikIndexIntoFile();
 	    	
@@ -100,18 +220,24 @@ public class GeofabrikUtils {
 		    // decode features
 		    while (it.hasNext()) {
 		        SimpleFeature ft = it.next();
+
+		        logger.warn("processing feature "+ft.toString());
+		        
 		        String id = ft.getAttribute("id").toString();
 		        String name = ft.getAttribute("name").toString();
 		        
+		        logger.warn("id = "+id+", name = "+name);
+		        
 		        id2name.put(id, name);
+		        
 		        
 		        // find parent (optional)
 		        String parent = (String) ft.getAttribute("parent");
 		        if (parent != null) {
 		        	id2parent.put(id, parent);
-		        	//System.out.println(id+" has for parent "+parent);
+		        	logger.warn(id+" has for parent "+parent);
 		        } else {
-		        	//System.out.println(id+" has no parent");
+		        	logger.warn(id+" has no parent");
 		        }
 
 		        // find url
@@ -125,14 +251,6 @@ public class GeofabrikUtils {
 		        
 		        name2url.put(id, shp);
 		        
-		        /*
-		        System.out.println(ft);
-		        System.out.println(id);
-		        System.out.println(name);
-		        System.out.println(shp);
-
-		        System.out.println();
-		        */
 		    }
 		    
 		    // find parents
@@ -144,17 +262,20 @@ public class GeofabrikUtils {
 		    	String newId = id2name.get(id);
 		    	
 		    	String parent = id2parent.get(id);
+		    			    	
 	    		while (parent != null) {
+			    	logger.warn("for id "+newId+" we found parent "+parent);
 	    			newId = id2name.get(parent) +"/" + newId;
 	    			id = parent;
 	    			parent = id2parent.get(id);
 		    	} 
 		    	
 	    		hierarchy2url.put(newId, url);
+		    	logger.warn(newId+" => "+url);
 		    }
 		    
-		    cachedName2Url = Collections.unmodifiableMap(hierarchy2url);
-		    return cachedName2Url;
+		    //cachedName2Url = Collections.unmodifiableMap(hierarchy2url);
+		    return hierarchy2url;
 			
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -171,8 +292,7 @@ public class GeofabrikUtils {
 			
 		} 
 	    
-	    
-	}
+	}*/
 	
 	/**
 	 * Get the directory to use to store cache for GeoFabrik

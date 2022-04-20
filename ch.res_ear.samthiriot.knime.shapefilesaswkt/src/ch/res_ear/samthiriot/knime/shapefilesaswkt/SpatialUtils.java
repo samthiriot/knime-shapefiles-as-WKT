@@ -105,6 +105,9 @@ public class SpatialUtils {
 			throw new IllegalArgumentException("unable to decode CRS from string: "+s);
 		} catch (NullPointerException e2) {
 			throw new IllegalArgumentException("This string does not contains any CRS: "+s);
+		} catch (RuntimeException e3) {
+			e3.printStackTrace();
+			throw new IllegalArgumentException("Error when decoding CRS from string "+s+": "+e3.getMessage(), e3);
 		}
 	}
 	

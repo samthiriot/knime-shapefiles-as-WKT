@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.IOUtils;
@@ -353,8 +354,9 @@ public class ReadWKTFromGeofabrikNodeModel extends NodeModel {
 			if (idxSpace > 0)
 				layerCode = layerCode.substring(0, idxSpace);
 			final String layerCodeToSearch = layerCode;
-			ZipFile zipFile = new ZipFile(destFile);
+			ZipFile zipFile = null;
 			try {
+				zipFile = new ZipFile(destFile);
 				Collection<ZipEntry> relevantEntries = zipFile
 					.stream()
 					.filter(entry -> entry.getName().contains(layerCodeToSearch))
@@ -370,8 +372,12 @@ public class ReadWKTFromGeofabrikNodeModel extends NodeModel {
 		            	fileForShp = destFileEntry;
 				}
 				
+			} catch(ZipException e) {
+				destFile.delete();
+				throw new RuntimeException("error when opening downloaded data. Please try to reexecute...");
 			} finally {
-				zipFile.close();	
+				if (zipFile != null)
+					zipFile.close();	
 			}
 			
 		}

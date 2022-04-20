@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.eclipse.swt.widgets.Display;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
@@ -33,6 +34,11 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 public class ReadWKTFromGeofabrikNodeDialog extends DefaultNodeSettingsPane {
 
 	
+	protected final DialogComponentStringSelection dialogZone;
+	protected final SettingsModelString m_nameToLoad;
+	
+	public static final String DEFAULT_ZONE = "Europe/Germany/Baden-Württemberg/Regierungsbezirk Karlsruhe";
+	
 	/**
 	 * New dialog pane for configuring the node. The dialog created here
 	 * will show up when double clicking on a node in KNIME Analytics Platform.
@@ -41,16 +47,18 @@ public class ReadWKTFromGeofabrikNodeDialog extends DefaultNodeSettingsPane {
         super();
         
         {
-	        SettingsModelString m_nameToLoad = new SettingsModelString("name_to_load", "Europe/Germany/Baden-Württemberg/Regierungsbezirk Karlsruhe");
+	        m_nameToLoad = new SettingsModelString("name_to_load", DEFAULT_ZONE);
+	        m_nameToLoad.setEnabled(false);
 	        
-	        Collection<String> names = GeofabrikUtils.fetchListOfDataExtracts().keySet();
-	        
-	        addDialogComponent(new DialogComponentStringSelection(
+	        dialogZone = new DialogComponentStringSelection(
 	        		m_nameToLoad,
 	        		"Zone to load",
-	        		names
-	        		));
-	        }
+	        		Arrays.asList("loading...                                                  ")
+	        		);
+	        dialogZone.setEnabled(false);
+	        dialogZone.setToolTipText("loading...");
+	        addDialogComponent(dialogZone);
+        }
         
         {
 	        SettingsModelString m_layerToLoad = new SettingsModelString(
@@ -77,6 +85,26 @@ public class ReadWKTFromGeofabrikNodeDialog extends DefaultNodeSettingsPane {
 	        		layers
 	        		));
         }
+
+        // load the list of zone names
+       GeofabrikUtils
+       		.obtainListOfDataExtracts()
+       		.thenAccept(zone2url -> {
+       			System.out.println("got list");
+       			Collection<String> names = zone2url.keySet();
+       			Display.getDefault().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						System.out.println("update list");
+						dialogZone.replaceListItems(names, DEFAULT_ZONE);
+		       			dialogZone.setEnabled(true);
+		    	        dialogZone.setToolTipText(null);
+
+					}
+				});
+       		});
+        //Collection<String> names = GeofabrikUtils.fetchListOfDataExtracts().keySet();
+        
     }
 }
 

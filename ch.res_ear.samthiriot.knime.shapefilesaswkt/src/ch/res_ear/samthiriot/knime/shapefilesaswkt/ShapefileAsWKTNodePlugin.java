@@ -25,6 +25,7 @@ import org.knime.core.node.NodeLogger;
 import org.osgi.framework.BundleContext;
 
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.preferences.PreferenceConstants;
+import ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_geofabrik.GeofabrikUtils;
 
 /**
  * This is the eclipse bundle activator.
@@ -68,6 +69,9 @@ public class ShapefileAsWKTNodePlugin extends Plugin {
         				"unable to define hints for the geotools library: "+e.getMessage(), 
         				e);
         }
+        
+        // update the list of geofabrik sources
+        GeofabrikUtils.obtainListOfDataExtracts();
     }
 
     /**
