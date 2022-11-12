@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/gt-geojson-26.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hamcrest-core-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/json-simple-1.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/junit-4.10.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/aircompressor-0.20.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/animal-sniffer-annotations-1.17.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bigint-0.7.1.jar"/>

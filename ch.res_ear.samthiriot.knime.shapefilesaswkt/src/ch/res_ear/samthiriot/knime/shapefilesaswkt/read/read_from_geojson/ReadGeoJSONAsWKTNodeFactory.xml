@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shp-wkt-reader-icon.png" 
+		type="Source" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+		
+    <name>Read from GeoJSON</name>
+    
+    <shortDescription>
+        Reads Spatial Data from GeoJSON format
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        <p>
+        Reads spatial data stored in <a href="https://en.wikipedia.org/wiki/GeoJSON">GeoJSON format</a>
+        and decodes the geometries into <a href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">WKT (Well-known Text Representation)</a>. 
+        Decodes every attribute of the spatial features as a column of a corresponding KNIME type.
+        </p>
+        <p>
+        Note that GeoJSON data is assumed by default to be encoded in the Coordinate Reference System WGS84. 
+		The GeoJSON format allows to define the CRS in the file, but we do not read it.
+		You might select another coordinate system in the options if necessary.
+        </p>
+        <p>
+        The actual decoding of the GeoJSON format is done using the <a href="https://geotools.org/">geotools opensource library</a>.
+		The support of GeoJSON is unsupported in GeoTools, so this node might work in most cases but not support the full GeoJSON format.
+        </p>
+        
+        </intro>
+        
+        <option name="Selected file">The GeoJSON file to open (often finishing with .json)</option>
+        <option name="Coordinate Reference System">The Coordinate Reference System to interpret the numbers in latitude ane longitude</option>
+       
+    </fullDescription>
+    
+    <ports>        
+        <outPort index="0" name="WKT entities">The population with their attributes and WKT representation.</outPort>
+    </ports>    
+  
+</knimeNode>

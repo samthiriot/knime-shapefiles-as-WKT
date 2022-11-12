@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shp-wkt-writer-icon.png" 
+		type="Sink" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+		
+    <name>Write Geometries to GeoJSON</name>
+    
+    <shortDescription>
+        Writes Geometries to GeoJSON format
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        Writes WKT geometries into 
+        <a href="https://en.wikipedia.org/wiki/GeoJSON">GeoJSON format</a>. 
+        <p>
+        The actual processing is done by the 
+        opensource <a href="https://geotools.org/">geotools library</a>.
+		The support of GeoJSON is unsupported in GeoTools, so this node might work in most cases but not support the full GeoJSON format. 
+		</p>
+		</intro>        
+        
+        <option name="filename">File to create or erase.</option>
+    
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="In-Port name">Data with WKT geometries</inPort>
+    </ports>    
+    
+</knimeNode>
