@@ -26,7 +26,7 @@
         </p>
         <p>
         The actual decoding of the GeoJSON format is done using the <a href="https://geotools.org/">geotools opensource library</a>.
-		The support of GeoJSON is unsupported in GeoTools, so this node might work in most cases but not support the full GeoJSON format.
+		The GeoJSON format is unsupported in GeoTools, so this node might work in most cases but not support the full GeoJSON format.
         </p>
         
         </intro>

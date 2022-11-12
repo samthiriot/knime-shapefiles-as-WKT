@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shp-wkt-reader-icon.png" 
+		type="Source" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+		
+    <name>Read from GeoTIFF</name>
+    
+    <shortDescription>
+        Reads Spatial Data from GeoTIFF format
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        <p>
+        Reads spatial data stored in <a href="https://en.wikipedia.org/wiki/GeoTIFF">GeoTIFF format</a>
+        and decodes the geometries into <a href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">WKT (Well-known Text Representation)</a>. 
+        Decodes every attribute of the spatial features as a column of a corresponding KNIME type.
+        </p>
+        <p>
+		GeoTIFF is raster, or coverage, data. 
+		We produce TODO
+        </p>
+        <p>
+        The actual decoding of the shapefile format is done using the <a href="https://geotools.org/">geotools library</a>.
+       	The support of GeoTIFF is unsupported in GeoTools, so this node might work in most cases but not support the full GeoJSON format.
+        
+        </p>
+        
+        </intro>
+        
+        <option name="Selected file">The KML to open (often finishing with .kml)</option>
+       
+    </fullDescription>
+    
+    <ports>        
+        <outPort index="0" name="WKT entities">The population with their attributes and WKT representation.</outPort>
+    </ports>    
+  
+</knimeNode>

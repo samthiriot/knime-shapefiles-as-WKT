@@ -80,6 +80,13 @@
       id="ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_geojson.ReadGeoJSONAsWKTNodeFactory">
 </node>
 <node
+      category-path="/community/spatialAsWKT/readSpatialAsWKT"
+      deprecated="false"
+      factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_geotiff.ReadGeoTIFFAsWKTNodeFactory"
+      hidden="false"
+      id="ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_geotiff.ReadGeoTIFFAsWKTNodeFactory">
+</node>
+<node
       category-path="/community/spatialAsWKT/readWebSpatialAsWKT"
       deprecated="false"
       factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_geofabrik.ReadWKTFromGeofabrikNodeFactory"
