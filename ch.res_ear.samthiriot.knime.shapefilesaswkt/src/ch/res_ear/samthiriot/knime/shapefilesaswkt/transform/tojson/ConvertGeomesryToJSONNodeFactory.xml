@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shapefilesAsWKT.png"  
+		type="Other" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+    
+    <name>Convert Geometries to GeoJSON</name>
+    
+    <shortDescription>
+       Convert Geometries to GeoJSON
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        Convert every Geometries to GeoJSON, by adding a new column with this format.
+
+        <p>
+		The coordinates of the GeoJSON geometries are produced in the same Coordinate Reference System as the one used in the table.
+		</p>
+        
+        <p>
+		The actual computation is done by the great <a href="https://geotools.org/">Geotools library</a>.
+		</p>
+        </intro>
+        
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="datatable with WKT geometries">Table with geometries</inPort>
+        <outPort index="0" name="datatable with GeoJSON geometries">Table with geometries and their GeoJSON counterpart</outPort>
+    </ports>    
+    
+</knimeNode>

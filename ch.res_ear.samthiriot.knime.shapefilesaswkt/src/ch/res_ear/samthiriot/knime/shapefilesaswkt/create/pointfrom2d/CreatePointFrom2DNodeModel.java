@@ -260,6 +260,12 @@ public class CreatePointFrom2DNodeModel extends NodeModel {
 		
 		container.close();
 		BufferedDataTable out = container.getTable();
+		
+        // add flow variables for the CRS
+    	final CoordinateReferenceSystem crs = SpatialUtils.getCRSforString(m_crs.getStringValue());
+        pushFlowVariableString("CRS_code", SpatialUtils.getStringForCRS(crs));
+        pushFlowVariableString("CRS_WKT", crs.toWKT());
+        
 		return new BufferedDataTable[] { out };
 	}
 

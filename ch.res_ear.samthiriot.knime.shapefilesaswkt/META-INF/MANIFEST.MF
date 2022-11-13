@@ -161,6 +161,7 @@ Bundle-Vendor: EIFER (European Institute for Energy Research)
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
+ org.eclipse.xsd;bundle-version="2.0.0",
  org.knime.workbench.core;bundle-version="[3.7.0,5.0.0)",
  org.knime.base;bundle-version="[3.7.0,5.0.0)",
  org.knime.product;bundle-version="[3.7.0,5.0.0)",

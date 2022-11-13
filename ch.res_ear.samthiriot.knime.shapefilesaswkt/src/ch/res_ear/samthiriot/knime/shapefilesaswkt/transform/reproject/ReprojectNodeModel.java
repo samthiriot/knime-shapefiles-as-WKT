@@ -174,6 +174,11 @@ public class ReprojectNodeModel extends NodeModel {
         // once we are done, we close the container and return its table
         container.close();
         BufferedDataTable out = container.getTable();
+        
+        // add flow variables for the CRS
+        pushFlowVariableString("CRS_code", SpatialUtils.getStringForCRS(crsTarget));
+        pushFlowVariableString("CRS_WKT", crsTarget.toWKT());
+        
         return new BufferedDataTable[]{out};
     }
 
