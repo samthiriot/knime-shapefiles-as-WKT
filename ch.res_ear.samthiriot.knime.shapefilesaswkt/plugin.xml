@@ -11,6 +11,15 @@
       </category>
       <category
             after="readSpatialAsWKT"
+            description="Read raster data to WKT format"
+            icon="icons/logo_v2_small_read.png"
+            level-id="readRasterAsWKT"
+            locked="false"
+            name="Read raster from file"
+            path="/community/spatialAsWKT">
+      </category>
+      <category
+            after="readRasterAsWKT"
             description="Read spatial data to WKT format"
             icon="icons/logo_v2_small_read.png"
             level-id="readWebSpatialAsWKT"
@@ -80,7 +89,7 @@
       id="ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_geojson.ReadGeoJSONAsWKTNodeFactory">
 </node>
 <node
-      category-path="/community/spatialAsWKT/readSpatialAsWKT"
+      category-path="/community/spatialAsWKT/readRasterAsWKT"
       deprecated="false"
       factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_geotiff.ReadGeoTIFFAsWKTNodeFactory"
       hidden="false"
@@ -177,18 +186,6 @@
       deprecated="false"
       factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.pointfrom2d.CreatePointFrom2DNodeFactory"
       id="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.pointfrom2d.CreatePointFrom2DNodeFactory">
-</node>
-<node
-      category-path="/community/spatialAsWKT/createSpatialAsWKT"
-      deprecated="false"
-      factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.google.GeocodingGoogleNodeFactory"
-      id="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.google.GeocodingGoogleNodeFactory">
-</node>
-<node
-      category-path="/community/spatialAsWKT/createSpatialAsWKT"
-      deprecated="false"
-      factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.osm.GeocodingOSMNodeFactory"
-      id="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.osm.GeocodingOSMNodeFactory">
 </node>
 <node
       category-path="/community/spatialAsWKT/transformSpatialAsWKT"

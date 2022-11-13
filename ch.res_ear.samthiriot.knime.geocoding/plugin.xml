@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?eclipse version="3.0"?><plugin>
+                            <extension point="org.knime.product.splashExtension">
+                               <splashExtension icon="icons/logo_v2_48.png" icon24="icons/logo_v2_24.png" icon32="icons/logo_v2_32.png" id="ch.res_ear.samthiriot.knime.geocoding.splashExtension" tooltip="Spatial Processing Nodes">
+                               </splashExtension>
+                            </extension>
+   <extension point="org.knime.workbench.repository.categories">
+      <category
+            description="Manipulation of spatial data in WKT format"
+            icon="icons/logo_v2_16.png"
+            level-id="spatialAsWKT"
+            locked="false"
+            name="Spatial Processing"
+            path="/community/">
+      </category>
+      <category
+            after="propertiesSpatialAsWKT"
+            description="Geocode postal addresses"
+            icon="icons/logo_v2_16.png"
+            level-id="geocode"
+            locked="false"
+            name="Geocode"
+            path="/community/spatialAsWKT/">
+      </category>
+   </extension>
+
+   <extension point="org.knime.workbench.repository.nodes">
+<node
+      category-path="/community/spatialAsWKT/geocode"
+      deprecated="false"
+      factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.google.GeocodingGoogleNodeFactory"
+      id="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.google.GeocodingGoogleNodeFactory">
+</node>
+<node
+      category-path="/community/spatialAsWKT/geocode"
+      deprecated="false"
+      factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.osm.GeocodingOSMNodeFactory"
+      id="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.osm.GeocodingOSMNodeFactory">
+</node>
+</extension>
+   
+</plugin>

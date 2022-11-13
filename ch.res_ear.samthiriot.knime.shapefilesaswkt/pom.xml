@@ -20,7 +20,6 @@
      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>     
      <geotools.version>26.3</geotools.version>
 	 <maven.test.skip>true</maven.test.skip>
-     <google.api.version>0.9.3</google.api.version>
 	 <httpclient.version>4.3.2</httpclient.version>
 	 <gson.version>2.8.5</gson.version>
   </properties>
@@ -168,12 +167,6 @@
 	    <version>${geotools.version}</version>
 	</dependency>
 			
-	<!-- for geocoding -->
-	<dependency>
-	  <groupId>com.google.maps</groupId>
-	  <artifactId>google-maps-services</artifactId>
-	  <version>${google.api.version}</version>
-	</dependency>
 	
 	<!-- 
 	<dependency>
@@ -199,13 +192,15 @@
 	  <artifactId>osmapi</artifactId>
 	  <version>3.3</version>
 	</dependency>
- -->
+	
 	<dependency>
 	  <groupId>fr.dudie</groupId>
 	  <artifactId>nominatim-api</artifactId>
 	  <version>3.3</version>
 	</dependency>
 
+ -->
+	
 	 	
   </dependencies>
   

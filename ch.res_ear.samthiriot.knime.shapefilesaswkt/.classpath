@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/gt-geojson-26.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/hamcrest-core-1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/json-simple-1.1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/junit-4.10.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/aircompressor-0.20.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/animal-sniffer-annotations-1.17.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bigint-0.7.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/checker-qual-3.5.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/colt-1.2.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-codec-1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-codec-1.11.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-collections4-4.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-dbcp-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-io-2.10.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-jxpath-1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-lang3-3.8.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-logging-1.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-logging-1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-pool-1.5.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-text-1.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/concurrent-1.3.4.jar"/>
@@ -28,16 +24,13 @@
 	<classpathentry exported="true" kind="lib" path="lib/FastInfoset-1.2.15.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/geodb-0.9.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/GeographicLib-Java-1.49.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/geogson-core-1.1.100.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/geogson-jts-1.1.100.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/google-maps-services-0.9.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/gson-2.8.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gt-app-schema-resolver-26.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gt-arcgrid-26.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gt-complex-26.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gt-coverage-26.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gt-cql-26.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gt-epsg-hsql-26.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gt-geojson-26.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gt-geojsondatastore-26.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gt-geopkg-26.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gt-geotiff-26.3.jar"/>
@@ -70,10 +63,11 @@
 	<classpathentry exported="true" kind="lib" path="lib/gt-xsd-wfs-26.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/guava-27.0-jre.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/h2-1.1.119.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hamcrest-core-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hatbox-1.0.b10.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hsqldb-2.4.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/httpclient-4.0.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/httpcore-4.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/httpclient-4.5.13.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/httpcore-4.4.13.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/imageio-ext-arcgrid-1.3.10.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/imageio-ext-cog-commons-1.3.10.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/imageio-ext-cog-reader-1.3.10.jar"/>
@@ -98,6 +92,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/jaxb-runtime-2.4.0-b180830.0438.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jcc-11.5.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jgridshift-core-1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/json-simple-1.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jsr305-3.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jt-affine-1.1.21.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jt-algebra-1.1.21.jar"/>
@@ -124,7 +119,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/jt-rlookup-1.1.21.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jt-scale-1.1.21.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jt-scale2-1.1.21.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jts-core-1.14.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jts-core-1.18.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jt-shadedrelief-1.1.21.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jt-stats-1.1.21.jar"/>
@@ -135,15 +129,13 @@
 	<classpathentry exported="true" kind="lib" path="lib/jt-warp-1.1.21.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jt-zonal-1.1.21.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jt-zonalstats-1.6.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/junit-4.10.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/miglayout-3.7-swing.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mysql-connector-java-8.0.26.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/net.opengis.fes-26.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/net.opengis.ows-26.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/net.opengis.wfs-26.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/nominatim-api-3.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/okhttp-3.14.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/okio-1.17.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.emf.common-2.15.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.emf.ecore.xmi-2.15.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.emf.ecore-2.15.0.jar"/>
@@ -154,7 +146,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/protobuf-java-3.11.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/si-quantity-2.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/si-units-2.0.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/slf4j-api-1.7.25.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j-api-1.7.13.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/sqlite-jdbc-3.34.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/stax-ex-1.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/systems-common-2.0.2.jar"/>
@@ -164,7 +156,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/xml-commons-resolver-1.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
 		<attributes>
-			<attribute name="module" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>

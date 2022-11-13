@@ -187,7 +187,7 @@ public class GeocodingGoogleNodeModel extends NodeModel {
 		DataTableSpec outputSpec = createOutputSpec(inputTable.getDataTableSpec());
 		BufferedDataContainer container = exec.createDataContainer(outputSpec);
     	
-		GeometryFactory gf = new GeometryFactory();
+		com.vividsolutions.jts.geom.GeometryFactory gf = new com.vividsolutions.jts.geom.GeometryFactory();
 	        	        
 		final int idxColAddress = inputTable.getSpec().findColumnIndex(colname);
 		
@@ -271,7 +271,7 @@ public class GeocodingGoogleNodeModel extends NodeModel {
 				// add the geometry (point) cell
 				double latitude = result.geometry.location.lat;
 				double longitude = result.geometry.location.lng;
-				Point point = gf.createPoint(new Coordinate(longitude,latitude));
+				com.vividsolutions.jts.geom.Point point = gf.createPoint(new com.vividsolutions.jts.geom.Coordinate(longitude,latitude));
 				cells.add(StringCellFactory.create(point.toString()));
 				
 				// add the geometry type cell

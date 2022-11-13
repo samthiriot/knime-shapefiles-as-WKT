@@ -161,9 +161,9 @@ public class ReadGeoJSONAsWKTNodeModel extends NodeModel {
         // CRS is always WGS84 for KML
 		CoordinateReferenceSystem crs;
 		try {
-			crs = CRS.decode("EPSG:4326"); // WGS84 
+			crs = CRS.decode(m_crs.getStringValue()); 
 		} catch (FactoryException e) {
-			throw new RuntimeException("unable to find the Coordinate Reference System EPSG:4326. This error should not happen. Please report this bug for solving.");
+			throw new RuntimeException("unable to find the Coordinate Reference System "+m_crs.getStringValue()+". This error should not happen. Please report this bug for solving.");
 		}      
     	// we can now declare the geometry column
     	DataColumnSpecCreator creatorGeom = new DataColumnSpecCreator(
@@ -262,8 +262,13 @@ public class ReadGeoJSONAsWKTNodeModel extends NodeModel {
 
         final DataCell missing = new MissingCell("was undefined in GML");
         
-	    CoordinateReferenceSystem crs = null;
-
+	    CoordinateReferenceSystem crs;
+	    try {
+			crs = CRS.decode(m_crs.getStringValue()); 
+		} catch (FactoryException e) {
+			throw new RuntimeException("unable to find the Coordinate Reference System "+m_crs.getStringValue()+". This error should not happen. Please report this bug for solving.");
+		}      
+	    
 	    //PrecisionModel precisionGeom = new PrecisionModel(PrecisionModel.FLOATING);
 	    
 	    FeatureIterator<SimpleFeature> iter = getFeaturesIterator();

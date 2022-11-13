@@ -1,7 +1,5 @@
 package ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_geofabrik;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="lib" path="lib/geogson-core-1.1.100.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/geogson-jts-1.1.100.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/guava-19.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jts-core-1.14.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/nominatim-api-3.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-codec-1.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-logging-1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/httpclient-4.5.13.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/httpcore-4.4.13.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/google-maps-services-0.9.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gson-2.8.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/h2-1.1.119.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/okhttp-3.14.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/okio-1.17.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j-api-1.7.25.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry including="**/*.java" kind="src" output="target/classes" path="src">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>

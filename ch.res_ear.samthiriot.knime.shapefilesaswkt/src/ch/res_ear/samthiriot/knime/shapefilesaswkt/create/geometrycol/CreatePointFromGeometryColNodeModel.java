@@ -44,8 +44,6 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.vividsolutions.jts.io.ParseException;
-
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
 
 
