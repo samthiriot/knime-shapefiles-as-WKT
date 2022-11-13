@@ -5,6 +5,17 @@
                                </splashExtension>
                             </extension>
    <extension point="org.knime.workbench.repository.categories">
+         <category description="Manipulation of spatial data in WKT format" icon="icons/logo_v2_16.png" level-id="spatialAsWKT" locked="false" name="Spatial Processing" path="/community/">
+      </category>
+            <category
+            after="readRasterAsWKT"
+            description="Read spatial data to WKT format"
+            icon="icons/logo_v2_small_read.png"
+            level-id="readWebSpatialAsWKT"
+            locked="false"
+            name="Read from web"
+            path="/community/spatialAsWKT">
+      </category>
    </extension>
 
    <extension point="org.knime.workbench.repository.nodes">
