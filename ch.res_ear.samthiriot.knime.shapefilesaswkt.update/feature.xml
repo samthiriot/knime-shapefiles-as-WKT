@@ -703,4 +703,12 @@ Public License instead of this License.  But first, please read
          id="ch.res_ear.samthiriot.knime.shapefilesaswkt.feature"
          version="0.0.0"/>
 
+   <includes
+         id="ch.res_ear.samthiriot.knime.download.vector"
+         version="0.0.0"/>
+
+   <includes
+         id="ch.res_ear.samthiriot.knime.geocoding.feature"
+         version="0.0.0"/>
+
 </feature>
