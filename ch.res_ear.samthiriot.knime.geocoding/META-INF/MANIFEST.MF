@@ -25,7 +25,7 @@ Bundle-ClassPath: .,
  lib/guava-19.0.jar,
  lib/jts-core-1.14.0.jar,
  lib/nominatim-api-3.3.jar
-Bundle-Vendor: EIFER
+Bundle-Vendor: EIFER (European Institute for Energy Research)
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.knime.core;bundle-version="4.6.0",

@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="ch.res_ear.samthiriot.knime.shapefilesaswkt.feature"
-      label="KNIME Spatial Processing Nodes"
-      version="1.2.3.qualifier"
+      id="ch.res_ear.samthiriot.knime.geocoding.feature"
+      label="KNIME Nodes for Geocoding of postal addresses"
+      version="1.0.0.qualifier"
       provider-name="EIFER (European Institute for Energy Research)">
 
    <description url="https://github.com/samthiriot/knime-shapefiles-as-WKT">
-      KNIME collection of nodes to manipulate spatial data: shapefiles,
-OpenStreetMap data, WKT geometries, etc.
+      KNIME collection of nodes to geocode postal addresses into x,y coordinates
    </description>
 
    <copyright>
@@ -701,19 +700,11 @@ Public License instead of this License.  But first, please read
       <discovery label="Repository with sourcecode and bugtracker" url="https://github.com/samthiriot/knime-shapefiles-as-WKT"/>
    </url>
 
-   <requires>
-      <import plugin="org.knime.workbench.core" version="3.7.0"/>
-      <import plugin="org.knime.base" version="3.7.0"/>
-      <import plugin="org.knime.product" version="3.7.0"/>
-      <import plugin="org.knime.workbench" version="3.7.0"/>
-      <import plugin="org.knime.testing" version="3.7.0"/>
-      <import plugin="org.eclipse.core.resources"/>
-   </requires>
-
    <plugin
-         id="ch.res_ear.samthiriot.knime.shapefilesaswkt"
+         id="ch.res_ear.samthiriot.knime.geocoding"
          download-size="0"
          install-size="0"
-         version="0.0.0"/>
+         version="0.0.0"
+         unpack="false"/>
 
 </feature>
