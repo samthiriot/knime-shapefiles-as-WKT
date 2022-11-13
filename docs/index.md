@@ -115,6 +115,7 @@ You can install these nodes in KNIME 4.6 or above following these steps:
 * [use the color manager to edit symboloty](pages/5_color_and_view/index.md)
 * [compute the surface of geometries](pages/6_compute_surface/index.md)
 * [extract shapefile data to Excel](pages/7_extract_attributes_excel/index.md)
+* [extract raster data in GeoTIFF and vectorize it](pages/8_read_geotiff/index.md)
 * [compute the accessibility of buildings to services](pages/9_demo_accessibility_zones/index.md)
 
  
