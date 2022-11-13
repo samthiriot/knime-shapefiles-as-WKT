@@ -10,18 +10,16 @@ The collection offers nodes to read shapefiles as KNIME data tables and store KN
 
 ![Screenshot of the spatial nodes](docs/capture_main.png)
 
+### Install it from update site 
+
+In KNIME, add as an external repository: https://knime.res-ear.ch .
+
 ### how does it work?
 
-All the smart work is done by the wonderful [geotools](https://en.wikipedia.org/wiki/GeoTools) [JTS library](https://en.wikipedia.org/wiki/JTS_Topology_Suite).
+All the smart work is done by the wonderful [geotools](https://en.wikipedia.org/wiki/GeoTools) and [JTS](https://en.wikipedia.org/wiki/JTS_Topology_Suite).[opensource](https://en.wikipedia.org/wiki/Open_source) libraries.
 We only do provide the integration of these features inside KNIME. 
 We currently integrated the library in its snapshot version 22, because we had to submit small changes to the library to integrate it smoothly.
 
-
-## License
-
-These nodes were developed for the [European Institute for Energy Research (EIFER)](https://www.eifer.kit.edu/).
-They are notably used for Generation of Synthetic Populations (GoSP), in order to read spatial populations. 
-These nodes are released as GPL v3; see the [Free Software Foundation presentation](https://www.gnu.org/licenses/quick-guide-gplv3.en.html) if you're not familiar with open-source licenses.
 
 
 ## Documentation
@@ -29,17 +27,11 @@ These nodes are released as GPL v3; see the [Free Software Foundation presentati
 See [the documentation and examples](https://samthiriot.github.io/knime-shapefiles-as-WKT/).
 
 
-## Install it
+## License
 
-## From update site 
-
-In KNIME, add as an external repository: https://knime.res-ear.ch .
-
-### Zip installation
-
-Alternatively, you can install this collection of nodes is to download it as a zip file and add it to your current KNIME installation.
-
-Download the last release from this site, then follow the [KNIME instructions to install a plugin](https://www.knime.com/downloads/update).
+These nodes were developed for the [European Institute for Energy Research (EIFER)](https://www.eifer.kit.edu/).
+They are notably used for Generation of Synthetic Populations (GoSP), in order to read spatial populations. 
+These nodes are released as GPL v3; see the [Free Software Foundation presentation](https://www.gnu.org/licenses/quick-guide-gplv3.en.html) if you're not familiar with open-source licenses.
 
 
 ## Developers

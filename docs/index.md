@@ -27,7 +27,7 @@ We decided to create another collection of nodes which overcomes these limitatio
 
  
 
-# Limitations
+# Limitations
 
 This collection does not intend to turn KNIME into a Geographic Information Systems. 
 Tools dedicated to this usage will always be better for this "pure" usage.  
@@ -39,10 +39,12 @@ However if you have to merge data with spatial data, or extract data from spatia
 ## Read spatial data from several formats:
 
 Read information from:
-* Spatial databases including postgis. 
+* Spatial databases including postgis 
 * ESRI shapefile format; we support all the types of geometries, including lines, points or polygons. 
 * KML
 * GML v3
+* GeoJSON
+* GeoTIFF
 
 
 ## Write spatial data into several format
@@ -50,14 +52,12 @@ Read information from:
 Write spatial data into:
 * Spatial databases, including postgis,
 * ESRI shapefileformat, with the limitations inherent to this old file format (short column names, limited count of columns, etc.)
-* KML,
+* KML
 * GML v3
-
+* GeoJSON
  
 
-
-
-## Projection and reprojection
+## Projection and reprojection
 
 Spatial data ultimately corresponds to a pile of (x,y) coordinates. They only have a geographical meaning if they are considered according to a [Coordinate Reference System](https://en.wikipedia.org/wiki/Spatial_reference_system) which defines 
 where in Earth these coordinates are. Coordinate Reference Systems might cover the entire planet with limited precision and risks of distortion, or might only cover a limited portion of the globe with high accuracy.
@@ -95,14 +95,14 @@ It is compatible with the standard KNIME coloring of rows done by the [Color Man
 
 # Installation
 
-You can install these nodes in KNIME 3.7.2 or above following these steps:
+You can install these nodes in KNIME 4.6 or above following these steps:
 * in KNIME, open Help/Install new software
 * Click top right button "Add", and add the repository:
-	* name: "Recent unstable contributions"
-	* Location: http://update.knime.com/community-contributions/trunk
-* After clicking ok, select this "Recent unstable contributions" entry in the combo box,
-* Select the collection of nodes named "Spatial Processing Nodes"
-* Follow the next steps to install 
+	* name: "KNIME EIFER Repository"
+	* Location: https://knime.res-ear.ch 
+* After clicking ok, select this "KNIME EIFER Repository" entry in the combo box,
+* Select the collection of nodes named "Shapefiles nodes for KNIME based on GeoTools"
+* Follow the guidance from KNIME to install 
 
 
 # Demo, examples
@@ -119,9 +119,9 @@ You can install these nodes in KNIME 3.7.2 or above following these steps:
 
  
 
-# Copyright and License
+# Copyright and License
 
-Copyright (c) 2019 [EIFER](https://www.eifer.kit.edu/) (European Institute for Energy Research).
+Copyright (c) 2022 [EIFER](https://www.eifer.kit.edu/) (European Institute for Energy Research).
 This program and the accompanying materials are made available under the terms of the GNU GENERAL PUBLIC LICENSE
 which accompanies this distribution, and is available at [https://www.gnu.org/licenses/gpl-3.0.html](https://www.gnu.org/licenses/gpl-3.0.html)
 
