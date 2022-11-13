@@ -1,12 +1,11 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Geocoding
+Bundle-Name: KNIME Nodes for Geocoding
 Bundle-SymbolicName: ch.res_ear.samthiriot.knime.geocoding;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Export-Package: ch.res_ear.samthiriot.knime.geocoding,
- ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding,
- ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.google,
- ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.osm
+ ch.res_ear.samthiriot.knime.geocoding.google,
+ ch.res_ear.samthiriot.knime.geocoding.osm
 Bundle-Activator: ch.res_ear.samthiriot.knime.geocoding.Activator
 Bundle-ClassPath: .,
  target/classes/,

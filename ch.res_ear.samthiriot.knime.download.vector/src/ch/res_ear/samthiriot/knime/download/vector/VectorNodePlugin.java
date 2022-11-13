@@ -12,19 +12,12 @@
  * $Revision$ $Date$ $Author$
  *
  */
-package ch.res_ear.samthiriot.knime.shapefilesaswkt;
-
-import java.io.File;
+package ch.res_ear.samthiriot.knime.download.vector;
 
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
-import org.geotools.util.factory.Hints;
-import org.knime.core.node.NodeLogger;
 import org.osgi.framework.BundleContext;
 
-import ch.res_ear.samthiriot.knime.shapefilesaswkt.preferences.PreferenceConstants;
+import ch.res_ear.samthiriot.knime.download.vector.read_from_geofabrik.GeofabrikUtils;
 
 /**
  * This is the eclipse bundle activator.
@@ -35,16 +28,15 @@ import ch.res_ear.samthiriot.knime.shapefilesaswkt.preferences.PreferenceConstan
  *
  * @author Samuel Thiriot (EIFER)
  */
-public class ShapefileAsWKTNodePlugin extends Plugin {
+public class VectorNodePlugin extends Plugin {
     // The shared instance.
-    private static ShapefileAsWKTNodePlugin plugin;
+    private static VectorNodePlugin plugin;
 
-    public static final String KEY_PREFERENCE_STORE = "ch.res_ear.samthiriot.knime.shapefilesaswkt.preferences";
-    
+   
     /**
      * The constructor.
      */
-    public ShapefileAsWKTNodePlugin() {
+    public VectorNodePlugin() {
         super();
         plugin = this;
     }
@@ -58,17 +50,9 @@ public class ShapefileAsWKTNodePlugin extends Plugin {
     @Override
     public void start(final BundleContext context) throws Exception {
         super.start(context);
-
-        try {
-        	Hints.putSystemDefault(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
-        } catch (RuntimeException e) {
-        	NodeLogger
-        		.getLogger(ShapefileAsWKTNodePlugin.class)
-        		.warn(
-        				"unable to define hints for the geotools library: "+e.getMessage(), 
-        				e);
-        }
         
+        // update the list of geofabrik sources
+        GeofabrikUtils.obtainListOfDataExtracts();
     }
 
     /**
@@ -88,26 +72,10 @@ public class ShapefileAsWKTNodePlugin extends Plugin {
      * 
      * @return Singleton instance of the Plugin
      */
-    public static ShapefileAsWKTNodePlugin getDefault() {
+    public static VectorNodePlugin getDefault() {
         return plugin;
     }
 
-	public IPreferenceStore getPreferenceStore() {
-		//Preferences preferences = InstanceScope.INSTANCE.getNode(ShapefileAsWKTNodePlugin.KEY_PREFERENCE_STORE);
-		
-		IPreferenceStore prefs = new ScopedPreferenceStore(
-				InstanceScope.INSTANCE, 
-				KEY_PREFERENCE_STORE
-				);
-		{
-			File f = new File(System.getProperty("java.io.tmpdir"));
-			File f2 = new File(f, "spatial data cache");
-			f2.mkdirs();
-			
-			prefs.setDefault(PreferenceConstants.P_DIRECTORY_CACHE, f2.getAbsolutePath());
-		}
-		return prefs;
-	}
 
 }
 

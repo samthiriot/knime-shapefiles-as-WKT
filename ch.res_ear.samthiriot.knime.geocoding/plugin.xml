@@ -28,14 +28,14 @@
 <node
       category-path="/community/spatialAsWKT/geocode"
       deprecated="false"
-      factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.google.GeocodingGoogleNodeFactory"
-      id="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.google.GeocodingGoogleNodeFactory">
+      factory-class="ch.res_ear.samthiriot.knime.geocoding.google.GeocodingGoogleNodeFactory"
+      id="ch.res_ear.samthiriot.knime.geocoding.google.GeocodingGoogleNodeFactory">
 </node>
 <node
       category-path="/community/spatialAsWKT/geocode"
       deprecated="false"
-      factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.osm.GeocodingOSMNodeFactory"
-      id="ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geocoding.osm.GeocodingOSMNodeFactory">
+      factory-class="ch.res_ear.samthiriot.knime.geocoding.osm.GeocodingOSMNodeFactory"
+      id="ch.res_ear.samthiriot.knime.geocoding.osm.GeocodingOSMNodeFactory">
 </node>
 </extension>
    
