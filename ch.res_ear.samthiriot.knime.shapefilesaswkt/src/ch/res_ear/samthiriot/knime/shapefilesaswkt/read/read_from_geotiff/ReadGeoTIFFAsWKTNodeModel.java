@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.media.jai.PlanarImage;
-import javax.media.jai.RasterFactory;
 import javax.media.jai.iterator.RectIter;
 
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -39,6 +38,7 @@ import org.knime.core.data.DataColumnProperties;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.MissingCell;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.DoubleCell;
@@ -63,6 +63,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.core.util.FileUtil;
+import org.locationtech.jts.geom.Point;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
@@ -91,10 +92,13 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
 
     private final SettingsModelString m_file = new SettingsModelString("filename", null);
 
-    private final SettingsModelBoolean m_createColumnId = new SettingsModelBoolean("create col id", true);
+    private final SettingsModelBoolean m_createColumnId = new SettingsModelBoolean("create col id", false);
     private final SettingsModelBoolean m_createColumnCoords = new SettingsModelBoolean("create col coords", true);
-    private final SettingsModelBoolean m_createColumnGeom = new SettingsModelBoolean("create col geom", true);
+    private final SettingsModelBoolean m_createColumnGeom = new SettingsModelBoolean("create col geom", false);
+    private final SettingsModelBoolean m_createColumnLatLon = new SettingsModelBoolean("create spatial coords", false);
 
+    private final SettingsModelBoolean m_detectMasked = new SettingsModelBoolean("detect masked values", false);
+    private final SettingsModelBoolean m_skipAllMasked = new SettingsModelBoolean("skip when all masked", false);
 
 	/**
 	 * Constructor for the node model.
@@ -189,6 +193,18 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
         	specs.add(creatorGeom.createSpec());
         
 	    }
+
+	    if (m_createColumnLatLon.getBooleanValue()) {
+        	specs.add(new DataColumnSpecCreator(
+        			"latitude",
+        			DoubleCell.TYPE
+        			).createSpec());
+        	specs.add(new DataColumnSpecCreator(
+        			"longitude",
+        			DoubleCell.TYPE
+        			).createSpec());
+	    }
+	    
 	    	
 	    
     	return specs.toArray(new DataColumnSpec[specs.size()]);
@@ -208,7 +224,11 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
     	final boolean createId = m_createColumnId.getBooleanValue();
     	final boolean createCoords = m_createColumnCoords.getBooleanValue();
     	final boolean createGeom = m_createColumnGeom.getBooleanValue();
-
+    	final boolean createSpatialCoords = m_createColumnLatLon.getBooleanValue();
+    	
+        final boolean maskedMissing = m_detectMasked.getBooleanValue();
+        final boolean maskedSkip = m_skipAllMasked.getBooleanValue();
+        
     	// open the file
 
     	// retrieve parameters
@@ -247,6 +267,25 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
         final int numBands = raster.getSampleModel().getNumBands();
         final int dataType = raster.getSampleModel().getDataType();
         
+        {
+	        final Envelope2D envelopeInit = coverage.getEnvelope2D();
+	        pushFlowVariableDouble("origin x", envelopeInit.x);
+	        pushFlowVariableDouble("origin y", envelopeInit.y);
+	        pushFlowVariableDouble("envelope left", envelopeInit.getMinX());
+	        pushFlowVariableDouble("envelope bottom", envelopeInit.getMinY());
+	        pushFlowVariableDouble("envelope width", envelopeInit.width);
+	        pushFlowVariableDouble("envelope height", envelopeInit.height);
+	        pushFlowVariableDouble("envelope right", envelopeInit.getMaxX());
+	        pushFlowVariableDouble("envelope top", envelopeInit.getMaxY());
+	        
+	    	GridEnvelope2D envelope = new GridEnvelope2D(0, 0, 1, 1);
+	    	Envelope2D crsEnvelope = coverage.getGridGeometry().gridToWorld(envelope);
+	    	
+	        // TODO extcract the right things!!!
+	        pushFlowVariableDouble("pixel width", crsEnvelope.width);
+	        pushFlowVariableDouble("pixel height", crsEnvelope.height);
+        }
+        
         final double[] valuesD = new double[numBands];
         final int[] valuesI = new int[numBands];
 
@@ -260,6 +299,8 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
         long line = 0;
         iterator.startLines();
         int y = 0;
+        final MissingCell missing = new MissingCell("undefined in the geotiff file");
+
         while (!iterator.finishedLines()) {
 			iterator.startPixels();
 			int x=0;
@@ -282,6 +323,8 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
 					cells.add(IntCellFactory.create(x));
 				}
 				
+		    	boolean allMissing = true;
+
 			    switch (dataType) {
 			    case DataBuffer.TYPE_BYTE:
 			    case DataBuffer.TYPE_INT:
@@ -289,40 +332,58 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
 			    case DataBuffer.TYPE_USHORT:
 			    	iterator.getPixel(valuesI);
 			      	for (int i = 0; i < numBands; i++) {
-			    	  	cells.add(IntCellFactory.create(valuesI[i]));
+			      		if (maskedMissing && Integer.MIN_VALUE == valuesI[i] )
+				    	  	cells.add(missing);
+			      		else {
+			    	  		cells.add(IntCellFactory.create(valuesI[i]));
+			    	  		allMissing = false;
+			      		}
 			      	}
 			      	break;
 			    case DataBuffer.TYPE_DOUBLE:
 			    case DataBuffer.TYPE_FLOAT:
 			    	iterator.getPixel(valuesD);
 			    	for (int i = 0; i < numBands; i++) {
-			    		cells.add(DoubleCellFactory.create(valuesD[i]));
+			      		if (maskedMissing && (Math.abs(valuesD[i] + Double.MAX_VALUE) < 1E-20) )
+				    	  	cells.add(missing);
+			      		else {
+				    		cells.add(DoubleCellFactory.create(valuesD[i]));
+			    	  		allMissing = false;
+			      		}
 			    	}
 			    	break;
 			    default:
 			    	break;
 			    }
 			    
-			    if (createGeom) {
-
-			    	GridEnvelope2D envelope = new GridEnvelope2D(x, y, 1, 1);
-			    	Envelope2D crsEnvelope = coverage.getGridGeometry().gridToWorld(envelope);
-			    	org.locationtech.jts.geom.Polygon poly = FeatureUtilities.getPolygon(crsEnvelope, (int)line);
-
-		            cells.add(StringCellFactory.create(poly.toString()));
-			    }
-	              
-			    RasterFactory.createPixelInterleavedSampleModel(DataBuffer.TYPE_INT, planarImg.getWidth(), planarImg.getHeight(), 1);
-				
-			    container.addRowToTable(
-	        			new DefaultRow(
-		        			new RowKey("Row_" + line), 
-		        			cells
-		        			)
-	        			);
-				
-	            exec.checkCanceled();
+			    // no value
+		      	if (!maskedSkip || !allMissing) {
+				    
+				    if (createGeom || createSpatialCoords) {
 	
+				    	GridEnvelope2D envelope = new GridEnvelope2D(x, y, 1, 1);
+				    	Envelope2D crsEnvelope = coverage.getGridGeometry().gridToWorld(envelope);
+				    	org.locationtech.jts.geom.Polygon poly = FeatureUtilities.getPolygon(crsEnvelope, (int)line);
+	
+				    	if (createGeom)
+				    		cells.add(StringCellFactory.create(poly.toString()));
+				    	
+				    	if (createSpatialCoords) {
+				    		Point p = poly.getCentroid();
+				    		cells.add(DoubleCellFactory.create(p.getY()));				    		
+				    		cells.add(DoubleCellFactory.create(p.getX()));
+				    	}
+				    }
+		              				
+				    container.addRowToTable(
+		        			new DefaultRow(
+			        			new RowKey("Row_" + line), 
+			        			cells
+			        			)
+		        			);
+				
+		      	}
+		      	
 	        	line++;
 	        	
 	        	if (line % 100 == 1) {
@@ -348,6 +409,11 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
         // once we are done, we close the container and return its table
         container.close();
         BufferedDataTable out = container.getTable();
+        
+        // add flow variables for the CRS
+        pushFlowVariableString("CRS_code", SpatialUtils.getStringForCRS(crs));
+        pushFlowVariableString("CRS_WKT", crs.toWKT());
+        
         return new BufferedDataTable[]{ out };
     }
 
@@ -365,7 +431,11 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
     	m_createColumnId.saveSettingsTo(settings);
     	m_createColumnCoords.saveSettingsTo(settings);
     	m_createColumnGeom.saveSettingsTo(settings);
+    	m_createColumnLatLon.saveSettingsTo(settings);
     	
+        m_detectMasked.saveSettingsTo(settings);
+        m_skipAllMasked.saveSettingsTo(settings);
+        
     }
 
     /**
@@ -380,7 +450,11 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
         m_createColumnId.loadSettingsFrom(settings);
         m_createColumnCoords.loadSettingsFrom(settings);
     	m_createColumnGeom.loadSettingsFrom(settings);
+    	m_createColumnLatLon.loadSettingsFrom(settings);
     	
+		m_detectMasked.loadSettingsFrom(settings);
+		m_skipAllMasked.loadSettingsFrom(settings);
+
     }
 
     /**
@@ -395,7 +469,10 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
     	m_createColumnId.validateSettings(settings);
     	m_createColumnCoords.validateSettings(settings);
     	m_createColumnGeom.validateSettings(settings);
+    	m_createColumnLatLon.validateSettings(settings);
     	
+		m_detectMasked.validateSettings(settings);
+		m_skipAllMasked.validateSettings(settings);
 
     }
     

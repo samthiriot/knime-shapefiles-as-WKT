@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode 
+		icon="./shp-wkt-writer-icon.png" 
+		type="Sink" 
+		xmlns="http://knime.org/node/v2.8" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+		
+    <name>Write Raster to GeoTIFF</name>
+    
+    <shortDescription>
+        Writes Raster to GeoJSON format
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        Takes a raster table as input, and writes in into a
+		<a href="https://en.wikipedia.org/wiki/GeoTIFF">GeoTIFF format</a>.         
+		<p>
+		Takes as an input a table with two integer columns for the X and Y coordinates of the pixels (not latitude and longitude).
+		It will store all the other numeric columns as bands of the GeoTIFF. If you want to ignore some columns, please filter them first with a "column filter" node.
+		Non-numeric columns will be ignored.
+		</p>
+		
+		<p>
+		If all the numeric columns are integers, it will create a GeoTIFF with integer values. If any column is double, the GeoTIFF will contain double values.
+		</p>
+		
+		<p>
+        The actual processing is done by the 
+        opensource <a href="https://geotools.org/">geotools library</a>.
+		The GeoTIFF format is unsupported in GeoTools, so this node might work in most cases but not support the full GeoTIFF format.
+		</p>
+		</intro>        
+        
+        <option name="filename">File to create or erase.</option>
+        <option name="X coordinate">Select the column of the table in which the X coordinate is stored.</option>
+        <option name="Y coordinate">Select the column of the table in which the Y coordinate is stored.</option>
+        
+        <option name="CRS">Choose the Coordinate Reference System.</option>
+
+        <option name="Compression method">Compression saves space, at the expanse of processing power and  writing/reading time. All formats are lossless. 
+        LZW has the highest compression ratio, highest processing power; then comes DEFLATE; PACKBITS has the lowest compression ratio and lowest processing power.</option>
+    
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="In-Port name">Raster data in a knime table</inPort>
+    </ports>    
+    
+</knimeNode>

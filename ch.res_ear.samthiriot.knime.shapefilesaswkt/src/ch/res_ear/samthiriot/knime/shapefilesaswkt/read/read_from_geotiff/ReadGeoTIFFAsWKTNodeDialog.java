@@ -27,12 +27,16 @@ public class ReadGeoTIFFAsWKTNodeDialog extends DefaultNodeSettingsPane {
     protected ReadGeoTIFFAsWKTNodeDialog() {
         super();
         
+        createNewGroup("File");
+        
         addDialogComponent(new DialogComponentFileChooser(
         		new SettingsModelString("filename", null),
         		"GeoTIFF",
         		".tif|.tiff" // TODO other extensions?
         		));
                    
+        createNewGroup("Columns to create");
+
         addDialogComponent(new DialogComponentBoolean(
         		new SettingsModelBoolean("create col id", true),
         		"Create a column for ID"
@@ -42,8 +46,23 @@ public class ReadGeoTIFFAsWKTNodeDialog extends DefaultNodeSettingsPane {
         		"Create columns with line/column"
         		));
         addDialogComponent(new DialogComponentBoolean(
-        		new SettingsModelBoolean("create col geom", true),
+        		new SettingsModelBoolean("create col geom", false),
         		"Create a column for the geometry"
+        		));
+        addDialogComponent(new DialogComponentBoolean(
+        		new SettingsModelBoolean("create spatial coords", false),
+        		"Create columns with latitude/longitude"
+        		));
+        
+        createNewGroup("Missing / masked values");
+
+        addDialogComponent(new DialogComponentBoolean(
+        		new SettingsModelBoolean("detect masked values", false),
+        		"Detect masked values"
+        		));
+        addDialogComponent(new DialogComponentBoolean(
+        		new SettingsModelBoolean("skip when all masked", false),
+        		"Skip rows when all values are missing"
         		));
     }
 }
