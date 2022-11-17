@@ -260,68 +260,114 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
     	logger.info("will create "+numericColumnsUnused.size()+" "+(type == DataBuffer.TYPE_INT ? "integer" : "double")+" band"+(numericColumnsUnused.size()>1?"s":"")+" named "+String.join(", ", numericColumnsUnused));
     	
     	// detect the envelope
-    	exec.setMessage("detecting the bounding box");
+    	exec.setMessage("detecting the grid size");
     	int minX = Integer.MAX_VALUE;
     	int minY = Integer.MAX_VALUE;
     	int maxX = Integer.MIN_VALUE;
     	int maxY = Integer.MIN_VALUE;
 
-    	// TODO measure max value and adapt the type
-    	
+    	// detect min-max values
+    	double maxValue = - Double.MAX_VALUE;
+    	double minValue = Double.MAX_VALUE;
+    			    	
     	int currentRow = 0;
     	CloseableRowIterator itRow = inputPopulation.iterator();
     	while (itRow.hasNext()) {
 			DataRow row = itRow.next();
+			
 			Integer x = ((IntValue)row.getCell(idxColX)).getIntValue();
 			if (x < minX)
 				minX = x;
 			if (x > maxX)
 				maxX = x;
+			
 			Integer y = ((IntValue)row.getCell(idxColY)).getIntValue();
 			if (y < minY)
 				minY = y;
 			if (y > maxY)
 				maxY = y;
 			
+			for (int b=0; b<bandsColIdx.length; b++) {
+				double cellValue = ((DoubleValue)row.getCell(bandsColIdx[b])).getDoubleValue();   
+				if (cellValue > maxValue)
+					maxValue = cellValue;
+				if (cellValue < minValue)
+					minValue = cellValue;
+			}
+			
 			if (currentRow % 100 == 0) {
-				exec.setProgress(0.3*(double)currentRow / inputPopulation.size(), "detecting the bounding box");
+				exec.setProgress(0.3*(double)currentRow / inputPopulation.size(), "detecting the grid size");
 				exec.checkCanceled();
 			}
 			currentRow++;
 		}
     	itRow.close();
-		exec.setProgress(0.3, "detecting the bounding box");
+		exec.setProgress(0.3, "detecting the grid size");
 		exec.checkCanceled();
-		
+
     	final int width = maxX - minX + 1;
     	final int height = maxY - minY + 1;
-    	final long pixels = width*height;
-    	logger.info("the bounding box is ("+minX+","+minY+") ("+maxX+","+maxY+"), that is an image of "+width+"x"+height+" pixels");
-    	
+    	final long pixels = width * height;
+    	logger.info("the grid size is ("+minX+","+minY+") ("+maxX+","+maxY+"), that is an image of "+width+"x"+height+" pixels");
+
     	// controls!
     	if (inputPopulation.size() < pixels)
     		setWarningMessage("There are less rows that pixels. The image will be only partly defined");
     	else if (inputPopulation.size() > pixels)
     		throw new RuntimeException("There are more rows that pixels. Please ensure you selected the right columns for the coordinates.");
+    	final boolean expectMissingValues = inputPopulation.size() < pixels;
     	
-    	
-
+		// adapt the precise data type according to max values.
+		// TODO
+    	int typePrecise = type;
+    	double maxAbsValue = Math.max( Math.abs(minValue), Math.abs(maxValue) );
+		switch (type) {
+		case DataBuffer.TYPE_INT:
+			if (maxAbsValue <= 255 && !(expectMissingValues && minValue==0)) { // dont use a type that would store "missing" the same way as actual data
+				typePrecise = DataBuffer.TYPE_BYTE;
+				logger.info("data will be stored as byte");
+			} else if (maxAbsValue <= Short.MAX_VALUE) {
+				typePrecise = DataBuffer.TYPE_SHORT;
+				logger.info("data will be stored as short");
+			} 
+			else if (minValue > 0 && maxAbsValue <= Short.MAX_VALUE * 2 && !(expectMissingValues && minValue==0))  {
+				typePrecise = DataBuffer.TYPE_USHORT;	
+				logger.info("data will be stored as unsigned short");
+			} 
+			else  {
+				typePrecise = DataBuffer.TYPE_INT;
+				logger.info("data will be stored as integer");
+			} 
+			break;
+		case DataBuffer.TYPE_DOUBLE:
+			if (maxAbsValue <= Float.MAX_VALUE) {
+				typePrecise = DataBuffer.TYPE_FLOAT;
+				logger.info("data will be stored as float");
+			} 
+			else  {
+				typePrecise = DataBuffer.TYPE_DOUBLE;				
+				logger.info("data will be stored as double");
+			} 
+			break;
+		default:
+			throw new RuntimeException("unsupported data type");
+		}
+	
     	// first create the image from data
     	exec.setProgress(0.3, "creation of the grid data");
 
     	// prepare the future data
         final SampleModel sampleModel = RasterFactory.createPixelInterleavedSampleModel(
-        		type, 
+        		typePrecise, 
                 width, height, 
                 bandsColIdx.length
                 );
-        //final WritableRaster raster = Raster.createWritableRaster(sampleModel, new Point(minX, minY));
-        final WritableRaster raster = RasterFactory.createBandedRaster(type, width, height, bandsColIdx.length, null);
+        final WritableRaster raster = RasterFactory.createBandedRaster(typePrecise, width, height, bandsColIdx.length, null);
 
         // set the default values (if necessary)
         if (inputPopulation.size() < pixels) {
         	exec.setMessage("defining default values...");
-        	fillRasterWithDefault(exec, minX, minY, maxX, maxY, bandsColIdx, type, raster);
+        	fillRasterWithDefault(exec, minX, minY, maxX, maxY, bandsColIdx, type, typePrecise, raster);
         }    	
 		exec.checkCanceled();
 
@@ -425,6 +471,9 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
         final ParameterValueGroup params = format.getWriteParameters();
         params.parameter(AbstractGridFormat.GEOTOOLS_WRITE_PARAMS.getName().toString()).setValue(wp);
 
+        if (file.exists())
+        	file.delete();
+        
         GridCoverageWriter writer = format.getWriter(file);
         
         writer.write(gc, (GeneralParameterValue[]) params.values().toArray(new GeneralParameterValue[1]));
@@ -439,13 +488,34 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
 
 
 	private void fillRasterWithDefault(final ExecutionContext exec, int minX, int minY, int maxX, int maxY,
-			int[] bandsColIdx, int type, final WritableRaster raster) throws CanceledExecutionException {
+			int[] bandsColIdx, int type, int typePrecise, final WritableRaster raster) throws CanceledExecutionException {
+		
+		
 		switch (type) {
+		
 		case DataBuffer.TYPE_INT:
+			int valueI;
+			switch (typePrecise) {
+			case DataBuffer.TYPE_BYTE:
+				valueI = 0;
+				break;
+			case DataBuffer.TYPE_SHORT:
+				valueI = Short.MIN_VALUE;
+				break;
+			case DataBuffer.TYPE_USHORT:
+				valueI = 0;
+				break;
+			case DataBuffer.TYPE_INT:
+				valueI = Integer.MIN_VALUE;
+				break;
+			default:
+				throw new RuntimeException("unsupported data precise type " + typePrecise);
+			}
+			logger.info("fillimg missing data with value "+valueI);
 			for (int b=0; b<bandsColIdx.length; b++) {
 				for (int x=minX; x<maxX; x++) {
 		    		for (int y=minY; y<maxY; y++) {
-		    			raster.setSample(x, y, b, Integer.MIN_VALUE);
+		    			raster.setSample(x, y, b, valueI);
 		    		}
 		    	}    
 	    		exec.checkCanceled();
@@ -453,19 +523,33 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
 			}
 			break;
 		case DataBuffer.TYPE_DOUBLE:
+			double valueD;
+			switch (typePrecise) {
+			case DataBuffer.TYPE_FLOAT:
+				valueD = Float.MIN_VALUE;
+				break;
+			case DataBuffer.TYPE_DOUBLE:
+				valueD = Double.MIN_VALUE;
+				break;
+			default:
+				throw new RuntimeException("unsupported data precise type " + typePrecise);
+			}
+			logger.info("fillimg missing data with value "+valueD);
 			for (int b=0; b<bandsColIdx.length; b++) {
 				for (int x=minX; x<maxX; x++) {
 		    		for (int y=minY; y<maxY; y++) {
-		    			raster.setSample(x, y, b, -Double.MAX_VALUE);
+		    			raster.setSample(x, y, b, valueD);
 		    		}
-		    	}   
+		    	}    
 	    		exec.checkCanceled();
-	    		// TODO progress
+	    		// TODO progress		
 			}
 			break;
 		default:
-			throw new RuntimeException("unsupported data type");
+			throw new RuntimeException("unsupported data type " + type);
 		}
+		
+	
 	}
 
 

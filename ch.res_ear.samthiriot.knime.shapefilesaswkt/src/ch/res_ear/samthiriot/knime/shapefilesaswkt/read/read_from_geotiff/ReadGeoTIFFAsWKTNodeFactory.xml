@@ -29,6 +29,11 @@
         Several variables are also produced with metadata such as the coordinate reference system, the pixel size or the bounding box. 
         </p>
         <p>
+        In some files, a specific value should be interpreted as "missing". 
+        We consider here that the missing value is the lowest possible value in the type used for storage 
+        (which means 0 for unsigned types such as Byte ou unsigned short).
+		</p>
+        <p>
         The actual decoding of the shapefile format is done using the <a href="https://geotools.org/">geotools library</a>.
        	The support of GeoTIFF is unsupported in GeoTools, so this node might work in most cases but not support the full GeoJSON format.
         </p>

@@ -38,6 +38,7 @@ import org.knime.core.data.DataColumnProperties;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.DataType;
 import org.knime.core.data.MissingCell;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
@@ -152,31 +153,33 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
         
         //if (numBands != names.length)
         //	throw new RuntimeException("wrong count of names");
-        	
+        
+        DataType type = null;
+        
 	    switch (dataType) {
+	    
 	    case DataBuffer.TYPE_BYTE:
 	    case DataBuffer.TYPE_INT:
 	    case DataBuffer.TYPE_SHORT:
 	    case DataBuffer.TYPE_USHORT:
-	      	for (int i = 0; i < numBands; i++) {
-	        	specs.add(new DataColumnSpecCreator(
-	        	        coverage.getSampleDimension(i).getDescription().toString(),
-	        			IntCell.TYPE
-	        			).createSpec());
-	        }
+	    	type = IntCell.TYPE;
 	      	break;
+	      	
 	    case DataBuffer.TYPE_DOUBLE:
 	    case DataBuffer.TYPE_FLOAT:
-	    	for (int i = 0; i < numBands; i++) {
-	        	specs.add(new DataColumnSpecCreator(
-	        			coverage.getSampleDimension(i).getDescription().toString(),
-	        			DoubleCell.TYPE
-	        			).createSpec());
-	        	}
+	    	type = DoubleCell.TYPE;
 	    	break;
 	    default:
-	    	break;
+	    	throw new RuntimeException("Unknown data type "+dataType);
 	    }
+	    
+	    for (int i = 0; i < numBands; i++) {
+        	specs.add(new DataColumnSpecCreator(
+        	        coverage.getSampleDimension(i).getDescription().toString(),
+        			type
+        			).createSpec());
+        }
+      	
 
 	    // geometry column 
 	    if (m_createColumnGeom.getBooleanValue()) {
@@ -299,8 +302,51 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
         long line = 0;
         iterator.startLines();
         int y = 0;
-        final MissingCell missing = new MissingCell("undefined in the geotiff file");
 
+        // deal with missing values
+        final MissingCell missing = new MissingCell("undefined in the geotiff file");
+    	int missingI = 0;
+    	double missingD = 0;
+    	
+    	switch (dataType) {
+	    case DataBuffer.TYPE_BYTE:
+	    	missingI = 0;
+	    	break;
+	    case DataBuffer.TYPE_INT:
+	    	missingI = Integer.MIN_VALUE;
+	    	break;
+	    case DataBuffer.TYPE_SHORT:
+	    	missingI = Short.MIN_VALUE;
+	    	break;
+	    case DataBuffer.TYPE_USHORT:
+	    	missingI = 0;
+	    	break;
+	    case DataBuffer.TYPE_DOUBLE:
+	    	missingD = Double.MIN_VALUE;;
+	    	break;			    
+	    case DataBuffer.TYPE_FLOAT:
+	    	missingD = Float.MIN_VALUE;
+	    	break;
+	    default:
+	    	throw new RuntimeException("unknown data type: "+dataType);
+	    }
+    	if (maskedMissing) {
+        	switch (dataType) {
+    	    case DataBuffer.TYPE_BYTE:
+    	    case DataBuffer.TYPE_INT:
+    	    case DataBuffer.TYPE_SHORT:
+    	    case DataBuffer.TYPE_USHORT:
+    	    	logger.info("will consider as missimg values value "+missingI);
+    	    	break;
+    	    case DataBuffer.TYPE_DOUBLE:
+    	    case DataBuffer.TYPE_FLOAT:
+    	    	logger.info("will consider as missimg values value "+missingD);
+    	    	break;
+    	    default:
+    	    	throw new RuntimeException("unknown data type: "+dataType);
+    	    }
+    	}
+    	
         while (!iterator.finishedLines()) {
 			iterator.startPixels();
 			int x=0;
@@ -325,14 +371,14 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
 				
 		    	boolean allMissing = true;
 
-			    switch (dataType) {
+		    	switch (dataType) {
 			    case DataBuffer.TYPE_BYTE:
 			    case DataBuffer.TYPE_INT:
 			    case DataBuffer.TYPE_SHORT:
 			    case DataBuffer.TYPE_USHORT:
 			    	iterator.getPixel(valuesI);
 			      	for (int i = 0; i < numBands; i++) {
-			      		if (maskedMissing && Integer.MIN_VALUE == valuesI[i] )
+			      		if (maskedMissing && missingI == valuesI[i] )
 				    	  	cells.add(missing);
 			      		else {
 			    	  		cells.add(IntCellFactory.create(valuesI[i]));
@@ -344,7 +390,7 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
 			    case DataBuffer.TYPE_FLOAT:
 			    	iterator.getPixel(valuesD);
 			    	for (int i = 0; i < numBands; i++) {
-			      		if (maskedMissing && (Math.abs(valuesD[i] + Double.MAX_VALUE) < 1E-20) )
+			      		if (maskedMissing && (Math.abs(valuesD[i] + missingD) < 1E-20) )
 				    	  	cells.add(missing);
 			      		else {
 				    		cells.add(DoubleCellFactory.create(valuesD[i]));
@@ -353,7 +399,7 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
 			    	}
 			    	break;
 			    default:
-			    	break;
+			    	throw new RuntimeException("unknown data type: "+dataType);
 			    }
 			    
 			    // no value
