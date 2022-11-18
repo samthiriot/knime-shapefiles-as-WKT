@@ -107,6 +107,8 @@ You can install these nodes in KNIME 4.6 or above following these steps:
 
 # Demo, examples
 
+You can [download all the demo workflows here](all-demo-workflows.knar). 
+
 * [read geometries from ESRI shapefiles](pages/0_read_shapefiles/index.md)
 * [merge shapefiles in KNIME](pages/1_merge_shapefiles/index.md)
 * [reproject geometries](pages/2_reproject/index.md)
@@ -118,7 +120,6 @@ You can install these nodes in KNIME 4.6 or above following these steps:
 * [extract raster data in GeoTIFF and vectorize it](pages/8_read_geotiff/index.md)
 * [compute the accessibility of buildings to services](pages/9_demo_accessibility_zones/index.md)
 
- 
 
 # Copyright and License
 
