@@ -157,7 +157,11 @@
       factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.properties.type.TypeOfWKTGeometriesNodeFactory">
 </node>
    <node category-path="/community/spatialAsWKT/writeSpatialAsWKT" deprecated="false" factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.write.write_to_shapefile.WriteWKTAsShapefileNodeFactory"/>
-<node category-path="/community/spatialAsWKT/writeSpatialAsWKT" deprecated="false" factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.write.write_to_kml.WriteWKTToKMLNodeFactory"/>
+<node
+      category-path="/community/spatialAsWKT/writeSpatialAsWKT"
+      deprecated="false"
+      factory-class="ch.res_ear.samthiriot.knime.shapefilesaswkt.write.write_to_kml.WriteWKTToKMLNodeFactory"
+      hidden="true"/>
 <node
       category-path="/community/spatialAsWKT/writeSpatialAsWKT"
       deprecated="false"

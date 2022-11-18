@@ -227,8 +227,7 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
 		}
         
     	File file = FileUtil.getFileFromURL(url);
-        
-		
+   
     	// read the CRS from parameters
     	CoordinateReferenceSystem crs = null; 
 		try {

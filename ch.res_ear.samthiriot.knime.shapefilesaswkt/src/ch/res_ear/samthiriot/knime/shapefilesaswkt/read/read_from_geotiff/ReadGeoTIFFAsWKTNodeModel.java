@@ -220,247 +220,270 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
 
-    	
-    	// see https://gis.stackexchange.com/questions/106882/reading-each-pixel-of-each-band-of-multiband-geotiff-with-geotools-java
-
-    	
-    	final boolean createId = m_createColumnId.getBooleanValue();
-    	final boolean createCoords = m_createColumnCoords.getBooleanValue();
-    	final boolean createGeom = m_createColumnGeom.getBooleanValue();
-    	final boolean createSpatialCoords = m_createColumnLatLon.getBooleanValue();
-    	
-        final boolean maskedMissing = m_detectMasked.getBooleanValue();
-        final boolean maskedSkip = m_skipAllMasked.getBooleanValue();
-        
-    	// open the file
-
-    	// retrieve parameters
-        CheckUtils.checkSourceFile(m_file.getStringValue());
-        
-        // identify the file containing the KML (possibly with knime:// protocol)
-        URL filename;
 		try {
-			filename = FileUtil.toURL(m_file.getStringValue());
-		} catch (InvalidPathException | MalformedURLException e2) {
-			e2.printStackTrace();
-			throw new InvalidSettingsException("unable to open URL "+m_file.getStringValue()+": "+e2.getMessage());
-		}
-        
-        if (filename == null)
-        	throw new InvalidSettingsException("no file defined");
-       
-        exec.setMessage("Opening the file");
-
-        // open the file content
-        InputStream inputStream;
-		try {
-			inputStream = FileUtil.openStreamWithTimeout(filename);
-		} catch (IOException e2) {
-			e2.printStackTrace();
-			throw new IllegalArgumentException("unable to open the URL "+filename+": "+e2.getMessage());
-		}
-
-		final Hints hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
-        GeoTiffReader reader = new GeoTiffReader(inputStream, hints);
-        
-        GridCoverage2D coverage = reader.read(null);
-		CoordinateReferenceSystem crs = coverage.getCoordinateReferenceSystem();
-        
-        final RenderedImage raster = coverage.getRenderedImage();
-        final int numBands = raster.getSampleModel().getNumBands();
-        final int dataType = raster.getSampleModel().getDataType();
-        
-        {
-	        final Envelope2D envelopeInit = coverage.getEnvelope2D();
-	        pushFlowVariableDouble("origin x", envelopeInit.x);
-	        pushFlowVariableDouble("origin y", envelopeInit.y);
-	        pushFlowVariableDouble("envelope left", envelopeInit.getMinX());
-	        pushFlowVariableDouble("envelope bottom", envelopeInit.getMinY());
-	        pushFlowVariableDouble("envelope width", envelopeInit.width);
-	        pushFlowVariableDouble("envelope height", envelopeInit.height);
-	        pushFlowVariableDouble("envelope right", envelopeInit.getMaxX());
-	        pushFlowVariableDouble("envelope top", envelopeInit.getMaxY());
-	        
-	    	GridEnvelope2D envelope = new GridEnvelope2D(0, 0, 1, 1);
-	    	Envelope2D crsEnvelope = coverage.getGridGeometry().gridToWorld(envelope);
+	
+	    	// see https://gis.stackexchange.com/questions/106882/reading-each-pixel-of-each-band-of-multiband-geotiff-with-geotools-java
 	    	
-	        // TODO extcract the right things!!!
-	        pushFlowVariableDouble("pixel width", crsEnvelope.width);
-	        pushFlowVariableDouble("pixel height", crsEnvelope.height);
-        }
-        
-        final double[] valuesD = new double[numBands];
-        final int[] valuesI = new int[numBands];
-
-        PlanarImage planarImg = PlanarImage.wrapRenderedImage(raster);
-        RectIter iterator = RectIterFactory.create(raster, planarImg.getBounds());
-
-        final int total = planarImg.getHeight() * planarImg.getWidth();
-        
-        final BufferedDataContainer container = exec.createDataContainer(new DataTableSpec(createSpecs(coverage, raster, crs)));
-
-        long line = 0;
-        iterator.startLines();
-        int y = 0;
-
-        // deal with missing values
-        final MissingCell missing = new MissingCell("undefined in the geotiff file");
-    	int missingI = 0;
-    	double missingD = 0;
-    	
-    	switch (dataType) {
-	    case DataBuffer.TYPE_BYTE:
-	    	missingI = 0;
-	    	break;
-	    case DataBuffer.TYPE_INT:
-	    	missingI = Integer.MIN_VALUE;
-	    	break;
-	    case DataBuffer.TYPE_SHORT:
-	    	missingI = Short.MIN_VALUE;
-	    	break;
-	    case DataBuffer.TYPE_USHORT:
-	    	missingI = 0;
-	    	break;
-	    case DataBuffer.TYPE_DOUBLE:
-	    	missingD = Double.MIN_VALUE;;
-	    	break;			    
-	    case DataBuffer.TYPE_FLOAT:
-	    	missingD = Float.MIN_VALUE;
-	    	break;
-	    default:
-	    	throw new RuntimeException("unknown data type: "+dataType);
-	    }
-    	if (maskedMissing) {
-        	switch (dataType) {
-    	    case DataBuffer.TYPE_BYTE:
-    	    case DataBuffer.TYPE_INT:
-    	    case DataBuffer.TYPE_SHORT:
-    	    case DataBuffer.TYPE_USHORT:
-    	    	logger.info("will consider as missimg values value "+missingI);
-    	    	break;
-    	    case DataBuffer.TYPE_DOUBLE:
-    	    case DataBuffer.TYPE_FLOAT:
-    	    	logger.info("will consider as missimg values value "+missingD);
-    	    	break;
-    	    default:
-    	    	throw new RuntimeException("unknown data type: "+dataType);
-    	    }
-    	}
-    	
-        while (!iterator.finishedLines()) {
-			iterator.startPixels();
-			int x=0;
-            
-			exec.checkCanceled();
-			exec.setProgress(
-        			(double)line/total, 
-        			"reading pixels of line "+y
-        			);
-            
-			while (!iterator.finishedPixels()) {
-
-				ArrayList<DataCell> cells = new ArrayList<DataCell>(numBands);
-				
-				if (createId)
-					cells.add(LongCellFactory.create(line));
-				
-				if (createCoords) {
-					cells.add(IntCellFactory.create(y));
-					cells.add(IntCellFactory.create(x));
-				}
-				
-		    	boolean allMissing = true;
-
-		    	switch (dataType) {
-			    case DataBuffer.TYPE_BYTE:
-			    case DataBuffer.TYPE_INT:
-			    case DataBuffer.TYPE_SHORT:
-			    case DataBuffer.TYPE_USHORT:
-			    	iterator.getPixel(valuesI);
-			      	for (int i = 0; i < numBands; i++) {
-			      		if (maskedMissing && missingI == valuesI[i] )
-				    	  	cells.add(missing);
-			      		else {
-			    	  		cells.add(IntCellFactory.create(valuesI[i]));
-			    	  		allMissing = false;
-			      		}
-			      	}
-			      	break;
-			    case DataBuffer.TYPE_DOUBLE:
-			    case DataBuffer.TYPE_FLOAT:
-			    	iterator.getPixel(valuesD);
-			    	for (int i = 0; i < numBands; i++) {
-			      		if (maskedMissing && (Math.abs(valuesD[i] + missingD) < 1E-20) )
-				    	  	cells.add(missing);
-			      		else {
-				    		cells.add(DoubleCellFactory.create(valuesD[i]));
-			    	  		allMissing = false;
-			      		}
-			    	}
-			    	break;
-			    default:
-			    	throw new RuntimeException("unknown data type: "+dataType);
-			    }
-			    
-			    // no value
-		      	if (!maskedSkip || !allMissing) {
-				    
-				    if (createGeom || createSpatialCoords) {
+	    	final boolean createId = m_createColumnId.getBooleanValue();
+	    	final boolean createCoords = m_createColumnCoords.getBooleanValue();
+	    	final boolean createGeom = m_createColumnGeom.getBooleanValue();
+	    	final boolean createSpatialCoords = m_createColumnLatLon.getBooleanValue();
+	    	
+	        final boolean maskedMissing = m_detectMasked.getBooleanValue();
+	        final boolean maskedSkip = m_skipAllMasked.getBooleanValue();
+	        
+	    	// open the file
 	
-				    	GridEnvelope2D envelope = new GridEnvelope2D(x, y, 1, 1);
-				    	Envelope2D crsEnvelope = coverage.getGridGeometry().gridToWorld(envelope);
-				    	org.locationtech.jts.geom.Polygon poly = FeatureUtilities.getPolygon(crsEnvelope, (int)line);
+	    	// retrieve parameters
+	        CheckUtils.checkSourceFile(m_file.getStringValue());
+	        
+	        // identify the file containing the KML (possibly with knime:// protocol)
+	        URL filename;
+			try {
+				filename = FileUtil.toURL(m_file.getStringValue());
+			} catch (InvalidPathException | MalformedURLException e2) {
+				e2.printStackTrace();
+				throw new InvalidSettingsException("unable to open URL "+m_file.getStringValue()+": "+e2.getMessage());
+			}
+	        
+	        if (filename == null)
+	        	throw new InvalidSettingsException("no file defined");
+	       
+	        exec.setMessage("Opening the file");
 	
-				    	if (createGeom)
-				    		cells.add(StringCellFactory.create(poly.toString()));
-				    	
-				    	if (createSpatialCoords) {
-				    		Point p = poly.getCentroid();
-				    		cells.add(DoubleCellFactory.create(p.getY()));				    		
-				    		cells.add(DoubleCellFactory.create(p.getX()));
+	        // open the file content
+	        InputStream inputStream;
+			try {
+				inputStream = FileUtil.openStreamWithTimeout(filename);
+			} catch (IOException e2) {
+				e2.printStackTrace();
+				throw new IllegalArgumentException("unable to open the URL "+filename+": "+e2.getMessage());
+			}
+	
+			final Hints hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
+	        GeoTiffReader reader = new GeoTiffReader(inputStream, hints);
+	        
+	        GridCoverage2D coverage = null;
+	        CoordinateReferenceSystem crs = null;
+	        try { 
+	        	coverage = reader.read(null);
+	        	crs = coverage.getCoordinateReferenceSystem();
+	        } catch (Exception e) {
+	        	logger.error("error while reading the file: "+e.getMessage(), e);
+	        	e.printStackTrace();
+	        	throw e;
+	        } catch (Error e) {
+	        	logger.error("error while reading the file: "+e.getMessage(), e);
+	        	e.printStackTrace();
+	        	throw e;
+	        }
+			
+	        final RenderedImage raster = coverage.getRenderedImage();
+	        final int numBands = raster.getSampleModel().getNumBands();
+	        final int dataType = raster.getSampleModel().getDataType();
+	        
+	        {
+		        final Envelope2D envelopeInit = coverage.getEnvelope2D();
+		        pushFlowVariableDouble("origin x", envelopeInit.x);
+		        pushFlowVariableDouble("origin y", envelopeInit.y);
+		        pushFlowVariableDouble("envelope left", envelopeInit.getMinX());
+		        pushFlowVariableDouble("envelope bottom", envelopeInit.getMinY());
+		        pushFlowVariableDouble("envelope width", envelopeInit.width);
+		        pushFlowVariableDouble("envelope height", envelopeInit.height);
+		        pushFlowVariableDouble("envelope right", envelopeInit.getMaxX());
+		        pushFlowVariableDouble("envelope top", envelopeInit.getMaxY());
+		        
+		    	GridEnvelope2D envelope = new GridEnvelope2D(0, 0, 1, 1);
+		    	Envelope2D crsEnvelope = coverage.getGridGeometry().gridToWorld(envelope);
+		    	
+		        // TODO extcract the right things!!!
+		        pushFlowVariableDouble("pixel width", crsEnvelope.width);
+		        pushFlowVariableDouble("pixel height", crsEnvelope.height);
+	        }
+	        
+	        final double[] valuesD = new double[numBands];
+	        final int[] valuesI = new int[numBands];
+	
+	        PlanarImage planarImg = PlanarImage.wrapRenderedImage(raster);
+	        RectIter iterator = RectIterFactory.create(raster, planarImg.getBounds());
+	
+	        final int total = planarImg.getHeight() * planarImg.getWidth();
+	        
+	        final BufferedDataContainer container = exec.createDataContainer(new DataTableSpec(createSpecs(coverage, raster, crs)));
+	
+	        long line = 0;
+	        iterator.startLines();
+	        int y = 0;
+	
+	        // deal with missing values
+	        final MissingCell missing = new MissingCell("undefined in the geotiff file");
+	    	int missingI = 0;
+	    	double missingD = 0;
+	    	
+	    	switch (dataType) {
+		    case DataBuffer.TYPE_BYTE:
+		    	missingI = 0;
+		    	break;
+		    case DataBuffer.TYPE_INT:
+		    	missingI = Integer.MIN_VALUE;
+		    	break;
+		    case DataBuffer.TYPE_SHORT:
+		    	missingI = Short.MIN_VALUE;
+		    	break;
+		    case DataBuffer.TYPE_USHORT:
+		    	missingI = 0;
+		    	break;
+		    case DataBuffer.TYPE_DOUBLE:
+		    	missingD = Double.MIN_VALUE;;
+		    	break;			    
+		    case DataBuffer.TYPE_FLOAT:
+		    	missingD = Float.MIN_VALUE;
+		    	break;
+		    default:
+		    	throw new RuntimeException("unknown data type: "+dataType);
+		    }
+	    	if (maskedMissing) {
+	        	switch (dataType) {
+	    	    case DataBuffer.TYPE_BYTE:
+	    	    case DataBuffer.TYPE_INT:
+	    	    case DataBuffer.TYPE_SHORT:
+	    	    case DataBuffer.TYPE_USHORT:
+	    	    	logger.info("will consider as missimg values value "+missingI);
+	    	    	break;
+	    	    case DataBuffer.TYPE_DOUBLE:
+	    	    case DataBuffer.TYPE_FLOAT:
+	    	    	logger.info("will consider as missimg values value "+missingD);
+	    	    	break;
+	    	    default:
+	    	    	throw new RuntimeException("unknown data type: "+dataType);
+	    	    }
+	    	}
+	    	
+	        while (!iterator.finishedLines()) {
+				iterator.startPixels();
+				int x=0;
+	            
+				exec.checkCanceled();
+				exec.setProgress(
+	        			(double)line/total, 
+	        			"reading pixels of line "+y
+	        			);
+	            
+				while (!iterator.finishedPixels()) {
+	
+					ArrayList<DataCell> cells = new ArrayList<DataCell>(numBands);
+					
+					if (createId)
+						cells.add(LongCellFactory.create(line));
+					
+					if (createCoords) {
+						cells.add(IntCellFactory.create(y));
+						cells.add(IntCellFactory.create(x));
+					}
+					
+			    	boolean allMissing = true;
+	
+			    	switch (dataType) {
+				    case DataBuffer.TYPE_BYTE:
+				    case DataBuffer.TYPE_INT:
+				    case DataBuffer.TYPE_SHORT:
+				    case DataBuffer.TYPE_USHORT:
+				    	iterator.getPixel(valuesI);
+				      	for (int i = 0; i < numBands; i++) {
+				      		if (maskedMissing && missingI == valuesI[i] )
+					    	  	cells.add(missing);
+				      		else {
+				    	  		cells.add(IntCellFactory.create(valuesI[i]));
+				    	  		allMissing = false;
+				      		}
+				      	}
+				      	break;
+				    case DataBuffer.TYPE_DOUBLE:
+				    case DataBuffer.TYPE_FLOAT:
+				    	iterator.getPixel(valuesD);
+				    	for (int i = 0; i < numBands; i++) {
+				      		if (maskedMissing && (Math.abs(valuesD[i] + missingD) < 1E-20) )
+					    	  	cells.add(missing);
+				      		else {
+					    		cells.add(DoubleCellFactory.create(valuesD[i]));
+				    	  		allMissing = false;
+				      		}
 				    	}
+				    	break;
+				    default:
+				    	throw new RuntimeException("unknown data type: "+dataType);
 				    }
-		              				
-				    container.addRowToTable(
-		        			new DefaultRow(
-			        			new RowKey("Row_" + line), 
-			        			cells
-			        			)
-		        			);
-				
-		      	}
-		      	
-	        	line++;
+				    
+				    // no value
+			      	if (!maskedSkip || !allMissing) {
+					    
+					    if (createGeom || createSpatialCoords) {
+		
+					    	GridEnvelope2D envelope = new GridEnvelope2D(x, y, 1, 1);
+					    	Envelope2D crsEnvelope = coverage.getGridGeometry().gridToWorld(envelope);
+					    	org.locationtech.jts.geom.Polygon poly = FeatureUtilities.getPolygon(crsEnvelope, (int)line);
+		
+					    	if (createGeom)
+					    		cells.add(StringCellFactory.create(poly.toString()));
+					    	
+					    	if (createSpatialCoords) {
+					    		Point p = poly.getCentroid();
+					    		cells.add(DoubleCellFactory.create(p.getY()));				    		
+					    		cells.add(DoubleCellFactory.create(p.getX()));
+					    	}
+					    }
+			              				
+					    container.addRowToTable(
+			        			new DefaultRow(
+				        			new RowKey("Row_" + line), 
+				        			cells
+				        			)
+			        			);
+					
+			      	}
+			      	
+		        	line++;
+		        	
+		        	if (line % 100 == 1) {
+		    			exec.checkCanceled();
+		    			exec.setProgress(
+		            			(double)line/total);
+		        	}
+		        	
+	              iterator.nextPixel();
+	              x++;
+	            }
+	
 	        	
-	        	if (line % 100 == 1) {
-	    			exec.checkCanceled();
-	    			exec.setProgress(
-	            			(double)line/total);
-	        	}
-	        	
-              iterator.nextPixel();
-              x++;
-            }
-
-        	
-            iterator.nextLine();
-            y++;
-          }
-        exec.setProgress(
-    			(double)line/total, 
-    			"reading pixels"
-    			);
-
-        
-        // once we are done, we close the container and return its table
-        container.close();
-        BufferedDataTable out = container.getTable();
-        
-        // add flow variables for the CRS
-        pushFlowVariableString("CRS_code", SpatialUtils.getStringForCRS(crs));
-        pushFlowVariableString("CRS_WKT", crs.toWKT());
-        
-        return new BufferedDataTable[]{ out };
+	            iterator.nextLine();
+	            y++;
+	          }
+	        exec.setProgress(
+	    			(double)line/total, 
+	    			"reading pixels"
+	    			);
+	
+	        
+	        // once we are done, we close the container and return its table
+	        container.close();
+	        BufferedDataTable out = container.getTable();
+	        
+	        // add flow variables for the CRS
+	        pushFlowVariableString("CRS_code", SpatialUtils.getStringForCRS(crs));
+	        pushFlowVariableString("CRS_WKT", crs.toWKT());
+	        
+	        return new BufferedDataTable[]{ out };
+	        
+        } catch (Exception e) {
+        	logger.error("exception while reading the file: "+e.getMessage(), e);
+        	e.printStackTrace();
+        	throw e;
+        } catch (Error e) {
+        	logger.error("error while reading the file: "+e.getMessage(), e);
+        	e.printStackTrace();
+        	throw e;
+        }
+		
     }
 
     

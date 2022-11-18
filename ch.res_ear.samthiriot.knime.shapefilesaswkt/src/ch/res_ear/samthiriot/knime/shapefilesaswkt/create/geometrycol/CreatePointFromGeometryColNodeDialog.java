@@ -10,7 +10,6 @@
  *******************************************************************************/
 package ch.res_ear.samthiriot.knime.shapefilesaswkt.create.geometrycol;
 
-import org.knime.core.data.DoubleValue;
 import org.knime.core.data.StringValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;

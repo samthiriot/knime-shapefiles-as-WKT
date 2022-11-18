@@ -13,9 +13,7 @@ package ch.res_ear.samthiriot.knime.shapefilesaswkt.write.write_to_geojson;
 import javax.swing.JFileChooser;
 
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
-import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
-import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
 /**
