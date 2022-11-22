@@ -99,7 +99,9 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
     private final SettingsModelBoolean m_createColumnLatLon = new SettingsModelBoolean("create spatial coords", false);
 
     private final SettingsModelBoolean m_detectMasked = new SettingsModelBoolean("detect masked values", false);
-    private final SettingsModelBoolean m_skipAllMasked = new SettingsModelBoolean("skip when all masked", false);
+    private final SettingsModelBoolean m_skipAllMasked = new SettingsModelBoolean("skip when all masked", true);
+
+    private final SettingsModelString m_maskedValue = new SettingsModelString("masked value", "");
 
 	/**
 	 * Constructor for the node model.
@@ -320,39 +322,58 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
 	    	int missingI = 0;
 	    	double missingD = 0;
 	    	
-	    	switch (dataType) {
-		    case DataBuffer.TYPE_BYTE:
-		    	missingI = 0;
-		    	break;
-		    case DataBuffer.TYPE_INT:
-		    	missingI = Integer.MIN_VALUE;
-		    	break;
-		    case DataBuffer.TYPE_SHORT:
-		    	missingI = Short.MIN_VALUE;
-		    	break;
-		    case DataBuffer.TYPE_USHORT:
-		    	missingI = 0;
-		    	break;
-		    case DataBuffer.TYPE_DOUBLE:
-		    	missingD = Double.MIN_VALUE;;
-		    	break;			    
-		    case DataBuffer.TYPE_FLOAT:
-		    	missingD = Float.MIN_VALUE;
-		    	break;
-		    default:
-		    	throw new RuntimeException("unknown data type: "+dataType);
-		    }
+	    	if (!m_maskedValue.getStringValue().isBlank()) {
+	        	switch (dataType) {
+	    	    case DataBuffer.TYPE_BYTE:
+	    	    case DataBuffer.TYPE_INT:
+	    	    case DataBuffer.TYPE_SHORT:
+	    	    case DataBuffer.TYPE_USHORT:
+	    	    	missingI = Integer.parseInt(m_maskedValue.getStringValue());
+	    	    	break;
+	    	    case DataBuffer.TYPE_DOUBLE:
+	    	    case DataBuffer.TYPE_FLOAT:
+	    	    	missingD = Double.parseDouble(m_maskedValue.getStringValue());
+	    	    	break;
+	    	    default:
+	    	    	throw new RuntimeException("unknown data type: "+dataType);
+	    	    }
+	    	} else {
+		    	switch (dataType) {
+			    case DataBuffer.TYPE_BYTE:
+			    	missingI = 0;
+			    	break;
+			    case DataBuffer.TYPE_INT:
+			    	missingI = Integer.MIN_VALUE;
+			    	break;
+			    case DataBuffer.TYPE_SHORT:
+			    	missingI = Short.MIN_VALUE;
+			    	break;
+			    case DataBuffer.TYPE_USHORT:
+			    	missingI = 0;
+			    	break;
+			    case DataBuffer.TYPE_DOUBLE:
+			    	missingD = -Double.MAX_VALUE;;
+			    	break;			    
+			    case DataBuffer.TYPE_FLOAT:
+			    	missingD = -Float.MAX_VALUE;
+			    	break;
+			    default:
+			    	throw new RuntimeException("unknown data type: "+dataType);
+			    }
+	    	}
+	    		
+
 	    	if (maskedMissing) {
 	        	switch (dataType) {
 	    	    case DataBuffer.TYPE_BYTE:
 	    	    case DataBuffer.TYPE_INT:
 	    	    case DataBuffer.TYPE_SHORT:
 	    	    case DataBuffer.TYPE_USHORT:
-	    	    	logger.info("will consider as missimg values value "+missingI);
+	    	    	logger.info("will consider as missing values value "+missingI);
 	    	    	break;
 	    	    case DataBuffer.TYPE_DOUBLE:
 	    	    case DataBuffer.TYPE_FLOAT:
-	    	    	logger.info("will consider as missimg values value "+missingD);
+	    	    	logger.info("will consider as missing values value "+missingD);
 	    	    	break;
 	    	    default:
 	    	    	throw new RuntimeException("unknown data type: "+dataType);
@@ -402,7 +423,7 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
 				    case DataBuffer.TYPE_FLOAT:
 				    	iterator.getPixel(valuesD);
 				    	for (int i = 0; i < numBands; i++) {
-				      		if (maskedMissing && (Math.abs(valuesD[i] + missingD) < 1E-20) )
+				      		if (maskedMissing && (Math.abs(valuesD[i] - missingD) < 1E-20) )
 					    	  	cells.add(missing);
 				      		else {
 					    		cells.add(DoubleCellFactory.create(valuesD[i]));
@@ -504,7 +525,7 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
     	
         m_detectMasked.saveSettingsTo(settings);
         m_skipAllMasked.saveSettingsTo(settings);
-        
+        m_maskedValue.saveSettingsTo(settings);
     }
 
     /**
@@ -523,7 +544,7 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
     	
 		m_detectMasked.loadSettingsFrom(settings);
 		m_skipAllMasked.loadSettingsFrom(settings);
-
+		m_maskedValue.loadSettingsFrom(settings);
     }
 
     /**
@@ -542,7 +563,7 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
     	
 		m_detectMasked.validateSettings(settings);
 		m_skipAllMasked.validateSettings(settings);
-
+		m_maskedValue.validateSettings(settings);
     }
     
     /**

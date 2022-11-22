@@ -53,6 +53,7 @@
        
       	<option name="Detect masked values">Consider the values at lower infinity as being masked (slows down reading, but reduces the volume of data produced)</option>     
        	<option name="Skip rows when all values are missing">When all bands are detected missing, skip the row (might save space)</option>
+       	<option name="Value to skip">Enter the numerical value to consider as missing. Leave blank to use the lowest value possible.</option>
        
        
        

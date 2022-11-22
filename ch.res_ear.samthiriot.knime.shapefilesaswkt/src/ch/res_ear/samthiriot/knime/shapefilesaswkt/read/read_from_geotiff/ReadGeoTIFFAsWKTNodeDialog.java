@@ -13,6 +13,7 @@ package ch.res_ear.samthiriot.knime.shapefilesaswkt.read.read_from_geotiff;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
+import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
@@ -64,6 +65,10 @@ public class ReadGeoTIFFAsWKTNodeDialog extends DefaultNodeSettingsPane {
         		new SettingsModelBoolean("skip when all masked", false),
         		"Skip rows when all values are missing"
         		));
-    }
+        addDialogComponent(new DialogComponentString(
+        		new SettingsModelString("masked value", ""),
+        		"Value to skip (blank for autodetect)"
+        		));
+    }   
 }
 
