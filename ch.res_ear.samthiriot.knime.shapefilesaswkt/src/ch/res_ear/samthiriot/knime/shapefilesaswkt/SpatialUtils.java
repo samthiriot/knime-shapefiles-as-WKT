@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,6 +27,7 @@ import java.util.Random;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.collection.ListFeatureCollection;
+import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
@@ -175,7 +177,7 @@ public class SpatialUtils {
 	
 	
 	public static DataStore createDataStore() {
-        return SpatialUtils.createTmpDataStore(true);
+        return SpatialUtils.createTmpDataStore(true, Charset.defaultCharset().name());
 	}
 
 	
@@ -624,16 +626,14 @@ public class SpatialUtils {
 		AddRowsRunnable runnable = new AddRowsRunnable(sample, idxColGeom, store, type, execProgress, false, null);
 
 		runnable.run();
-		
-		
+			
 	}
-		
-	
+
 	/**
 	 * Create a temporary datastore
 	 * @return
 	 */
-	public static DataStore createTmpDataStore(boolean createSpatialIndex) {
+	public static DataStore createTmpDataStore(boolean createSpatialIndex, String charset) {
         File file;
 		try {
 			file = FileUtil.createTempFile("datastore", ".shp", true);
@@ -642,12 +642,14 @@ public class SpatialUtils {
 			throw new RuntimeException("unable to create a geotools datastore", e1);
 
 		}
-		
-		return createDataStore(file, createSpatialIndex);
+		return createDataStore(file, createSpatialIndex, charset);
 	}
 	
+	public static DataStore createTmpDataStore(boolean createSpatialIndex) {
+		return createTmpDataStore(createSpatialIndex, Charset.defaultCharset().name());
+	}
 	
-	public static DataStore createDataStore(File file, boolean createSpatialIndex) {
+	public static DataStore createDataStore(File file, boolean createSpatialIndex, String charset) {
         
 		Map<String,Serializable> map = new HashMap<>();
 		try {
@@ -667,9 +669,19 @@ public class SpatialUtils {
 			throw new RuntimeException("unable to create a geotools datastore", e);
 		}
 		
+		// set the charset
+		try {
+			((ShapefileDataStore)dataStore).setCharset(Charset.forName(charset));
+		} catch (ClassCastException e) {
+			throw new RuntimeException("unable to define charset for this datastore");
+		}
+		
 		return dataStore;
 	}
 	
+	public static DataStore createDataStore(File file, boolean createSpatialIndex) {
+		return createDataStore(file, createSpatialIndex, Charset.defaultCharset().name());
+	}
 	
 	/** 
 	 * finds the entities of a datastore contained inside 

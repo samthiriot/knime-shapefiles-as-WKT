@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -72,6 +73,7 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
     final static int MAX_COLUMNS = 255;
 	
     private final SettingsModelString m_file = new SettingsModelString("filename", null);
+    private final SettingsModelString m_charset = new SettingsModelString("charset", Charset.defaultCharset().name());
 
 
     /**
@@ -100,7 +102,8 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
     		throw new IllegalArgumentException("the input table contains spatial data but no Coordinate Reference System");
     	    	
     	CoordinateReferenceSystem crsOrig = SpatialUtils.decodeCRS(inputPopulation.getSpec());
-    	
+    	final String charset = m_charset.getStringValue();
+
     	URL url;
 		try {
 			
@@ -116,7 +119,7 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
     	
     	// copy the input population into a datastore
     	exec.setMessage("storing entities");
-        DataStore datastore = SpatialUtils.createDataStore(file, true);
+        DataStore datastore = SpatialUtils.createDataStore(file, true, charset);
         
 		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
         builder.setName("entities");
@@ -301,6 +304,7 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         
     	m_file.saveSettingsTo(settings);
+    	m_charset.saveSettingsTo(settings);
 
     }
 
@@ -313,6 +317,7 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
             
         
     	m_file.loadSettingsFrom(settings);
+    	m_charset.loadSettingsFrom(settings);
 
     }
 
@@ -324,6 +329,7 @@ public class WriteWKTAsShapefileNodeModel extends NodeModel {
             throws InvalidSettingsException {
             
     	m_file.validateSettings(settings);
+    	m_charset.validateSettings(settings);
 
     }
     

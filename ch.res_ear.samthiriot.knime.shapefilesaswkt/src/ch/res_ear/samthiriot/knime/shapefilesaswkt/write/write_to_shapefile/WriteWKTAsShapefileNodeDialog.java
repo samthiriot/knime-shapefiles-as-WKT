@@ -10,11 +10,15 @@
  *******************************************************************************/
 package ch.res_ear.samthiriot.knime.shapefilesaswkt.write.write_to_shapefile;
 
+import java.nio.charset.Charset;
+
 import javax.swing.JFileChooser;
 
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentFileChooser;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
+
+import ch.res_ear.samthiriot.knime.dialogs.DialogComponentEncodingSelection;
 
 /**
  * <code>NodeDialog</code> for the "WriteWKTAsShapefile" Node.
@@ -44,6 +48,11 @@ public class WriteWKTAsShapefileNodeDialog extends DefaultNodeSettingsPane {
         		JFileChooser.SAVE_DIALOG,
         		false
         		));  
+
+        addDialogComponent(new DialogComponentEncodingSelection(
+        		new SettingsModelString("charset", Charset.defaultCharset().name()),
+        		false
+        		));
     }
 }
 
