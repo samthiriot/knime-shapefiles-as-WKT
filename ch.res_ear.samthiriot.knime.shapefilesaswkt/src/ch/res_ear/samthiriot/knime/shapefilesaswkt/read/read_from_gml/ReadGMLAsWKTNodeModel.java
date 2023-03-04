@@ -24,8 +24,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.wfs.GML;
 import org.geotools.wfs.GML.Version;
@@ -55,7 +53,6 @@ import org.locationtech.jts.geom.Geometry;
 import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.xml.sax.SAXException;
 
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.FeaturesDecodingUtils;
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
@@ -112,7 +109,11 @@ public class ReadGMLAsWKTNodeModel extends NodeModel {
 	 */
 	protected SimpleFeatureIterator getFeaturesIterator() throws InvalidSettingsException {
 	
-		URL filename;
+    	// fail if no file
+    	if (m_file.getStringValue() == null)
+    		throw new IllegalArgumentException("No filename provided");
+
+    	URL filename;
 		try {
 			filename = FileUtil.toURL(m_file.getStringValue());
 		} catch (InvalidPathException | MalformedURLException e2) {
@@ -173,7 +174,7 @@ public class ReadGMLAsWKTNodeModel extends NodeModel {
 		SimpleFeatureIterator iter = null;
 		try {
 			iter = gml.decodeFeatureIterator(inputStream);
-		} catch (IOException | ParserConfigurationException | SAXException e) {
+		} catch (Exception e) { // IOException | ParserConfigurationException | SAXException
 			throw new InvalidSettingsException("unable to decode the file as GML: "+e.getMessage(), e);
 		}
 		

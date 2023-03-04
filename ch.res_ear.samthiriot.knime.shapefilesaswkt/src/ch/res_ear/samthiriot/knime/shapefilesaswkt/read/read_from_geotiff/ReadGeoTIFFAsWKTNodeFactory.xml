@@ -15,23 +15,47 @@
     <fullDescription>
         <intro>
         <p>
-        Reads spatial data stored in <a href="https://en.wikipedia.org/wiki/GeoTIFF">GeoTIFF format</a>
-        and decodes the geometries into <a href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">WKT (Well-known Text Representation)</a>. 
+        Reads spatial data stored in <a href="https://en.wikipedia.org/wiki/GeoTIFF">GeoTIFF format</a>. 
         Decodes every attribute of the spatial features as a column of a corresponding KNIME type.
         </p>
         <p>
 		GeoTIFF is raster, or coverage, data. 
-		We produce TODO
+		We produce a table with (according to options) the row id, the x/y coordinates of the cell.
+		You miqht also create a vector polygon for every pixel (slower). 
+		Every band in the GeoTIFF file is extracted as a columns. Types are detected automatically. 
+		Column namer are the names of the bands in the file.
         </p>
+        <p>
+        Several variables are also produced with metadata such as the coordinate reference system, the pixel size or the bounding box. 
+        </p>
+        <p>
+        In some files, a specific value should be interpreted as "missing". 
+        We consider here that the missing value is the lowest possible value in the type used for storage 
+        (which means 0 for unsigned types such as Byte ou unsigned short).
+		</p>
         <p>
         The actual decoding of the shapefile format is done using the <a href="https://geotools.org/">geotools library</a>.
        	The support of GeoTIFF is unsupported in GeoTools, so this node might work in most cases but not support the full GeoJSON format.
-        
         </p>
         
         </intro>
         
         <option name="Selected file">The KML to open (often finishing with .kml)</option>
+       
+        <option name="Create a column for ID">Create a column with the index of the pixel (first is 0, the first one right is 1, etc)</option>
+        <option name="Create columns with line/column">Create columns for the x/y coordinates in the cell (not latitude / longitude)</option>
+        <option name="Create a column for the geometry">Create a column with a vector geometry (slower)</option>
+        <option name="Create columns with latitude/longitude">Create columns with the latitude/longitude of the centroid of the pixel (slower)</option>
+        
+        <option name="Selected file">The KML to open (often finishing with .kml)</option>
+       
+      
+       
+      	<option name="Detect masked values">Consider the values at lower infinity as being masked (slows down reading, but reduces the volume of data produced)</option>     
+       	<option name="Skip rows when all values are missing">When all bands are detected missing, skip the row (might save space)</option>
+       	<option name="Value to skip">Enter the numerical value to consider as missing. Leave blank to use the lowest value possible.</option>
+       
+       
        
     </fullDescription>
     

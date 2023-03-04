@@ -19,8 +19,6 @@ import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.geotools.feature.simple.SimpleFeatureImpl;
 import org.geotools.referencing.CRS;
 import org.geotools.xsd.Parser;
@@ -47,7 +45,6 @@ import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.xml.sax.SAXException;
 
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.FeaturesDecodingUtils;
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
@@ -117,11 +114,10 @@ public class ReadKMLAsWKTNodeModel extends NodeModel {
         SimpleFeature f;
 		try {
 			f = (SimpleFeature) parser.parse( inputStream );
-		} catch (IOException | SAXException | ParserConfigurationException e2) {
+		} catch (Exception e2) { // IOException | SAXException | ParserException...
 			e2.printStackTrace();
 			throw new IllegalArgumentException("Invalid file content "+filename+": "+e2.getMessage());
-
-		}
+		} 
 		
 		return f;
 	}
