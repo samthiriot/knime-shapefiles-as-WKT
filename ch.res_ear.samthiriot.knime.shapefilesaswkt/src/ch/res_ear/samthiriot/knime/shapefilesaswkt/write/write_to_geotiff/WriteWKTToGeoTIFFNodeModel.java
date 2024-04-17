@@ -287,11 +287,15 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
 				maxY = y;
 			
 			for (int b=0; b<bandsColIdx.length; b++) {
-				double cellValue = ((DoubleValue)row.getCell(bandsColIdx[b])).getDoubleValue();   
-				if (cellValue > maxValue)
-					maxValue = cellValue;
-				if (cellValue < minValue)
-					minValue = cellValue;
+				try {
+					double cellValue = ((DoubleValue)row.getCell(bandsColIdx[b])).getDoubleValue();   
+					if (cellValue > maxValue)
+						maxValue = cellValue;
+					if (cellValue < minValue)
+						minValue = cellValue;
+				}catch(ClassCastException e) {
+
+				}
 			}
 			
 			if (currentRow % 100 == 0) {
@@ -362,12 +366,13 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
                 bandsColIdx.length
                 );
         final WritableRaster raster = RasterFactory.createBandedRaster(typePrecise, width, height, bandsColIdx.length, null);
-
-        // set the default values (if necessary)
+        System.out.println(raster.getDataBuffer().getElemDouble(1));
+        /** set the default values (if necessary)
         if (inputPopulation.size() < pixels) {
         	exec.setMessage("defining default values...");
         	fillRasterWithDefault(exec, minX, minY, maxX, maxY, bandsColIdx, type, typePrecise, raster);
-        }    	
+        }
+        **/	
 		exec.checkCanceled();
 
         // read the data        
@@ -381,12 +386,24 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
 			switch (type) {
 			case DataBuffer.TYPE_INT:
 				for (int b=0; b<bandsColIdx.length; b++) {
-					raster.setSample(x, y, b, ((IntValue)row.getCell(bandsColIdx[b])).getIntValue());     					      
+					try {
+						raster.setSample(x, y, b, ((IntValue)row.getCell(bandsColIdx[b])).getIntValue());
+					}catch(ClassCastException e){
+						if(row.getCell(bandsColIdx[b]).toString()!="?"){
+							throw e;
+						}
+					}
 				}
 				break;
 			case DataBuffer.TYPE_DOUBLE:
 				for (int b=0; b<bandsColIdx.length; b++) {
-					raster.setSample(x, y, b, ((DoubleValue)row.getCell(bandsColIdx[b])).getDoubleValue());     					      
+					try {
+						raster.setSample(x, y, b, ((DoubleValue)row.getCell(bandsColIdx[b])).getDoubleValue());
+					}catch(ClassCastException e){
+						if(row.getCell(bandsColIdx[b]).toString()!="?"){
+							throw e;
+						}
+					}
 				}
 				break;
 			default:
