@@ -22,8 +22,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -326,7 +324,6 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
     	int typePrecise = type;
     	double maxAbsValue = Math.max( Math.abs(minValue), Math.abs(maxValue) );
     	Number missingValue = null;
-    	List<Number> candidatesForMissingValue = new LinkedList<Number>();
     	
     	final String strMinMax = " (min: "+minValue+", max:"+maxValue+")";
     	
@@ -384,11 +381,6 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
 					missingValue = Integer.MIN_VALUE;
 				else if (maxValue < Integer.MAX_VALUE)
 					missingValue = Integer.MAX_VALUE;
-				else 
-					for (int i=0; i<500; i++) {
-						candidatesForMissingValue.add(Integer.MIN_VALUE+i);
-						candidatesForMissingValue.add(Integer.MAX_VALUE-i);
-					}
 			} 
 			break;
 		case DataBuffer.TYPE_DOUBLE:
@@ -403,13 +395,6 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
 					missingValue = minValue * 0.9999;
 				else if (maxValue * 1.001 < Float.MAX_VALUE)
 					missingValue = maxValue * 1.001;
-				else { 
-					candidatesForMissingValue.add(0.0);
-					for (int i=0; i<100; i++) {
-						candidatesForMissingValue.add(-Float.MAX_VALUE+i);
-						candidatesForMissingValue.add(Float.MAX_VALUE-i);
-					}
-				}
 			} 
 			else  {
 				typePrecise = DataBuffer.TYPE_DOUBLE;				
@@ -418,13 +403,6 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
 					missingValue = minValue * 0.9999;
 				else if (maxValue * 1.001 < Double.MAX_VALUE)
 					missingValue = maxValue * 1.001;
-				else {
-					for (int i=0; i<100; i++) {
-						candidatesForMissingValue.add(-Double.MAX_VALUE+i);
-						candidatesForMissingValue.add(Double.MAX_VALUE-i);
-					}
-					candidatesForMissingValue.add(0.0);
-				}
 			} 
 			break;
 		default:
@@ -433,10 +411,6 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
 	
 		// define what value we might use as missing data
 		if (containsNull) {
-			if (missingValue == null) {
-				logger.info("no missing value found, searching among a list of candidates...");
-				missingValue = proposeMissingValue(inputPopulation, type, bandsColIdx, candidatesForMissingValue);
-			}
 			if (missingValue == null) 
 				throw new RuntimeException("unable to find a value for the mask");
 			logger.info("there might be missing data in the file, proposing as masked value: "+missingValue);
@@ -601,61 +575,6 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
     	
         return new BufferedDataTable[]{};
         
-	}
-
-	/**
-	 * For every value in a list of potential candidates for missing values, 
-	 * retains only the values not used in the data table
-	 * @param inputPopulation
-	 * @param candidatesForMissingValue
-	 * @return
-	 */
-	private Number proposeMissingValue(
-			BufferedDataTable inputPopulation,
-			int type,
-			int[] bandsColIdx,
-			List<Number> candidatesForMissingValue) {
-		
-		LinkedHashSet<Number> candidates = new LinkedHashSet<Number>(candidatesForMissingValue);
-		
-		logger.info("starting the detection of a potential missing value among values "+candidates);
-		
-		CloseableRowIterator itRow = inputPopulation.iterator();
-		try {
-	    	while (itRow.hasNext()) {
-				DataRow row = itRow.next();
-				
-				for (int b=0; b<bandsColIdx.length; b++) {
-					try {
-	
-						switch (type) {
-						case DataBuffer.TYPE_INT:
-							candidates.remove(((IntValue)row.getCell(bandsColIdx[b])).getIntValue());
-							break;
-						case DataBuffer.TYPE_DOUBLE:
-							candidates.remove(((DoubleValue)row.getCell(bandsColIdx[b])).getDoubleValue());
-							break;
-						}	
-						
-					} catch(ClassCastException e) {
-						// skip missing and other types quietly
-					}
-				}
-				
-				if (candidates.isEmpty()) {
-					logger.warn("there is no more candidate for a mask value...");
-					return null;
-				}
-			}
-		} finally {
-			itRow.close();
-		}
-		
-		// we removed all the candidates that were present in data
-		logger.debug("remaining candidates: "+candidates);
-		
-		// let's return the first
-		return candidates.iterator().next();
 	}
 
 	private void fillRasterWithDefault(final ExecutionContext exec, int minX, int minY, int maxX, int maxY,
