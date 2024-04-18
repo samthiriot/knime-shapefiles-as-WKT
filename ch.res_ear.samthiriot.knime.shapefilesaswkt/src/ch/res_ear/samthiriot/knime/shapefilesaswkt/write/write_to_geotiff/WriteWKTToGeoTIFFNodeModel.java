@@ -399,8 +399,8 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
 				typePrecise = DataBuffer.TYPE_FLOAT;
 				logger.info("data will be stored as float" + strMinMax);
 				
-				if (minValue * 1.001 > -Float.MAX_VALUE)
-					missingValue = minValue * 1.001;
+				if (minValue * 0.9999 > -Float.MAX_VALUE)
+					missingValue = minValue * 0.9999;
 				else if (maxValue * 1.001 < Float.MAX_VALUE)
 					missingValue = maxValue * 1.001;
 				else { 
@@ -414,8 +414,8 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
 			else  {
 				typePrecise = DataBuffer.TYPE_DOUBLE;				
 				logger.info("data will be stored as double" + strMinMax);
-				if (minValue * 1.001 > -Double.MAX_VALUE)
-					missingValue = minValue * 1.001;
+				if (minValue * 0.9999 > -Double.MAX_VALUE)
+					missingValue = minValue * 0.9999;
 				else if (maxValue * 1.001 < Double.MAX_VALUE)
 					missingValue = maxValue * 1.001;
 				else {
