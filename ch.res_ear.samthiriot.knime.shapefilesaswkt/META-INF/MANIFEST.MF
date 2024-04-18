@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Automatic-Module-Name: ch.res.ear.samthiriot.knime.shapefilesaswkt
 Bundle-Name: KNIME Spatial Processing Nodes
 Bundle-SymbolicName: ch.res_ear.samthiriot.knime.shapefilesaswkt;singleton:=true
-Bundle-Version: 1.3.7.qualifier
+Bundle-Version: 1.3.8.qualifier
 Bundle-ClassPath: .,
  target/classes/,
  lib/aircompressor-0.20.jar,
