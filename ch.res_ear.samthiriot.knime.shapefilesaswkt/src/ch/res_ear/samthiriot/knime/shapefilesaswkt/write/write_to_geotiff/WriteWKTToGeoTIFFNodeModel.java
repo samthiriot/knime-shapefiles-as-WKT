@@ -10,10 +10,8 @@
  *******************************************************************************/
 package ch.res_ear.samthiriot.knime.shapefilesaswkt.write.write_to_geotiff;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
-import java.awt.image.SampleModel;
+import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
@@ -21,9 +19,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.InvalidPathException;
 import java.util.Arrays;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -34,6 +33,7 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.util.CoverageUtilities;
 import org.geotools.gce.geotiff.GeoTiffFormat;
 import org.geotools.gce.geotiff.GeoTiffWriteParams;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -61,8 +61,6 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import it.geosolutions.imageio.utilities.ImageIOUtilities;
 
 
 /**
@@ -268,7 +266,8 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
     	// detect min-max values
     	double maxValue = - Double.MAX_VALUE;
     	double minValue = Double.MAX_VALUE;
-    			    	
+    	boolean containsNull = false;
+    	
     	int currentRow = 0;
     	CloseableRowIterator itRow = inputPopulation.iterator();
     	while (itRow.hasNext()) {
@@ -287,11 +286,15 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
 				maxY = y;
 			
 			for (int b=0; b<bandsColIdx.length; b++) {
-				double cellValue = ((DoubleValue)row.getCell(bandsColIdx[b])).getDoubleValue();   
-				if (cellValue > maxValue)
-					maxValue = cellValue;
-				if (cellValue < minValue)
-					minValue = cellValue;
+				try {
+					double cellValue = ((DoubleValue)row.getCell(bandsColIdx[b])).getDoubleValue();   
+					if (cellValue > maxValue)
+						maxValue = cellValue;
+					if (cellValue < minValue)
+						minValue = cellValue;
+				} catch(ClassCastException e) {
+					containsNull = true;
+				}
 			}
 			
 			if (currentRow % 100 == 0) {
@@ -310,65 +313,124 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
     	logger.info("the grid size is ("+minX+","+minY+") ("+maxX+","+maxY+"), that is an image of "+width+"x"+height+" pixels");
 
     	// controls!
-    	if (inputPopulation.size() < pixels)
+    	if (inputPopulation.size() < pixels) {
     		setWarningMessage("There are less rows that pixels. The image will be only partly defined");
-    	else if (inputPopulation.size() > pixels)
+    		containsNull = true;
+    	} else if (inputPopulation.size() > pixels)
     		throw new RuntimeException("There are more rows that pixels. Please ensure you selected the right columns for the coordinates.");
-    	final boolean expectMissingValues = inputPopulation.size() < pixels;
     	
 		// adapt the precise data type according to max values.
-		// TODO
+    	// the goal is to minimize the space used for storage
     	int typePrecise = type;
     	double maxAbsValue = Math.max( Math.abs(minValue), Math.abs(maxValue) );
+    	Number missingValue = null;
+    	
+    	final String strMinMax = " (min: "+minValue+", max:"+maxValue+")";
+    	
 		switch (type) {
 		case DataBuffer.TYPE_INT:
-			if (maxAbsValue <= 255 && !(expectMissingValues && minValue==0)) { // dont use a type that would store "missing" the same way as actual data
+			if ( 
+				(!containsNull && minValue >= 0 && maxValue <= 255) ||
+				(containsNull && (
+						(minValue > 0 && maxValue <= 255) ||
+						(minValue >= 0 && maxValue < 255))
+						)
+				) { // should be able to encode the data, or data + mask in case a mask is needed
 				typePrecise = DataBuffer.TYPE_BYTE;
-				logger.info("data will be stored as byte");
-			} else if (maxAbsValue <= Short.MAX_VALUE) {
-				typePrecise = DataBuffer.TYPE_SHORT;
-				logger.info("data will be stored as short");
-			} 
-			else if (minValue > 0 && maxAbsValue <= Short.MAX_VALUE * 2 && !(expectMissingValues && minValue==0))  {
+				logger.info("data will be stored as byte" + strMinMax);
+				if (containsNull) {
+					// we need to identify a value to use as a mask, that is not used as a value
+					if (minValue > 0)
+						// use the lowest encodable value
+						missingValue = 0;
+					else if (maxValue < 255)
+						missingValue = 255;
+				}
+				
+			} else if ( 
+					(!containsNull && minValue >= 0 && maxValue <= Short.MAX_VALUE * 2) ||
+					(containsNull && (
+							(minValue > 0 && maxValue <= Short.MAX_VALUE * 2)
+							|| (minValue >= 0 && maxValue < Short.MAX_VALUE * 2)
+							))
+					) {
 				typePrecise = DataBuffer.TYPE_USHORT;	
-				logger.info("data will be stored as unsigned short");
-			} 
-			else  {
+				logger.info("data will be stored as unsigned short" + strMinMax);
+				if (minValue > 0)
+					missingValue = 0;
+				else if (maxValue < Short.MAX_VALUE*2)
+					missingValue = Short.MAX_VALUE*2;
+			} else if ( 
+					(!containsNull && minValue >= Short.MIN_VALUE && maxValue <= Short.MAX_VALUE) ||
+					(containsNull && (
+							(minValue > Short.MIN_VALUE && maxValue <= Short.MAX_VALUE)
+							|| (minValue >= Short.MIN_VALUE && maxValue < Short.MAX_VALUE)
+							))
+					) {
+				typePrecise = DataBuffer.TYPE_SHORT;
+				logger.info("data will be stored as short" + strMinMax);
+				if (minValue > Short.MIN_VALUE)
+					missingValue = Short.MIN_VALUE;
+				else if (maxValue < Short.MAX_VALUE)
+					missingValue = Short.MAX_VALUE;
+				
+			} else  {
 				typePrecise = DataBuffer.TYPE_INT;
-				logger.info("data will be stored as integer");
+				logger.info("data will be stored as integer" + strMinMax);
+				if (minValue > Integer.MIN_VALUE)
+					missingValue = Integer.MIN_VALUE;
+				else if (maxValue < Integer.MAX_VALUE)
+					missingValue = Integer.MAX_VALUE;
 			} 
 			break;
 		case DataBuffer.TYPE_DOUBLE:
-			if (maxAbsValue <= Float.MAX_VALUE) {
+			if ( 
+					(!containsNull && maxAbsValue <= Float.MAX_VALUE) ||
+					(containsNull && maxAbsValue < Float.MAX_VALUE)
+					) {
 				typePrecise = DataBuffer.TYPE_FLOAT;
-				logger.info("data will be stored as float");
+				logger.info("data will be stored as float" + strMinMax);
+				
+				if (minValue * 0.9999 > -Float.MAX_VALUE)
+					missingValue = minValue * 0.9999;
+				else if (maxValue * 1.001 < Float.MAX_VALUE)
+					missingValue = maxValue * 1.001;
 			} 
 			else  {
 				typePrecise = DataBuffer.TYPE_DOUBLE;				
-				logger.info("data will be stored as double");
+				logger.info("data will be stored as double" + strMinMax);
+				if (minValue * 0.9999 > -Double.MAX_VALUE)
+					missingValue = minValue * 0.9999;
+				else if (maxValue * 1.001 < Double.MAX_VALUE)
+					missingValue = maxValue * 1.001;
 			} 
 			break;
 		default:
 			throw new RuntimeException("unsupported data type");
 		}
 	
+		// define what value we might use as missing data
+		if (containsNull) {
+			if (missingValue == null) 
+				throw new RuntimeException("unable to find a value for the mask");
+			logger.info("there might be missing data in the file, proposing as masked value: "+missingValue);
+		}
+		
     	// first create the image from data
     	exec.setProgress(0.3, "creation of the grid data");
 
     	// prepare the future data
-        final SampleModel sampleModel = RasterFactory.createPixelInterleavedSampleModel(
-        		typePrecise, 
-                width, height, 
-                bandsColIdx.length
-                );
-        final WritableRaster raster = RasterFactory.createBandedRaster(typePrecise, width, height, bandsColIdx.length, null);
-
+        final WritableRaster raster = RasterFactory.createBandedRaster(
+        		typePrecise,
+        		width, height,
+        		bandsColIdx.length, null);
+        
         // set the default values (if necessary)
         if (inputPopulation.size() < pixels) {
-        	exec.setMessage("defining default values...");
-        	fillRasterWithDefault(exec, minX, minY, maxX, maxY, bandsColIdx, type, typePrecise, raster);
-        }    	
-		exec.checkCanceled();
+        	exec.setMessage("defining default value "+missingValue);
+        	fillRasterWithDefault(exec, minX, minY, maxX, maxY, bandsColIdx, type, raster, missingValue);
+        }
+        exec.checkCanceled();
 
         // read the data        
 		exec.setProgress(0.4, "reading pixels");
@@ -381,12 +443,22 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
 			switch (type) {
 			case DataBuffer.TYPE_INT:
 				for (int b=0; b<bandsColIdx.length; b++) {
-					raster.setSample(x, y, b, ((IntValue)row.getCell(bandsColIdx[b])).getIntValue());     					      
+					try {
+						raster.setSample(x, y, b, ((IntValue)row.getCell(bandsColIdx[b])).getIntValue());
+					} catch(ClassCastException e){
+						// unable to decode this, will store missing value
+						raster.setSample(x, y, b, missingValue.intValue());
+					}
 				}
 				break;
 			case DataBuffer.TYPE_DOUBLE:
 				for (int b=0; b<bandsColIdx.length; b++) {
-					raster.setSample(x, y, b, ((DoubleValue)row.getCell(bandsColIdx[b])).getDoubleValue());     					      
+					try {
+						raster.setSample(x, y, b, ((DoubleValue)row.getCell(bandsColIdx[b])).getDoubleValue());
+					} catch(ClassCastException e){
+						// unable to decode this, will store missing value
+						raster.setSample(x, y, b, missingValue.doubleValue());
+					}
 				}
 				break;
 			default:
@@ -413,7 +485,6 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
     	
     	GridCoverageFactory gcf = new GridCoverageFactory();
     	gcf = CoverageFactoryFinder.getGridCoverageFactory(null);
-    	// TODO???
     	
     	GridSampleDimension[] dimensions = new GridSampleDimension[bandsColIdx.length];
 		for (int b=0; b<bandsColIdx.length; b++) {
@@ -422,19 +493,35 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
 					);
 		}
 		
-        final ColorModel colorModel = ImageIOUtilities.createColorModel(sampleModel);
-        Hashtable<String, Object> xxx = new Hashtable<String, Object>();
-        final BufferedImage image = new BufferedImage(
-                        colorModel,
-                        raster,
-                        colorModel.isAlphaPremultiplied(),
-                        xxx
-                        );
-    	GridCoverage2D gc = gcf.create(UUID.randomUUID().toString(), raster, referencedEnvelope);
-
-//    	GridCoverage2D gc = gcf.create(UUID.randomUUID().toString(), raster, referencedEnvelope, ); // dimensions 
-
-    	//GridCoverage2D gc = gcf.create(UUID.randomUUID().toString(), image, referencedEnvelope); // dimensions
+        Map<String,Object> properties = new HashMap<String, Object>();
+        if (missingValue != null) {
+	        CoverageUtilities.setNoDataProperty(properties, missingValue);
+			properties.put(CoverageUtilities.NODATA.toString(), missingValue);
+        }
+        
+        // first create the image
+		GridCoverage2D gc = gcf.create(
+    			UUID.randomUUID().toString(),
+    			raster,
+    			referencedEnvelope
+    			);
+		// then render it with the missing value
+		RenderedImage img = null;
+		GridCoverage2D gc2 = null;
+		try {
+			img = gc.getRenderedImage();
+			gc2 = gcf.create(
+					UUID.randomUUID().toString(),
+					img,
+					referencedEnvelope,
+					dimensions,
+					null,
+					properties
+					);
+		} finally {
+			gc.dispose(true);
+		}
+		
 		exec.checkCanceled();
 
     	// write it into a ffile
@@ -444,7 +531,7 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
     	// compression
     	// see https://github.com/geoserver/geoserver/blob/main/src/wcs/src/main/java/org/geoserver/wcs/responses/GeoTIFFCoverageResponseDelegate.java#L267
     	{
-    		String algo = m_compression.getStringValue();
+    		final String algo = m_compression.getStringValue();
     		if ("no compression".equals(algo)) {
     			// nothing to do
     		} else if ("LZW".equals(algo)) {
@@ -474,42 +561,29 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
         	file.delete();
         
         GridCoverageWriter writer = format.getWriter(file);
+        try {
+        	writer.write(gc2,
+        		(GeneralParameterValue[]) params.values().toArray(new GeneralParameterValue[1])
+        		);
+        } finally {
+        	writer.dispose();
+        	gc.dispose(true);
+        	gc2.dispose(true);
+        }
         
-        writer.write(gc, (GeneralParameterValue[]) params.values().toArray(new GeneralParameterValue[1]));
-    	writer.dispose();
-
     	exec.setProgress(1.0, "done");
-    	gc.dispose(true);
-
+    	
         return new BufferedDataTable[]{};
         
 	}
 
-
 	private void fillRasterWithDefault(final ExecutionContext exec, int minX, int minY, int maxX, int maxY,
-			int[] bandsColIdx, int type, int typePrecise, final WritableRaster raster) throws CanceledExecutionException {
-		
+			int[] bandsColIdx, int type, final WritableRaster raster, Number value) throws CanceledExecutionException {
 		
 		switch (type) {
 		
 		case DataBuffer.TYPE_INT:
-			int valueI;
-			switch (typePrecise) {
-			case DataBuffer.TYPE_BYTE:
-				valueI = 0;
-				break;
-			case DataBuffer.TYPE_SHORT:
-				valueI = Short.MIN_VALUE;
-				break;
-			case DataBuffer.TYPE_USHORT:
-				valueI = 0;
-				break;
-			case DataBuffer.TYPE_INT:
-				valueI = Integer.MIN_VALUE;
-				break;
-			default:
-				throw new RuntimeException("unsupported data precise type " + typePrecise);
-			}
+			int valueI = value.intValue();
 			logger.info("fillimg missing data with value "+valueI);
 			for (int b=0; b<bandsColIdx.length; b++) {
 				for (int x=minX; x<maxX; x++) {
@@ -522,17 +596,7 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
 			}
 			break;
 		case DataBuffer.TYPE_DOUBLE:
-			double valueD;
-			switch (typePrecise) {
-			case DataBuffer.TYPE_FLOAT:
-				valueD = Float.MIN_VALUE;
-				break;
-			case DataBuffer.TYPE_DOUBLE:
-				valueD = Double.MIN_VALUE;
-				break;
-			default:
-				throw new RuntimeException("unsupported data precise type " + typePrecise);
-			}
+			double valueD = value.doubleValue();
 			logger.info("fillimg missing data with value "+valueD);
 			for (int b=0; b<bandsColIdx.length; b++) {
 				for (int x=minX; x<maxX; x++) {

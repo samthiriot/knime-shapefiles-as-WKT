@@ -29,6 +29,7 @@ import javax.media.jai.iterator.RectIter;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridEnvelope2D;
+import org.geotools.coverage.util.CoverageUtilities;
 import org.geotools.coverage.util.FeatureUtilities;
 import org.geotools.gce.geotiff.GeoTiffReader;
 import org.geotools.geometry.Envelope2D;
@@ -69,6 +70,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import ch.res_ear.samthiriot.knime.shapefilesaswkt.SpatialUtils;
 import it.geosolutions.jaiext.iterators.RectIterFactory;
+import it.geosolutions.jaiext.range.NoDataContainer;
 
 
 /**
@@ -318,9 +320,12 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
 	        int y = 0;
 	
 	        // deal with missing values
-	        final MissingCell missing = new MissingCell("undefined in the geotiff file");
+	        final MissingCell missing = new MissingCell("masked in the geotiff file");
 	    	int missingI = 0;
 	    	double missingD = 0;
+	    	
+	    	// detect missing values in the file
+	    	NoDataContainer noDataContainer = CoverageUtilities.getNoDataProperty(coverage);
 	    	
 	    	if (!m_maskedValue.getStringValue().isBlank()) {
 	        	switch (dataType) {
@@ -337,49 +342,77 @@ public class ReadGeoTIFFAsWKTNodeModel extends NodeModel {
 	    	    default:
 	    	    	throw new RuntimeException("unknown data type: "+dataType);
 	    	    }
+	    		logger.info("the value "+m_maskedValue.getStringValue()+" forced by the user will be used as a masked value");
+	    		if (noDataContainer != null)
+	    			logger.warn("the user manually defined "+m_maskedValue.getStringValue()+
+	    					" as a mask value, but a no_data metadata was already defined in the file for value "+
+	    					noDataContainer+"; just clear the field to use this value");
 	    	} else {
-		    	switch (dataType) {
-			    case DataBuffer.TYPE_BYTE:
-			    	missingI = 0;
-			    	break;
-			    case DataBuffer.TYPE_INT:
-			    	missingI = Integer.MIN_VALUE;
-			    	break;
-			    case DataBuffer.TYPE_SHORT:
-			    	missingI = Short.MIN_VALUE;
-			    	break;
-			    case DataBuffer.TYPE_USHORT:
-			    	missingI = 0;
-			    	break;
-			    case DataBuffer.TYPE_DOUBLE:
-			    	missingD = -Double.MAX_VALUE;;
-			    	break;			    
-			    case DataBuffer.TYPE_FLOAT:
-			    	missingD = -Float.MAX_VALUE;
-			    	break;
-			    default:
-			    	throw new RuntimeException("unknown data type: "+dataType);
-			    }
+	    		if (noDataContainer == null) {
+	    			// there is no "no data" metadata in the file
+			    	switch (dataType) {
+				    case DataBuffer.TYPE_BYTE:
+				    	missingI = 0;
+				    	break;
+				    case DataBuffer.TYPE_INT:
+				    	missingI = Integer.MIN_VALUE;
+				    	break;
+				    case DataBuffer.TYPE_SHORT:
+				    	missingI = Short.MIN_VALUE;
+				    	break;
+				    case DataBuffer.TYPE_USHORT:
+				    	missingI = 0;
+				    	break;
+				    case DataBuffer.TYPE_DOUBLE:
+				    	missingD = -Double.MAX_VALUE;;
+				    	break;			    
+				    case DataBuffer.TYPE_FLOAT:
+				    	missingD = -Float.MAX_VALUE;
+				    	break;
+				    default:
+				    	throw new RuntimeException("unknown data type: "+dataType);
+				    }
+			    	// inform the user, because it's not sure at all this heuristic makes sense
+		        	switch (dataType) {
+		    	    case DataBuffer.TYPE_BYTE:
+		    	    case DataBuffer.TYPE_INT:
+		    	    case DataBuffer.TYPE_SHORT:
+		    	    case DataBuffer.TYPE_USHORT:
+				    	logger.info("there is no no_data metadata defined in this file. "
+				    			+ "The value masked value will be assumed to be by convention "
+				    			+ "the lowest value for this type: "+missingI);
+		    	    	break;
+		    	    case DataBuffer.TYPE_DOUBLE:
+		    	    case DataBuffer.TYPE_FLOAT:
+		    	    	logger.info("there is no no_data metadata defined in this file. "
+				    			+ "The value masked value will be assumed to be by convention "
+				    			+ "the lowest value for this type: "+missingD);
+		    	    	break;
+		    	    default:
+		    	    	throw new RuntimeException("unknown data type: "+dataType);
+		    	    }
+	    		} else {
+	    			// there is metadata in the file
+		    		double noDataValue = noDataContainer.getAsSingleValue();
+		    		switch (dataType) {
+		    	    case DataBuffer.TYPE_BYTE:
+		    	    case DataBuffer.TYPE_INT:
+		    	    case DataBuffer.TYPE_SHORT:
+		    	    case DataBuffer.TYPE_USHORT:
+		    	    	missingI = (new Double(noDataValue)).intValue();
+				    	logger.info("The mask value provided in the file is "+missingI);
+		    	    	break;
+		    	    case DataBuffer.TYPE_DOUBLE:
+		    	    case DataBuffer.TYPE_FLOAT:
+		    	    	missingD = noDataValue;
+		    	    	logger.info("The mask value provided in the file is "+missingD);
+		    	    	break;
+		    	    default:
+		    	    	throw new RuntimeException("unknown data type: "+dataType);
+		    	    }
+	    		}
 	    	}
-	    		
-
-	    	if (maskedMissing) {
-	        	switch (dataType) {
-	    	    case DataBuffer.TYPE_BYTE:
-	    	    case DataBuffer.TYPE_INT:
-	    	    case DataBuffer.TYPE_SHORT:
-	    	    case DataBuffer.TYPE_USHORT:
-	    	    	logger.info("will consider as missing values value "+missingI);
-	    	    	break;
-	    	    case DataBuffer.TYPE_DOUBLE:
-	    	    case DataBuffer.TYPE_FLOAT:
-	    	    	logger.info("will consider as missing values value "+missingD);
-	    	    	break;
-	    	    default:
-	    	    	throw new RuntimeException("unknown data type: "+dataType);
-	    	    }
-	    	}
-	    	
+	    		    	
 	        while (!iterator.finishedLines()) {
 				iterator.startPixels();
 				int x=0;
