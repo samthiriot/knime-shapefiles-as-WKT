@@ -2,7 +2,7 @@
 <feature
       id="ch.res_ear.samthiriot.knime.shapefilesaswkt.feature"
       label="KNIME Spatial Processing Nodes"
-      version="1.3.8.qualifier"
+      version="1.3.9.qualifier"
       provider-name="EIFER (European Institute for Energy Research)">
 
    <description url="https://github.com/samthiriot/knime-shapefiles-as-WKT">
@@ -712,8 +712,6 @@ Public License instead of this License.  But first, please read
 
    <plugin
          id="ch.res_ear.samthiriot.knime.shapefilesaswkt"
-         download-size="0"
-         install-size="0"
          version="0.0.0"/>
 
 </feature>

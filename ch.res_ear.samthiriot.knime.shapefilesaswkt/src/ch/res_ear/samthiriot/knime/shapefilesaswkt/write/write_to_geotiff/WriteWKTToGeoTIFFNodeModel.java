@@ -420,58 +420,71 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
     	exec.setProgress(0.3, "creation of the grid data");
 
     	// prepare the future data
-        final WritableRaster raster = RasterFactory.createBandedRaster(
+        WritableRaster raster = null;
+        try {
+        	raster = RasterFactory.createBandedRaster(
         		typePrecise,
         		width, height,
         		bandsColIdx.length, null);
+        } catch (RuntimeException e) {
+        	throw new RuntimeException("error when initializing a banded raster", e);
+        }
         
         // set the default values (if necessary)
-        if (inputPopulation.size() < pixels) {
-        	exec.setMessage("defining default value "+missingValue);
-        	fillRasterWithDefault(exec, minX, minY, maxX, maxY, bandsColIdx, type, raster, missingValue);
+        try {
+	        if (inputPopulation.size() < pixels) {
+	        	exec.setMessage("defining default value "+missingValue);
+	        	fillRasterWithDefault(exec, minX, minY, maxX, maxY, bandsColIdx, type, raster, missingValue);
+	        }
+	        exec.checkCanceled();
+        } catch (RuntimeException e) {
+        	throw new RuntimeException("error when initializing default values", e);
         }
-        exec.checkCanceled();
-
+        
         // read the data        
-		exec.setProgress(0.4, "reading pixels");
-    	itRow = inputPopulation.iterator();
-    	while (itRow.hasNext()) {
-			DataRow row = itRow.next();
-			final int x = ((IntValue)row.getCell(idxColX)).getIntValue();
-			final int y = ((IntValue)row.getCell(idxColY)).getIntValue();
+        exec.setProgress(0.4, "reading pixels");
+    	try {
+	        itRow = inputPopulation.iterator();
+	    	while (itRow.hasNext()) {
+				DataRow row = itRow.next();
+				final int x = ((IntValue)row.getCell(idxColX)).getIntValue();
+				final int y = ((IntValue)row.getCell(idxColY)).getIntValue();
+				
+				switch (type) {
+				case DataBuffer.TYPE_INT:
+					for (int b=0; b<bandsColIdx.length; b++) {
+						try {
+							raster.setSample(x, y, b, ((IntValue)row.getCell(bandsColIdx[b])).getIntValue());
+						} catch(ClassCastException e){
+							// unable to decode this, will store missing value
+							raster.setSample(x, y, b, missingValue.intValue());
+						}
+					}
+					break;
+				case DataBuffer.TYPE_DOUBLE:
+					for (int b=0; b<bandsColIdx.length; b++) {
+						try {
+							raster.setSample(x, y, b, ((DoubleValue)row.getCell(bandsColIdx[b])).getDoubleValue());
+						} catch(ClassCastException e){
+							// unable to decode this, will store missing value
+							raster.setSample(x, y, b, missingValue.doubleValue());
+						}
+					}
+					break;
+				default:
+					throw new RuntimeException("unsupported data type");
+				}
 			
-			switch (type) {
-			case DataBuffer.TYPE_INT:
-				for (int b=0; b<bandsColIdx.length; b++) {
-					try {
-						raster.setSample(x, y, b, ((IntValue)row.getCell(bandsColIdx[b])).getIntValue());
-					} catch(ClassCastException e){
-						// unable to decode this, will store missing value
-						raster.setSample(x, y, b, missingValue.intValue());
-					}
+				if (currentRow % 100 == 0) {
+					exec.setProgress(0.4 + 0.4*(double)currentRow / inputPopulation.size(), "reading pixels");
+					exec.checkCanceled();
 				}
-				break;
-			case DataBuffer.TYPE_DOUBLE:
-				for (int b=0; b<bandsColIdx.length; b++) {
-					try {
-						raster.setSample(x, y, b, ((DoubleValue)row.getCell(bandsColIdx[b])).getDoubleValue());
-					} catch(ClassCastException e){
-						// unable to decode this, will store missing value
-						raster.setSample(x, y, b, missingValue.doubleValue());
-					}
-				}
-				break;
-			default:
-				throw new RuntimeException("unsupported data type");
-			}
-		
-			if (currentRow % 100 == 0) {
-				exec.setProgress(0.4 + 0.4*(double)currentRow / inputPopulation.size(), "reading pixels");
-				exec.checkCanceled();
-			}
-			currentRow++;
-        }
-    	itRow.close();
+				currentRow++;
+	        }
+	    	itRow.close();
+    	} catch (RuntimeException e) {
+        	throw new RuntimeException("error when reading pixels", e);
+    	}
 		exec.setProgress(0.8, "reading pixels");
 		exec.checkCanceled();
 
@@ -499,11 +512,17 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
         }
         
         // first create the image
-		GridCoverage2D gc = gcf.create(
+		GridCoverage2D gc = null;
+		try {
+			gc = gcf.create(
     			UUID.randomUUID().toString(),
     			raster,
     			referencedEnvelope
     			);
+		} catch (RuntimeException e) {
+        	throw new RuntimeException("error when creating the raster", e);
+		}
+		
 		// then render it with the missing value
 		RenderedImage img = null;
 		GridCoverage2D gc2 = null;
@@ -517,6 +536,8 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
 					null,
 					properties
 					);
+		} catch (RuntimeException e) {
+        	throw new RuntimeException("error when creating the raster with properties", e);
 		} finally {
 			gc.dispose(true);
 		}
@@ -552,7 +573,6 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
     	}
         
         final GeoTiffFormat format = new GeoTiffFormat();
-        
         final ParameterValueGroup params = format.getWriteParameters();
         params.parameter(AbstractGridFormat.GEOTOOLS_WRITE_PARAMS.getName().toString()).setValue(wp);
 
@@ -564,6 +584,8 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
         	writer.write(gc2,
         		(GeneralParameterValue[]) params.values().toArray(new GeneralParameterValue[1])
         		);
+        } catch (RuntimeException e) {
+        	throw new RuntimeException("error when writing the raster into a file", e);
         } finally {
         	writer.dispose();
         	gc.dispose(true);
