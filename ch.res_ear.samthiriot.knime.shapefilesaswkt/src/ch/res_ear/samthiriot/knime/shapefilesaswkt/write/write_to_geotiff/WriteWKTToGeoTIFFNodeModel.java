@@ -483,8 +483,7 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
     			m_bottomRightLat.getDoubleValue(), 
     			crs);
     	
-    	GridCoverageFactory gcf = new GridCoverageFactory();
-    	gcf = CoverageFactoryFinder.getGridCoverageFactory(null);
+    	GridCoverageFactory gcf = CoverageFactoryFinder.getGridCoverageFactory(null);
     	
     	GridSampleDimension[] dimensions = new GridSampleDimension[bandsColIdx.length];
 		for (int b=0; b<bandsColIdx.length; b++) {
@@ -584,7 +583,7 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
 		
 		case DataBuffer.TYPE_INT:
 			int valueI = value.intValue();
-			logger.info("fillimg missing data with value "+valueI);
+			logger.info("filling missing data with value "+valueI);
 			for (int b=0; b<bandsColIdx.length; b++) {
 				for (int x=minX; x<maxX; x++) {
 		    		for (int y=minY; y<maxY; y++) {
@@ -597,7 +596,7 @@ public class WriteWKTToGeoTIFFNodeModel extends NodeModel {
 			break;
 		case DataBuffer.TYPE_DOUBLE:
 			double valueD = value.doubleValue();
-			logger.info("fillimg missing data with value "+valueD);
+			logger.info("filling missing data with value "+valueD);
 			for (int b=0; b<bandsColIdx.length; b++) {
 				for (int x=minX; x<maxX; x++) {
 		    		for (int y=minY; y<maxY; y++) {
